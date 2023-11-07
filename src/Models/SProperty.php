@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SProperty extends Model
 {
     use HasFactory;
+    protected $table = 'sproperties';
     // editable fields:
-    protected static $fields = ['scope', 'name', 'order', 'shortname', 'value', 'info'];
-    protected $fillable = SProperty::fields;
-
+    protected static $fields = ['id', 'scope', 'name', 'order', 'shortname', 'value', 'info'];
+    protected $fillable = ['id', 'scope', 'name', 'order', 'shortname', 'value', 'info'];
     /**
      * Returns all records from a given $scope.
      */
@@ -35,13 +36,52 @@ class SProperty extends Model
         string $titleField = 'name',
         string $valueField = 'id'
     ) {
-        if (in_array($titleField, self::$fillable) && in_array($valueField, self::$fillable)) {
+        if (in_array($titleField, self::$fields) && in_array($valueField, self::$fields)) {
             $recs = SProperty::byScope($scope);
             foreach ($recs as &$rec) {
                 array_push($titles, $rec[$titleField]);
                 array_push($titles, $rec[$valueField]);
             }
         }
+    }
+    public static function scopes(bool $undef = false): array
+    {
+        $texts = [];
+        $values = [];
+        if ($undef) {
+            array_push( $texts, '-');
+            array_push( $values, '-');
+        }
+        $records = DB::select('select scope from sproperties group by scope order by scope');
+        if (count($records) > 0) {
+            foreach ($records as $record) {
+                array_push($texts, $record->scope);
+                array_push($values, $record->scope);
+            }
+        }
+        return [$texts, $values];
+    }
+    public static function comboDataAsString(array $list, string $selected = ''): string
+    {
+        $rc = '';
+        $texts = $list[0];
+        $values = $list[1];
+        for ($ix = 0; $ix < count($texts); $ix++) {
+            $text = $texts[$ix];
+            $value = $values[$ix];
+            $sel = $value === $selected ? 'selected' : '';
+            $rc .= "\n<option $sel value=\"$value\">$text</option>";
+        }
+        return $rc;
+    }
+    public static function toComboData(string $string)
+    {
+        $items = explode("\n", $string);
+        $rc = [];
+        foreach ($items as $item) {
+            array_push($rc, explode("\n", $item));
+        }
+        return $rc;
     }
 }
 

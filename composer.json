@@ -14,5 +14,7 @@
             "email": "author@hamatoma.de"
         }
     ],
-    "require": {}
+    "require": {},
+    "minimum-stability": "dev",
+    "bin": ["scripts"]
 }
