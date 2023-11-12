@@ -16,5 +16,5 @@
     ],
     "require": {},
     "minimum-stability": "dev",
-    "bin": ["scripts"]
+    "bin": ["scripts/laraknife-tool.sh"]
 }

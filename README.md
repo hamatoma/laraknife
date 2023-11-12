@@ -12,9 +12,9 @@ composer require hamatoma/laraknife
 
 ## Description
 The package contains:
-- Blade templates for quick building Blade forms. 
-    - See src/resources/views/laraknife/form
-    - See doc/examples/edit.blade.php
+- Blade components and views for quick building Blade views and forms. 
+    - See resources/views/laraknife
+    - See resources/components/laraknife
 - Modules:
     - SProperty: define properties organized in groups ("scope").
 
@@ -23,9 +23,11 @@ Define properties organized in groups ("scope").
 There is a defined order of the property of a given group.
 
 Example: 
-- scope: "state"
+- scope: "status"
 - members: "active", "inactive", "locked", "deleted"
-There are 4 members in SProperty with the names "active" ... "deleted". Each has the scope "state".
+
+There are 4 records in SProperty with the names "active" ... "deleted". Each has the scope "state".
+
 The attributes are:
 - scope: defines the group the property belongs to
 - name 
@@ -34,4 +36,5 @@ The attributes are:
 - value
 - info
 
+There are helper functions for building comboboxes from that data: see SProperty.php and combobox.blade.php
  
