@@ -44,42 +44,17 @@ class SProperty extends Model
             }
         }
     }
-    public static function scopes(bool $undef = false): array
+    /**
+     * Returns a list of all scopes: values of the column "scope" in the table sproproperties.
+     */
+    public static function scopes(): array
     {
-        $texts = [];
-        $values = [];
-        if ($undef) {
-            array_push( $texts, '-');
-            array_push( $values, '-');
-        }
-        $records = DB::select('select scope from sproperties group by scope order by scope');
+        $rc = [];
+        $records = DB::select('select distinct scope from sproperties order by scope');
         if (count($records) > 0) {
             foreach ($records as $record) {
-                array_push($texts, $record->scope);
-                array_push($values, $record->scope);
+                array_push($rc, $record->scope);
             }
-        }
-        return [$texts, $values];
-    }
-    public static function comboDataAsString(array $list, string $selected = ''): string
-    {
-        $rc = '';
-        $texts = $list[0];
-        $values = $list[1];
-        for ($ix = 0; $ix < count($texts); $ix++) {
-            $text = $texts[$ix];
-            $value = $values[$ix];
-            $sel = $value === $selected ? 'selected' : '';
-            $rc .= "\n<option $sel value=\"$value\">$text</option>";
-        }
-        return $rc;
-    }
-    public static function toComboData(string $string)
-    {
-        $items = explode("\n", $string);
-        $rc = [];
-        foreach ($items as $item) {
-            array_push($rc, explode("\n", $item));
         }
         return $rc;
     }

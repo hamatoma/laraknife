@@ -18,10 +18,12 @@ function BuildLinks(){
   elif [ ! -d $templates ]; then
     Usage "wrong current directory: use root directory of the package. [missing $templates]"
   else
-    for module in SProperty; do
+    for module in SProperty User; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
-      ln -sv ../../$templates/Models/${module}.php app/Models/
-      ln -sv ../../$templates/Http/Controllers/${module}Controller.php app/Http/Controllers/
+      if [ $module != User ]; then
+        ln -sv ../../$templates/Models/${module}.php app/Models/
+      fi
+      ln -sv ../../../$templates/Http/Controllers/${module}Controller.php app/Http/Controllers/
     done
     for module in laraknife sproperty; do
       test "$option" = "--force" && rm -fv resources/views/$module
@@ -32,6 +34,7 @@ function BuildLinks(){
       test "$option" = "--force" && rm -fv database/migrations/$node
       ln -sv ../../$templates/database/migrations/$node database/migrations/$node
     done
+    mkdir -p resources/views/components
     test "$option" = "--force" && rm -fv resources/views/components/laraknife
     ln -sv ../../../$resources/components/laraknife resources/views/components/
   fi

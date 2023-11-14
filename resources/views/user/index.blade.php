@@ -1,15 +1,15 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="sproperty-index" action="/sproperty-index" method="POST">
+    <form id="user-index" action="/user-index" method="POST">
         @csrf
         <div id="main-content" class="container mt-5">
-            <x-laraknife.main-header title="{{ __('Scoped Properties') }}" />
+            <x-laraknife.main-header title="{{ __('Users') }}" />
 
                 <!-- panel.filter -->
                 <fieldset class="kn-filter">
                     <legend>{{ $legend }}</legend>
-                        <x-laraknife.combobox position="first" name="scope" label="Scope" options="{!!$options!!}" width2="4" />
+                        <x-laraknife.text position="first" name="id" label="Id" value="{{$fields['id']}}" width2="4" />
                         <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
                     <div class="row">
                       <x-laraknife.btn-search width2="10" />
@@ -25,21 +25,17 @@
                   <thead>
                       <tr>
                           <th></th>
-                          <th>{{__('Id')}}</th><th>{{__('Scope')}}</th><th>{{__('Name')}}</th>
-                          <th>{{__('Order')}}</th><th>{{__('Shortname')}}</th><th>{{__('Value')}}</th>
+                          <th>{{__('Id')}}</th><th>{{__('Name')}}</th><th>{{__('Email')}}</th>
                           <th></th>
                       </tr>
                   </thead>
-                  @foreach ($records as $sproperty)
+                  @foreach ($records as $user)
                   <tr>
-                      <td><a href="/sproperty-edit/{{$sproperty->id}}">{{ __('Change')}}</a></td>
-                      <td>{{$sproperty->id}}</td>
-                      <td>{{$sproperty->scope}}</td>
-                      <td>{{$sproperty->name}}</td>
-                      <td>{{$sproperty->order}}</td>
-                      <td>{{$sproperty->shortname}}</td>
-                      <td>{{$sproperty->value}}</td>
-                      <td><a href="/sproperty-show/{{$sproperty->id}}/delete">{{ __('Delete')}}</a></td>
+                      <td><a href="/user-edit/{{$user->id}}">{{ __('Change')}}</a></td>
+                      <td>{{$user->id}}</td>
+                      <td>{{$user->name}}</td>
+                      <td>{{$user->email}}</td>
+                      <td><a href="/user-show/{{$user->id}}/delete">{{ __('Delete')}}</a></td>
                   </tr>
               @endforeach
                 <tbody>

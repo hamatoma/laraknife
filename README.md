@@ -5,6 +5,9 @@ Helpers for development with Laravel
 
 ```
 composer require hamatoma/laraknife
+vendor/hamatoma/laraknife/scripts/laraknife-tool.sh build-links
+# If that is an update: use
+vendor/hamatoma/laraknife/scripts/laraknife-tool.sh build-links --force
 ```
 
 ## Glossar

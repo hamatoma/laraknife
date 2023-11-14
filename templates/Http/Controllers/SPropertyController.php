@@ -6,6 +6,7 @@ use App\Models\SProperty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Hamatoma\Laraknife as LKN;
 
 class SPropertyController extends Controller
 {
@@ -22,13 +23,6 @@ class SPropertyController extends Controller
     public function edit(SProperty $sproperty)
     {
         return view('sproperty.edit', ['sproperty' => $sproperty]);
-    }
-    /**
-     * Shows the deletion dialog.
-     */
-    public function delete(SProperty $sproperty)
-    {
-        return view('sproperty.delete', ['sproperty' => $sproperty]);
     }
     /**
      * Remove the specified resource from storage.
@@ -51,41 +45,25 @@ class SPropertyController extends Controller
                 $fields = ['scope' => '', 'text' => ''];
             } else {
                 $fields = $_POST;
-                $condition = null;
-                $values = [];
-                $value = array_key_exists('scope', $_POST) ? $_POST['scope'] : '';
-                if (!empty($value)) {
-                    $condition = "scope=:scope";
-                    $values = [':scope' => $value];
-                }
-                $value = str_replace('*', '%', $_POST['text']) . '%';
-                $value = str_replace('%%', '%', $value);
-                if ($value !== '%') {
-                    $condition2 = "(scope like :v1 or name like :v2 "
-                        . "or shortname like :v3 or value like :v4  or info like :v5)";
-                    if ($condition == null) {
-                        $condition = $condition2;
-                    } else {
-                        $condition .= " and $condition2";
-                    }
-                    $values[':v1'] = $value;
-                    $values[':v2'] = $value;
-                    $values[':v3'] = $value;
-                    $values[':v4'] = $value;
-                    $values[':v5'] = $value;
-                }
-                if ($condition != null) {
-                    $records = DB::select("select * from sproperties where $condition order by id", $values);
+                $conditions = [];
+                $parameters = [];
+                LKN\ViewHelpers::addConditionComparism($conditions, $parameters, 'scope');
+                LKN\ViewHelpers::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
+                if (count($conditions) > 0) {
+                    $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
+                    $records = DB::select("select * from sproperties where $condition order by scope,`order`,id", $parameters);
                 }
             }
             if ($records === null) {
-                $records = SProperty::orderBy('id', 'desc')->get();
+                $records = SProperty::orderBy('scope')->orderBy('order')->orderBy('id')->get();
             }
-            $options = SProperty::comboDataAsString(SProperty::scopes(true), isset($fields['scope']) ? $fields['scope'] : '');
+            $scopes = SProperty::scopes();
+            $options = LKN\ViewHelpers::buildEntriesOfCombobox($scopes, null, isset($fields['scope']) ? $fields['scope'] : '', '-');
             return view('sproperty.index', [
                 'records' => $records,
                 'fields' => $fields,
-                'options' => $options
+                'options' => $options,
+                'legend' => ''
             ]);
         }
     }
@@ -99,7 +77,7 @@ class SPropertyController extends Controller
             'scope' => 'required|alpha',
             'name' => 'required',
             'order' => 'integer|min:1|max:9999',
-            'shortname' => 'required|alpha',
+            'shortname' => 'required|alpha_num',
             'value' => 'nullable',
             'info' => 'nullable'
         ];
@@ -117,15 +95,15 @@ class SPropertyController extends Controller
         Route::put('/sproperty-create', [SPropertyController::class, 'store']);
         Route::get('/sproperty-edit/{sproperty}', [SPropertyController::class, 'edit']);
         Route::post('/sproperty-update/{sproperty}', [SPropertyController::class, 'update']);
-        Route::get('/sproperty-delete/{sproperty}', [SPropertyController::class, 'delete']);
-        Route::delete('/sproperty-delete/{sproperty}', [SPropertyController::class, 'destroy']);
+        Route::get('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'show']);
+        Route::delete('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'destroy']);
     }
     /**
      * Display the specified resource.
      */
-    public function show(SProperty $id)
+    public function show(SProperty $sproperty)
     {
-        //
+        return view('sproperty.show', ['sproperty' => $sproperty, 'mode' => 'delete']);
     }
 
     /**
