@@ -1,15 +1,14 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="sproperty-index" action="/sproperty-index" method="POST">
+    <form id="#module#-index" action="/#module#-index" method="POST">
         @csrf
         <div id="main-content" class="container mt-5">
-            <x-laraknife.main-header title="{{ __('Scoped Properties') }}" />
-
+            <x-laraknife.main-header title="{{ __('#Table#') }}" />
                 <!-- panel.filter -->
                 <fieldset class="kn-filter">
                     <legend>{{ $legend }}</legend>
-                        <x-laraknife.combobox position="first" name="scope" label="Scope" options="{!!$options!!}" width2="4" />
+                        <x-laraknife.combobox position="first" name="genus" label="Gender" options="{!!$options!!}" width2="4" />
                         <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
                     <div class="row">
                       <x-laraknife.btn-search width2="10" />
@@ -25,21 +24,19 @@
                   <thead>
                       <tr>
                           <th></th>
-                          <th>{{__('Id')}}</th><th>{{__('Scope')}}</th><th>{{__('Name')}}</th>
-                          <th>{{__('Order')}}</th><th>{{__('Shortname')}}</th><th>{{__('Value')}}</th>
+##FIELDS##
+                          <th>{{__('#Field#')}}</th>
+##END.FIELDS##
                           <th></th>
                       </tr>
                   </thead>
-                  @foreach ($records as $sproperty)
+                  @foreach ($records as $#module#)
                   <tr>
-                      <td><x-laraknife.change-record module="sproperty" key="{{$sproperty->id}}" /></td>
-                        <td>{{$sproperty->id}}</td>
-                        <td>{{$sproperty->scope}}</td>
-                        <td>{{$sproperty->name}}</td>
-                        <td>{{$sproperty->order}}</td>
-                        <td>{{$sproperty->shortname}}</td>
-                        <td>{{$sproperty->value}}</td>
-                        <td><x-laraknife.delete-record module="sproperty" key="{{$sproperty->id}}" /></td>
+                      <td><a href="/#module#-edit/{{$#module#->id}}">{{ __('Change')}}</a></td>
+##FIELDS##
+                      <td>{{$#module#->#field#}}</td>
+##END.FIELDS##
+                      <td><a href="/#module#-delete/{{$#module#->id}}">{{ __('Delete')}}</a></td>
                   </tr>
               @endforeach
                 <tbody>

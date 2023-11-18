@@ -1,0 +1,31 @@
+@extends('layouts.backend')
+
+@section('content')
+    <form id="#module#-show" action="/#module#-show/{{ $#module#->id }}/delete" method="POST">
+        @csrf
+        @method('DELETE')
+        <div id="main-content" class="container mt-5">
+            @if($mode === 'delete')
+            <x-laraknife.main-header title="{{ __('Deletion of a #Module#') }}" />
+            @else
+            <x-laraknife.main-header title="{{ __('A #Module#') }}" />
+            @endif
+            <x-laraknife.text position="first" name="id" label="Id" value="{{ $#module#->id }}" width2="4"
+                attribute="readonly" />
+##FIELDS##
+            <x-laraknife.text position="#position#" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4"
+                attribute="readonly" #attribute#/>
+##END.FIELDS##
+            <x-laraknife.row-empty />
+            <div class="row">
+                @if($mode === 'delete')
+                <x-laraknife.btn-delete width1="2" width2="4" />
+                <x-laraknife.btn-cancel width1="2" width2="4" />
+                @else
+                <x-laraknife.btn-cancel width1="8" width2="4" />
+                @endif
+            </div>
+            <x-laraknife.form-error />
+    </form>
+    </div>
+@endsection

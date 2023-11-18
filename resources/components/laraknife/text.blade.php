@@ -3,10 +3,10 @@
 <div class="row">
 @endif
 
-<div class="col-md-{{$width1}}"><label for="{{$name}}"> {{ __($label) }} </label>
+<div class="col-md-{{$width1}}"><label for="fld_{{$name}}"> {{ __($label) }} </label>
 </div>
 <div class="col-md-{{ $width2 }}">
-    <input class="expand100" name="{{ $name }}" value="{{ $value }}" @if(!empty($placeholder)) placeholder="{{ $placeholder }}" @endif {{$attribute}}/>
+    <input class="expand100" id="fld_{{$name}}" name="{{ $name }}" value="{{ $value }}" @if(!empty($placeholder)) placeholder="{{ $placeholder }}" @endif {{$attribute}}>
 </div>
 @if($position === 'alone' || $position === 'last')
 </div>

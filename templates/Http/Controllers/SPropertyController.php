@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\SProperty;
 use Illuminate\Http\Request;
+use Hamatoma\Laraknife as LKN;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Hamatoma\Laraknife as LKN;
 
 class SPropertyController extends Controller
 {
@@ -58,7 +58,8 @@ class SPropertyController extends Controller
                 $records = SProperty::orderBy('scope')->orderBy('order')->orderBy('id')->get();
             }
             $scopes = SProperty::scopes();
-            $options = LKN\ViewHelpers::buildEntriesOfCombobox($scopes, null, isset($fields['scope']) ? $fields['scope'] : '', '-');
+            $options = LKN\ViewHelpers::buildEntriesOfCombobox($scopes, null, 
+                isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
             return view('sproperty.index', [
                 'records' => $records,
                 'fields' => $fields,

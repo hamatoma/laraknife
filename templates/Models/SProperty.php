@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Hamatoma\Laraknife\ViewHelpers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,7 +18,7 @@ class SProperty extends Model
     /**
      * Returns all records from a given $scope.
      */
-    public static function byScope(string $scope): array
+    public static function byScope(string $scope): Collection
     {
         $rc = SProperty::where('scope', $scope)->orderBy('order')->get();
         return $rc;
@@ -40,7 +42,7 @@ class SProperty extends Model
             $recs = SProperty::byScope($scope);
             foreach ($recs as &$rec) {
                 array_push($titles, $rec[$titleField]);
-                array_push($titles, $rec[$valueField]);
+                array_push($values, $rec[$valueField]);
             }
         }
     }
@@ -57,6 +59,24 @@ class SProperty extends Model
             }
         }
         return $rc;
+    }
+    /**
+     * Builds the HTML selection options as string from all entries by a given scope.
+     * @param string $scope defines the database records to use
+     * @param string $currentSelected the value which marks the selected entry
+     * @param NULL|string $titleUndefined  if not null the first entry has that title and the value ''
+     * @param string $titleField the titles are taken from that column
+     * @param string $valueField the value are taken from that column
+     * @return string the HTML text of the options
+     */
+    public static function optionsByScope(string $scope, string $currentSelected, 
+        ?string $titleUndefined = null, string $titleField = 'name', string $valueField = 'id'): string
+    {
+        $titles = [];
+        $values = [];
+        self::combobox($scope, $titles, $values, $titleField, $valueField);
+        $options = ViewHelpers::buildEntriesOfCombobox($titles, $values, $currentSelected, $titleUndefined, true);
+        return $options;
     }
 }
 

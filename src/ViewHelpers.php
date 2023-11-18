@@ -49,8 +49,16 @@ class ViewHelpers
                 $no = 0;
                 foreach($fields as $field){
                     $no++;
-                    array_push($conditions2, "`$field` like :$field$no");
-                    $parameters[":$field$no"] = $value;
+                    if (strpos($field, '.') === false){
+                        array_push($conditions2, "`$field` like :$field$no");
+                        $parameters[":$field$no"] = $value;
+                    } else {
+                        $names = explode('.', $field);
+                        $table = $names[0];
+                        $field = $names[1];
+                        array_push($conditions2, "$table.`$field` like :$field$no");
+                        $parameters[":$field$no"] = $value;
+                    }
                 }
                 array_push($conditions, '(' . implode(" OR ", $conditions2) . ')');
             }
@@ -66,11 +74,16 @@ class ViewHelpers
      * @param NULL|string $textUndefined null: no additional entry.
      *   Otherwise: an entry is added as first entry with that text and the value ''
      */
-    public static function buildEntriesOfCombobox(array $texts, ?array $values, string $selected = '', ?string $textUndefined = null): string
+    public static function buildEntriesOfCombobox(array $texts, ?array $values, string $selected = '', 
+        ?string $textUndefined = null, bool $translate = false): string
     {
         $rc = '';
         if ($textUndefined != null) {
-            $sel = $selected === '' ? 'selected' : '';
+            if ($translate){
+                $textUndefined = __($textUndefined);
+            }
+            $textUndefined = htmlentities($textUndefined);
+            $sel = $selected === '' ? 'selected ' : '';
             $rc = "<option {$sel}value=\"\">$textUndefined</option>";
         }
         if ($values == null) {
@@ -78,6 +91,10 @@ class ViewHelpers
         }
         for ($ix = 0; $ix < count($texts); $ix++) {
             $text = $texts[$ix];
+            if ($translate){
+                $text = __($text);
+            }
+            $text = htmlentities($text);
             $value = $values[$ix];
             $sel = $value === $selected ? 'selected ' : '';
             $rc .= "\n<option {$sel}value=\"$value\">$text</option>";
