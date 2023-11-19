@@ -1,6 +1,7 @@
 <?php
 namespace Hamatoma\Laraknife;
-if (is_dir(__DIR__ . '/../vendor')){
+
+if (is_dir(__DIR__ . '/../vendor')) {
     require __DIR__ . '/../vendor/autoload.php';
 } else {
     require __DIR__ . '/../autoload.php';
@@ -74,7 +75,7 @@ class Builder
             $this->error("cannot extract table in $this->currentLine\n");
         } else {
             $this->tablename = $match[1];
-            if ($this->module == null){
+            if ($this->module == null) {
                 $this->setModule(preg_replace('/s$/', '', $this->tablename));
             }
             $this->tableCapital = Helper::toCapital($this->tablename);
@@ -107,8 +108,9 @@ class Builder
         $line = str_replace('#TableSingular#', $this->moduleCapital, $line);
         return $line;
     }
-    public function setModule(?string $module){
-        if ($module != null && $this->module == null){
+    public function setModule(?string $module)
+    {
+        if ($module != null && $this->module == null) {
             $this->module = strtolower($module);
             $this->moduleCapital = Helper::toCapital($this->module);
             echo "module: $this->module\n";
@@ -133,10 +135,49 @@ class Builder
         }
         return $rc;
     }
+    public function updateLanguages(string $dirSources, string $fileTarget)
+    {
+        if (!is_dir($dirSources)) {
+            $this->error("not a directory: $dirSources");
+        } else {
+            $summary = [];
+            $parent = dirname($fileTarget);
+            if (OsHelper::ensureDirectory($parent)) {
+                foreach (scandir($dirSources) as $file) {
+                    if (! str_ends_with($file, '.json')){
+                        continue;
+                    }
+                    $full = OsHelper::joinPath($dirSources, $file);
+                    $contents = file_get_contents($full);
+                    $tree = json_decode($contents);
+                    foreach ($tree as $key => $value) {
+                        if (!array_key_exists($key, $summary)) {
+                            $summary[$key] = $value;
+                        } else if ($summary[$key] !== $value) {
+                            $this->error("$file: $key has different values: \"$value\" != \"$summary[$key]\"");
+                        }
+                    }
+                }
+            }
+            if (count($summary) == 0) {
+                $this->error("no data found");
+            } else {
+                $keys = array_keys($summary);
+                sort($keys);
+                $sorted = [];
+                foreach ($keys as $key){
+                    $sorted[$key] = $summary[$key];
+                }
+                $contents = json_encode($sorted, JSON_PRETTY_PRINT);
+                file_put_contents($fileTarget, $contents);
+                echo "written: $fileTarget\n";
+            }
+        }
+    }
     public function writeTemplateToFile(string $source, string $target)
     {
         $parent = dirname($target);
-        if (file_exists($target) && ! $this->force){
+        if (file_exists($target) && !$this->force) {
             $this->error("$target already exists. Use --force to overwrite");
         } elseif (!file_exists($source)) {
             $this->error("missing $source");
@@ -149,7 +190,7 @@ class Builder
             $lastProcessed = 0;
             do {
                 $line = $this->nextLine();
-                if ($line === ''){
+                if ($line === '') {
                     array_push($output, '');
                     continue;
                 } elseif ($line == null) {
@@ -172,7 +213,7 @@ class Builder
                             break;
                         }
                     }
-                    if ($line == null){
+                    if ($line == null) {
                         $this->error("missing ##END.FIELDS##. Start in $source-$start");
                         break;
                     }
@@ -271,7 +312,7 @@ function parseArguments(array $argv, string $definition, array &$arguments, arra
 {
     $rc = true;
     $parameters = [];
-    foreach(explode(' ', $definition) as $item){
+    foreach (explode(' ', $definition) as $item) {
         $parts = explode(':', $item);
         $parameters[$parts[0]] = $parts[1];
     }
@@ -305,6 +346,7 @@ function usage(string $message)
     echo "php builder.php create:module FILE_MIGRATION \n";
     echo "  [--module=MODULE] [--templates=DIRECTORY]\n";
     echo "  [--views=DIRECTORY] [--controllers=DIRECTORY]\n";
+    echo "php builder.php update:languages DIR_SOURCE FILE_TARGET\n";
     echo "php builder.php version\n";
     echo "Examples:\n";
     echo "php builder.php create:module database/migrations/*articles*.php \\\n";
@@ -316,17 +358,26 @@ function usage(string $message)
 function main()
 {
     global $argv;
-    $argv = [
-        'dummy',
-        'create:module',
-        '/home/ws/php/laraknife/scripts/data/migration_test.php',
-        '--force',
-        '--module=noun',
-        '--templates=/home/ws/php/laraknife/templates/builder',
-        '--views=/tmp/unittest',
-        '--controllers=/tmp/unittest',
-        '--models=/tmp/unittest'
-    ];
+    //echo 'current dir: ', getcwd(), "\n";
+    if (count($argv) > 1 && $argv[1] === '--test') {
+        $argv = [
+            'dummy',
+            'create:module',
+            '/../scripts/data/migration_test.php',
+            '--force',
+            '--module=noun',
+            '--templates=../templates/builder',
+            '--views=/tmp/unittest',
+            '--controllers=/tmp/unittest',
+            '--models=/tmp/unittest'
+        ];
+        $argv = [
+            'dummy',
+            'update:languages',
+            '../scripts/data/lang',
+            '/tmp/unittest/de_DE.json',
+        ];
+    }
     if (count($argv) < 3) {
         usage("missing argument");
     } else {
@@ -336,7 +387,8 @@ function main()
             'templates' => 'templates/builder',
             'views' => 'resources/views',
             'controllers' => 'app/Http/Controllers',
-            'models' => 'app/Models'
+            'models' => 'app/Models',
+            'force' => false,
         ];
         if (parseArguments($argv, "module:s templates:s views:s controllers:s models:s force:b", $args, $options)) {
             $builder = new Builder();
@@ -348,6 +400,13 @@ function main()
                     case 'version':
                         global $VERSION;
                         echo $VERSION, "\n";
+                    case 'update:languages':
+                        if (count($args) < 3) {
+                            usage("missing arguments (DIR_SOURCES FILE_TARGET)");
+                        } else {
+                            $builder->updateLanguages($args[1], $args[2]);
+                        }
+                        break;
                     case 'create:module':
                         if (count($args) < 2) {
                             usage("missing FILE_MIGRATION");
