@@ -7,7 +7,7 @@ use App\Helpers\DbAccess;
 use App\Models\SProperty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Hamatoma\Laraknife\ViewHelpers;
+use App\Helpers\ViewHelper;
 use Illuminate\Support\Facades\Route;
 
 class ExchangeController extends Controller

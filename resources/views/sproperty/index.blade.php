@@ -7,26 +7,29 @@
             <x-laraknife.main-header title="{{ __('Scoped Properties') }}" />
 
                 <!-- panel.filter -->
-                <fieldset class="kn-filter">
+                <fieldset class="lkn-filter">
                     <legend>{{ $legend }}</legend>
-                        <x-laraknife.combobox position="first" name="scope" label="Scope" options="{!!$options!!}" width2="4" />
+                        <x-laraknife.combobox position="first" name="scope" label="Scope" options="{!!$options!!}" width2="4" class="lkn-autoupdate" />
                         <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
                     <div class="row">
                       <x-laraknife.btn-search width2="10" />
                     </div>
                   </fieldset>
-                <div class="kn-behind-filter">
+                <div class="lkn-behind-filter">
                   <div class="row">
                   <x-laraknife.btn-new width1="0" width2="12" />
                   </div>
                 </div>
-            <div class="kn-form-table">
-                <table class="table table-striped kn-table-db">
+            <div class="lkn-form-table">
+              <x-laraknife.hidden-button />
+              <x-laraknife.sortable-table value="{{$fields['_sortParams']}}"/>
+                <table class="table table-striped table-db lkn-sortable">
                   <thead>
                       <tr>
                           <th></th>
-                          <th>{{__('Id')}}</th><th>{{__('Scope')}}</th><th>{{__('Name')}}</th>
-                          <th>{{__('Order')}}</th><th>{{__('Shortname')}}</th><th>{{__('Value')}}</th>
+                          <th sortId="id">{{__('Id')}}</th><th sortId="scope">{{__('Scope')}}</th>
+                          <th sortId="name">{{__('Name')}}</th><th sortId="order">{{__('Order')}}</th>
+                          <th sortId="shortname">{{__('Shortname')}}</th><th sortId="value">{{__('Value')}}</th>
                           <th></th>
                       </tr>
                   </thead>

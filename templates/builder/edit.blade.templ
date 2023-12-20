@@ -6,7 +6,7 @@
         <div id="main-content" class="container mt-5">
             <x-laraknife.main-header title="{{ __('Change of a #Module#') }}" />
 ##FIELDS##
-            <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" value="{{ $#module#->id }}" width2="4"/>
+            <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4"/>
 ##END.FIELDS##
             <x-laraknife.row-empty />
             <div class="row">

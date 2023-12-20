@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\#Module#;
 use Illuminate\Http\Request;
-use Hamatoma\Laraknife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Hamatoma\Laraknife\ViewHelpers;
 
 class #Module#Controller extends Controller
 {
@@ -51,8 +51,8 @@ class #Module#Controller extends Controller
                 $fields = $_POST;
                 $conditions = [];
                 $parameters = [];
-                LKN\ViewHelpers::addConditionComparism($conditions, $parameters, '#secondary#');
-                LKN\ViewHelpers::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
+                ViewHelpers::addConditionComparism($conditions, $parameters, '#secondary#');
+                ViewHelpers::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
                 if (count($conditions) > 0) {
                     $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
                     $records = DB::select("select * from #table# where $condition order by scope,`order`,id", $parameters);
@@ -62,7 +62,7 @@ class #Module#Controller extends Controller
                 $records = #Module#::orderBy('scope')->orderBy('order')->orderBy('id')->get();
             }
             $scopes = #Module#::scopes();
-            $options = LKN\ViewHelpers::buildEntriesOfCombobox($scopes, null, 
+            $options = ViewHelpers::buildEntriesOfCombobox($scopes, null, 
                 isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
             return view('#module#.index', [
                 'records' => $records,

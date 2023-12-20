@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Hamatoma\Laraknife as LKN;
 
 class UserController extends Controller
 {
@@ -47,8 +47,8 @@ class UserController extends Controller
                 $fields = $_POST;
                 $conditions = [];
                 $parameters = [];
-                LKN\ViewHelpers::addConditionComparism($conditions, $parameters, 'id');
-                LKN\ViewHelpers::addConditionPattern($conditions, $parameters, 'name,email', 'text');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'id');
+                ViewHelper::addConditionPattern($conditions, $parameters, 'name,email', 'text');
                 if (count($conditions) > 0) {
                     $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
                     $records = DB::select("select * from users where $condition order by id", $parameters);

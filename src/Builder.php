@@ -149,6 +149,7 @@ class Builder
                     }
                     $full = OsHelper::joinPath($dirSources, $file);
                     $contents = file_get_contents($full);
+                    echo "read: $full\n";
                     $tree = json_decode($contents);
                     foreach ($tree as $key => $value) {
                         if (!array_key_exists($key, $summary)) {
@@ -384,7 +385,7 @@ function main()
         $args = [];
         $options = [
             'module' => null,
-            'templates' => 'templates/builder',
+            'templates' => 'vendor/hamatoma/laraknife/templates/builder',
             'views' => 'resources/views',
             'controllers' => 'app/Http/Controllers',
             'models' => 'app/Models',

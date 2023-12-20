@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\SProperty;
 use Illuminate\Http\Request;
-use Hamatoma\Laraknife as LKN;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Helpers\DbHelper;
+use App\Helpers\ViewHelper;
 
 class SPropertyController extends Controller
 {
@@ -40,25 +41,24 @@ class SPropertyController extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
             return redirect('/sproperty-create');
         } else {
-            $records = null;
+            $sql = 'select * from sproperties';
+            $parameters = [];
             if (count($_POST) == 0) {
-                $fields = ['scope' => '', 'text' => ''];
+                $fields = ['scope' => '', 'text' => '', '_sortParams' => 'scope:asc;order:asc;name:asc'];
             } else {
                 $fields = $_POST;
                 $conditions = [];
-                $parameters = [];
-                LKN\ViewHelpers::addConditionComparism($conditions, $parameters, 'scope');
-                LKN\ViewHelpers::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'scope');
+                ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
                 if (count($conditions) > 0) {
                     $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
-                    $records = DB::select("select * from sproperties where $condition order by scope,`order`,id", $parameters);
+                    $sql .= " where $condition";
                 }
             }
-            if ($records === null) {
-                $records = SProperty::orderBy('scope')->orderBy('order')->orderBy('id')->get();
-            }
+            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+            $records = DB::select($sql, $parameters);
             $scopes = SProperty::scopes();
-            $options = LKN\ViewHelpers::buildEntriesOfCombobox($scopes, null, 
+            $options = ViewHelper::buildEntriesOfCombobox($scopes, null, 
                 isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
             return view('sproperty.index', [
                 'records' => $records,

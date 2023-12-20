@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Models;
+use App\Helpers\ViewHelper;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Hamatoma\Laraknife\ViewHelpers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -21,6 +21,15 @@ class SProperty extends Model
     public static function byScope(string $scope): Collection
     {
         $rc = SProperty::where('scope', $scope)->orderBy('order')->get();
+        return $rc;
+    }
+    /**
+     * Returns the id of the record with a given $scope and $name.
+     */
+    public static function byScopeAndName(string $scope, string $name): ?int
+    {
+        $record = SProperty::where('scope', $scope)->where('name', $name)->first();
+        $rc = $record == null ? null : $record->id;
         return $rc;
     }
     /**
@@ -75,7 +84,7 @@ class SProperty extends Model
         $titles = [];
         $values = [];
         self::combobox($scope, $titles, $values, $titleField, $valueField);
-        $options = ViewHelpers::buildEntriesOfCombobox($titles, $values, $currentSelected, $titleUndefined, true);
+        $options = ViewHelper::buildEntriesOfCombobox($titles, $values, $currentSelected, $titleUndefined, true);
         return $options;
     }
 }

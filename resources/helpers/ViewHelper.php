@@ -1,12 +1,12 @@
 <?php
-namespace Hamatoma\Laraknife;
+namespace App\Helpers;
 
 /**
  * Helpers for views
  * 
  * This class contains only static methods.
  */
-class ViewHelpers
+class ViewHelper
 {
     /**
      * Adds a SQL condition "compared to FIELD" for filtering records.
@@ -95,7 +95,7 @@ class ViewHelpers
                 $text = __($text);
             }
             $text = htmlentities($text);
-            $value = $values[$ix];
+            $value = strval($values[$ix]);
             $sel = $value === $selected ? 'selected ' : '';
             $rc .= "\n<option {$sel}value=\"$value\">$text</option>";
         }

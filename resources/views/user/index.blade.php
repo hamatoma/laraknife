@@ -7,7 +7,7 @@
             <x-laraknife.main-header title="{{ __('Users') }}" />
 
                 <!-- panel.filter -->
-                <fieldset class="kn-filter">
+                <fieldset class="lkn-filter">
                     <legend>{{ $legend }}</legend>
                         <x-laraknife.text position="first" name="id" label="Id" value="{{$fields['id']}}" width2="4" />
                         <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
@@ -15,13 +15,13 @@
                       <x-laraknife.btn-search width2="10" />
                     </div>
                   </fieldset>
-                <div class="kn-behind-filter">
+                <div class="lkn-behind-filter">
                   <div class="row">
                   <x-laraknife.btn-new width1="0" width2="12" />
                   </div>
                 </div>
-            <div class="kn-form-table">
-                <table class="table table-striped kn-table-db">
+            <div class="lkn-form-table">
+                <table class="table table-striped lkn-table-db">
                   <thead>
                       <tr>
                           <th></th>

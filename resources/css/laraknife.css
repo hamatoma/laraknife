@@ -1,0 +1,31 @@
+.lkn-sortable th {
+    cursor: pointer;
+}
+.lkn-full-field {
+    width: 100%;
+}
+.lkn-wide {
+    width: 100%;
+}
+.lkn-panel {
+    border: grey solid 0.07rem;
+    padding: 2rem 3rem;
+    background-color: rgb(240, 240, 240, 0.5);
+    border-radius: 0.5rem;
+    box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
+}
+.lkn-filter, .lkn-form-table {
+    margin:0;
+    padding: 1rem;
+    border: 1px black solid;
+    border-radius: 0.25rem;
+    background-color: rgb(245, 245, 245);
+}
+
+.lkn-filter {
+    background-color: aliceblue;
+}
+.lkn-behind-filter {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}

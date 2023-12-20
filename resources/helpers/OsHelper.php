@@ -1,5 +1,5 @@
 <?php
-namespace Hamatoma\Laraknife;
+namespace App\Helpers;
 
 define('DOUBLE_SEP', DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR);
 
