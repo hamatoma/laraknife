@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.0.2 2023.12.21
+- new: Pagination
+- pagination works in sproperties
+
 ## 0.0.1 2023.12.20
 - CSS classes now start with lkn-
 - new: hidden-button.blade.php sortable-table.blade.php

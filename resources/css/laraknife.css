@@ -29,3 +29,27 @@
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
 }
+.lkn-page-item.active .lkn-page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.lkn-paging-block,
+.lkn-table {
+    background-color: white;
+}
+ul.lkn-pagination{
+	margin-bottom: 0 !important;
+}
+.lkn-compact-block{
+	margin: 0 !important;
+	padding: 0 !important;
+}
+.lkn-paging-text {
+    font-size: 80%;
+}
+.lkn-clear-both {
+	clear: both;
+}
+.lkn-float-right {
+    float: right;
+}

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SProperty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Models\SProperty;
 use App\Helpers\DbHelper;
 use App\Helpers\ViewHelper;
+use App\Helpers\Pagination;
 
 class SPropertyController extends Controller
 {
@@ -57,13 +58,15 @@ class SPropertyController extends Controller
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $records = DB::select($sql, $parameters);
+            $pagination = new Pagination($sql, $fields);
             $scopes = SProperty::scopes();
-            $options = ViewHelper::buildEntriesOfCombobox($scopes, null, 
+            $options = ViewHelper::buildEntriesOfCombobox($scopes, null,
                 isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
             return view('sproperty.index', [
                 'records' => $records,
                 'fields' => $fields,
                 'options' => $options,
+                'pagination' => $pagination,
                 'legend' => ''
             ]);
         }
