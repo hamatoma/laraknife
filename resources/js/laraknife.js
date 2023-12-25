@@ -64,15 +64,17 @@ class TableSorter {
     }
     initializeTableHeader() {
         const status = document.getElementById(this.statusField);
-        const items = status.value.split(';');
-        debug(`initializeTableHeader(): ${items.length} items`);
-        for (var ix = 0; ix < items.length; ix++) {
-            const parts = items[ix].split(':');
-            if (parts[0] !== '' && this.indexOfKey(parts[0]) == null) {
-                this.addSortItem(new SortItem(parts[0], parts.length > 1 ? parts[1] : 'asc'), false);
+        if (status){
+            const items = status.value.split(';');
+            debug(`initializeTableHeader(): ${items.length} items`);
+            for (var ix = 0; ix < items.length; ix++) {
+                const parts = items[ix].split(':');
+                if (parts[0] !== '' && this.indexOfKey(parts[0]) == null) {
+                    this.addSortItem(new SortItem(parts[0], parts.length > 1 ? parts[1] : 'asc'), false);
+                }
             }
+            this.updateArrows();
         }
-        this.updateArrows();
     }
     handleClickSort(event) {
         const key = event.currentTarget.getAttribute('sortId');

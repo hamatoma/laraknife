@@ -35,6 +35,8 @@
   "Search": "Suche",
   "Store": "Speichern",
   "Text": "Text",
+  "The search criterion selects %d out of %d data records.": "Das Suchkriterium wählt %d von %d Datensätzen aus.",
+  "The search criteria select %d out of %d data records.": "Die Suchkriterien wählen %d von %d Datensätzen aus.",
   "Total": "Gesamt",
   "User": "Benutzer",
   "Users": "Benutzer",

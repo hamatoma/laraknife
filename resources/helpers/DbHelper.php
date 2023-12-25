@@ -12,6 +12,19 @@ class DbHelper
         $this->table = $table;
     }
     /**
+     * Adds some where conditions given in an array at the end of the given SQL statement.
+     * @param string $sql the SQL statement to extend
+     * @param array $conditions a list of conditions
+     * @return string the $sql with an added where condition
+     */
+    public static function addConditions(string $sql, array $conditions): string{
+        if (count($conditions) > 0) {
+            $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
+            $sql .= " WHERE $condition";
+        }
+        return $sql;
+    }
+    /**
      * Appends the "order by" part of an SQL driven by a hidden field to a given SQL statement.
      * That hidden field is managed by JavaScript: 
      * If the user clicks on a table header that value is updated.

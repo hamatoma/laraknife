@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Helpers\ViewHelper;
+use App\Helpers\DbHelper;
+use App\Helpers\Pagination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -40,27 +42,26 @@ class UserController extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
             return redirect('/user-create');
         } else {
-            $records = null;
+            $sql = 'SELECT * FROM users';
+            $parameters = [];
             if (count($_POST) == 0) {
-                $fields = ['id' => '', 'text' => ''];
+                $fields = ['id' => '', 'text' => '', '_sortParams' => 'id:asc'];
             } else {
                 $fields = $_POST;
                 $conditions = [];
                 $parameters = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'id');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'name,email', 'text');
-                if (count($conditions) > 0) {
-                    $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
-                    $records = DB::select("select * from users where $condition order by id", $parameters);
-                }
+                $sql = DbHelper::addConditions($sql, $conditions);
             }
-            if ($records === null) {
-                $records = User::orderBy('id')->get();
-            }
+            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+            $records = DB::select($sql, $parameters);
+            $pagination = new Pagination($sql, $parameters, $fields);
             return view('user.index', [
                 'records' => $records,
                 'fields' => $fields,
-                'legend' => ''
+                'pagination' => $pagination,
+                'legend' => $pagination->legendText()
             ]);
         }
     }

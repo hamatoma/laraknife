@@ -42,7 +42,7 @@ class SPropertyController extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
             return redirect('/sproperty-create');
         } else {
-            $sql = 'select * from sproperties';
+            $sql = 'SELECT * FROM sproperties';
             $parameters = [];
             if (count($_POST) == 0) {
                 $fields = ['scope' => '', 'text' => '', '_sortParams' => 'scope:asc;order:asc;name:asc'];
@@ -51,14 +51,11 @@ class SPropertyController extends Controller
                 $conditions = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'scope');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
-                if (count($conditions) > 0) {
-                    $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
-                    $sql .= " where $condition";
-                }
+                $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $records = DB::select($sql, $parameters);
-            $pagination = new Pagination($sql, $fields);
+            $pagination = new Pagination($sql, $parameters, $fields);
             $scopes = SProperty::scopes();
             $options = ViewHelper::buildEntriesOfCombobox($scopes, null,
                 isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
@@ -67,7 +64,7 @@ class SPropertyController extends Controller
                 'fields' => $fields,
                 'options' => $options,
                 'pagination' => $pagination,
-                'legend' => ''
+                'legend' => $pagination->legendText()
             ]);
         }
     }

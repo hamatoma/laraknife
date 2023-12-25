@@ -1,5 +1,14 @@
 # Development phase
 
+## 0.0.3 2023.12.24
+- knowledge: components with $slot, components with PHP expressions (argument :param)
+- Pagination: No gap between 
+- Legend: now as bordered text over the top line
+- new: filter-panel.blade.php
+- new sortable-table-panel.blade.php
+- new: DbHelper::addConditions()
+- laraknife.js: getElementById() can return null
+
 ## 0.0.2 2023.12.21
 - new: Pagination
 - pagination works in sproperties
