@@ -1,9 +1,23 @@
-@if (count($errors) > 0)
+@props(['error' => ''])
+@php
+if (count($errors) == 1){
+    $error = $errors->all()[0];
+}
+$hasError = $error !== '' || count($errors) == 1;
+@endphp
+@if ($hasError)
 <div class = "text-danger">
-    <ul>
-        @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-        @endforeach
-    </ul>
+    @if ($error !== '')
+    {{ $error  }}
+    @else
+        @php
+        $listX = $errors->all();
+        @endphp
+        <ul>
+            @foreach ($listX as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        @endif
 </div>
 @endif

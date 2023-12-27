@@ -1,8 +1,13 @@
 # Development phase
 
+## 0.0.4 2023.12.27
+- Builder.php works in the project directory
+- Refactoring components / templates
+- User module works
+
 ## 0.0.3 2023.12.24
 - knowledge: components with $slot, components with PHP expressions (argument :param)
-- Pagination: No gap between 
+- CSS pagination: No gap between status text and table
 - Legend: now as bordered text over the top line
 - new: filter-panel.blade.php
 - new sortable-table-panel.blade.php

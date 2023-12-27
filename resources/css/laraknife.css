@@ -1,8 +1,14 @@
+button {
+    border-radius: 0.5rem;
+}
 .lkn-sortable th {
     cursor: pointer;
 }
-.lkn-full-field {
+.lkn-expand100 {
     width: 100%;
+}
+.lkn-empty-line-above{
+   margin-top: 1rem; 
 }
 .lkn-wide {
     width: 100%;
@@ -13,10 +19,12 @@
 .lkn-bottom-align{
     vertical-align: bottom;
 }
-.lkn-panel {
+.lkn-edit-panel, .lkn-create-panel, .lkn-show-panel, .lkn-panel {
+    background-color: aliceblue;
+}
+.lkn-panel, .lkn-edit-panel, .lkn-create-panel, .lkn-show-panel{
     border: grey solid 0.07rem;
     padding: 2rem 3rem;
-    background-color: rgb(240, 240, 240, 0.5);
     border-radius: 0.5rem;
     box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
 }
@@ -25,10 +33,9 @@
     padding: 1rem 1rem 0 1rem;
     border: 0.075rem black solid;
     border-radius: 0.25rem;
-    background-color: rgb(245, 245, 245);
 }
 
-.lkn-filter {
+.lkn-filter, .lkn-form-table {
     background-color: aliceblue;
 }
 .lkn-behind-filter {
@@ -41,10 +48,11 @@
 }
 .lkn-table {
     background-color: white;
+    margin-top: 0.25rem;
 }
 .lkn-pagination-block {
     display: flex;
-    background-color: rgb(245, 245, 245);
+    background-color: aliceblue;
 }
 ul.lkn-pagination{
 	margin-bottom: 0 !important;

@@ -3,17 +3,10 @@
 @section('content')
     <form id="#module#-edit" action="/#module#-update/{{ $#module#->id }}" method="POST">
         @csrf
-        <div id="main-content" class="container mt-5">
-            <x-laraknife.main-header title="{{ __('Change of a #Module#') }}" />
+        </x-laraknife.edit-panel> title="{{ __('Change of a #Module#') }}">
 ##FIELDS##
             <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4"/>
 ##END.FIELDS##
-            <x-laraknife.row-empty />
-            <div class="row">
-                <x-laraknife.btn-store width1="2" width2="4" />
-                <x-laraknife.btn-cancel width1="2" width2="4" />
-            </div>
-            <x-laraknife.form-error />
+        </x-laraknife.edit-panel>
     </form>
-    </div>
 @endsection

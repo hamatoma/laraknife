@@ -1,7 +1,7 @@
 <?php
-//namespace Hamatoma\Laraknife;
 namespace App\Helpers;
 
+use App\Helpers\ViewHelper;
 use Illuminate\Support\Facades\DB;
 
 class DbHelper
@@ -39,6 +39,7 @@ class DbHelper
      */
     public static function addOrderBy(string $sql, string $orderData, string $defaultOrder = ''): string
     {
+
         $order = '';
         if (empty($orderData)) {
             $order .= $defaultOrder;
@@ -72,33 +73,47 @@ class DbHelper
         return $rc ? $rc->$column : null;
     }
     /**
-     * Handles the pagination of a query to fill a data table.
-     * 
-     * The query should only return a part of the result set. This is called a "page".
-     * The first page has the offset 0 and the page number 1.
-     * The 2nd page has the offset $pageSize and the page number 2.
-     * @param string $sql defines the query for the table
-     * @param array $incoming the field values (from $_POST or $_GET)
-     * @param int $pageNo OUT: the number of the current page. Starts with 1.
-     * @param int $pageCount OUT: the number of all pages
-     * @param int $fieldOffset the name of the field containing the current offset
-     * @param int $fieldPageSize maximal number of rows in the result
-     * @param string $whereUnfiltered the condition for an unfiltered query
-     * @param string $fieldOffset the name of the hidden field storing the current offset
-     * 
+     * Returns the data used for constructing a combobox with <x-laraknife.combobox>.
+     * @param string $table the table with the combox data
+     * @param string $titleField name of the table column used for $titles, normally "name"
+     * @param string $valueField name of the table column used for $value, normally "id"
+     * @param string $selected current value of the field. Defines the selected entry
+     * @param string $undefinedText '' (no "undefined" entry), '-' or 'all'
+     * @param string $where the '' or where condition, e.g. "where id > 20"
+     * @param int $limit maximal number of entries
+     * @return array a list of arrays ['value' => value, 'text' => text, 'active' => isActive]
      */
-    public function pagination(string $sql, array $incoming, int &$pageNo, int &$pageCount,
-        ?string $whereUnfiltered = '1', string $fieldOffset = '_dbOffset',
-        string $fieldPageSize = '_dbPageSize')
-    {
-        if ($whereUnfiltered == null) {
-            $whereUnfiltered = '1';
+    public static function comboboxDataOfTable(
+        string $table,
+        string $titleField,
+        string $valueField,
+        string $selected,
+        string $undefinedText = 'all',
+        string $where = '',
+        string $orderBy = '',
+        int $limit = 100
+    ): array {
+        if ($undefinedText === ''){
+            $rc = [];
+        } else {
+            if ($undefinedText === 'all'){
+                $undefinedText = __('<All>');
+            }
+            $rc = [['text' => $undefinedText, 'value' => '', 'active' => $selected === '']];
         }
-        $sqlCount = "select count(*) from $this->table where $whereUnfiltered";
-        //$countRecords = DB::select($sqlCount)->first();
-        $offset = intval($incoming[$fieldOffset]);
-        $pageSize = intval($incoming[$fieldPageSize]);
-        $rc = $sql . " offset $offset limit $;";
+        $sql = "SELECT $titleField, $valueField from $table $where";
+        if ($orderBy == null){
+            $orderBy = $titleField;
+        }
+        if ($orderBy !== ''){
+            $sql .= ' order by ' . $orderBy;
+        }
+        $sql .= " limit $limit;";
+        $recs = DB::select($sql);
+        foreach ($recs as &$rec) {
+            $value = strval($rec->$valueField);
+            array_push($rc, ['text' => $rec->$titleField, 'value' => $value, 'active' => $value === $selected]);
+        }
         return $rc;
     }
 }

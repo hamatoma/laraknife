@@ -1,48 +1,39 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="#module#-index" action="/#module#-index" method="POST">
-        @csrf
-        <div id="main-content" class="container mt-5">
-            <x-laraknife.main-header title="{{ __('#Table#') }}" />
-                <!-- panel.filter -->
-                <fieldset class="kn-filter">
-                    <legend>{{ $legend }}</legend>
-                        <x-laraknife.combobox position="first" name="genus" label="Gender" options="{!!$options!!}" width2="4" />
-                        <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
-                    <div class="row">
-                      <x-laraknife.btn-search width2="10" />
-                    </div>
-                  </fieldset>
-                <div class="kn-behind-filter">
-                  <div class="row">
-                  <x-laraknife.btn-new width1="0" width2="12" />
-                  </div>
-                </div>
-            <div class="kn-form-table">
-                <table class="table table-striped kn-table-db">
-                  <thead>
-                      <tr>
-                          <th></th>
-##FIELDS##
-                          <th>{{__('#Field#')}}</th>
-##END.FIELDS##
-                          <th></th>
-                      </tr>
-                  </thead>
-                  @foreach ($records as $#module#)
-                  <tr>
-                      <td><a href="/#module#-edit/{{$#module#->id}}">{{ __('Change')}}</a></td>
-##FIELDS##
-                      <td>{{$#module#->#field#}}</td>
-##END.FIELDS##
-                      <td><a href="/#module#-delete/{{$#module#->id}}">{{ __('Delete')}}</a></td>
-                  </tr>
-              @endforeach
-                <tbody>
-                  </tbody>
-                </table>
-            </div>
+<form id="#module#-index" action="/#module#-index" method="POST">
+    @csrf
+    <x-laraknife.index-panel title="{{ __('#Table#') }}">
+      <x-laraknife.filter-panel legend="{{ $pagination->legendText() }}">
+        <x-laraknife.combobox position="first" name="genus" label="Gender" options="{!!$options!!}" width2="4" />
+        <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
+        <div class="row">
+          <x-laraknife.btn-search width2="10" />
         </div>
-    </form>
+      </x-laraknife.filter-panel>
+      <x-laraknife.index-button-panel buttonType="new"/>
+      <x-laraknife.sortable-table-panel :fields="$fields" :pagination="$pagination">
+        <thead>
+          <tr>
+            <th></th>
+##FIELDS##
+            <th sortId="#field#">{{__('#Field#')}}</th>
+##END.FIELDS##
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+      @foreach ($records as $#module#)
+        <tr>
+          <td><a href="/#module#-edit/{{$#module#->id}}">{{ __('Change')}}</a></td>
+##FIELDS##
+          <td>{{$#module#->#field#}}</td>
+##END.FIELDS##
+          <td><a href="/#module#-delete/{{$#module#->id}}">{{ __('Delete')}}</a></td>
+        </tr>
+      @endforeach
+      </tbody>
+    </x-laraknife.sortable-table-panel>
+  </x-laraknife.index-panel>
+</form>
 @endsection

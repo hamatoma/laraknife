@@ -15,9 +15,26 @@ class SPropertyController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('sproperty.create');
+        $rc = null;
+        $error = null;
+        if (count($_POST) > 0) {
+            $fields = $_POST;
+            try {
+                $incomingFields = $request->validate($this->rules(true));
+                $rc = $this->store($request);
+            } catch(\Exception $e ){ 
+                $error = $e->getMessage();
+            }
+        } else {
+            $fields = ['id' => '', 'scope' => '', 'name' => '', 'shortname' => '',
+                'order' => '', 'value' => '', 'info' => ''];
+        }
+        if ($rc == null){
+            $rc = view('sproperty.create', ['fields' => $fields, 'error' => $error]);
+        }
+        return $rc;
     }
     /**
      * Show the form for editing the specified resource.
@@ -58,13 +75,12 @@ class SPropertyController extends Controller
             $pagination = new Pagination($sql, $parameters, $fields);
             $scopes = SProperty::scopes();
             $options = ViewHelper::buildEntriesOfCombobox($scopes, null,
-                isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
+                isset($fields['scope']) ? $fields['scope'] : '', '<All>', true);
             return view('sproperty.index', [
                 'records' => $records,
                 'fields' => $fields,
                 'options' => $options,
-                'pagination' => $pagination,
-                'legend' => $pagination->legendText()
+                'pagination' => $pagination
             ]);
         }
     }

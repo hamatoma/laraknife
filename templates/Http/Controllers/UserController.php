@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SProperty;
 use App\Models\User;
 use App\Helpers\ViewHelper;
 use App\Helpers\DbHelper;
@@ -15,23 +16,53 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('user.create');
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/user-index');
+        } else {
+            $rc = null;
+            $error = null;
+            if (count($_POST) > 0) {
+                $fields = $_POST;
+                try {
+                    $incomingFields = $request->validate($this->rules());
+                    $rc = $this->store($request);
+                } catch (\Exception $e) {
+                    $error = $e->getMessage();
+                }
+            } else {
+                $fields = ['name' => '', 'email' => '', 'password' => '', 'password_confirmation' => '', 'role_id' => ''];
+            }
+            if ($rc == null) {
+                $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
+                $rc = view('user.create', ['fields' => $fields, 'roleOptions' => $options, 'error' => $error]);
+            }
+        }
+        return $rc;
     }
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(User $user)
     {
-        return view('user.edit', ['user' => $user]);
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/user-index');
+        } else {
+            $rc = null;
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id);
+            $rc = view('user.edit', ['user' => $user, 'roleOptions' => $options]);
+        }
+        return $rc;
     }
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(User $user, Request $request)
     {
-        $user->delete();
+        if ($request->btnSubmit === 'btnDelete') {
+            $user->delete();
+        }
         return redirect('/user-index');
     }
     /**
@@ -39,44 +70,56 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
-            return redirect('/user-create');
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
+            $rc = redirect('/user-create');
         } else {
-            $sql = 'SELECT * FROM users';
+            $sql = 'SELECT t0.*, t1.name as role FROM users t0 JOIN roles t1 on t0.role_id=t1.id ';
             $parameters = [];
             if (count($_POST) == 0) {
-                $fields = ['id' => '', 'text' => '', '_sortParams' => 'id:asc'];
+                $fields = ['id' => '', 'text' => '', 'role' => '0', '_sortParams' => 'id:asc'];
             } else {
                 $fields = $_POST;
                 $conditions = [];
                 $parameters = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'id');
+                ViewHelper::addConditionComparism($conditions, $parameters, 't0.role_id', 'role');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'role_id');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'name,email', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
-            return view('user.index', [
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role']);
+            $rc = view('user.index', [
                 'records' => $records,
                 'fields' => $fields,
                 'pagination' => $pagination,
-                'legend' => $pagination->legendText()
+                'roleOptions' => $options
             ]);
         }
+        return $rc;
     }
     /**
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(): array
+    private function rules(bool $isCreation = true): array
     {
-        $rc = [
-            'name' => 'required|unique:users',
-            'email' => 'required|email|unique:users',
-            'password' => 'required',
-            'repetition' => 'required'
-        ];
+        if ($isCreation) {
+            $rc = [
+                'name' => 'required|unique:users',
+                'email' => 'required|email|unique:users',
+                'role_id' => 'required',
+                'password' => 'required|confirmed',
+                'password_confirmation' => 'required'
+            ];
+        } else {
+            $rc = [
+                'name' => 'required',
+                'email' => 'required|email',
+                'role_id' => 'required'
+            ];
+        }
         return $rc;
     }
     public static function routes()
@@ -96,7 +139,13 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('user.show', ['user' => $user, 'mode' => 'delete']);
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/user-index');
+        } else {
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id);
+            $rc = view('user.show', ['user' => $user, 'mode' => 'delete', 'roleOptions' => $options]);
+        }
+        return $rc;
     }
 
     /**
@@ -104,9 +153,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
+        if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules());
-            unset($incomingFields['repetition']);
             User::create($incomingFields);
         }
         return redirect('/user-index');
@@ -116,11 +164,16 @@ class UserController extends Controller
      */
     public function update(User $user, Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
-            unset($incomingFields['repetition']);
-            $user->update($incomingFields);
+        if ($request->btnSubmit === 'btnStore') {
+            try {
+                $incomingFields = $request->validate($this->rules(false));
+                $user->update($incomingFields);
+                $rc = redirect('/user-index');
+            } catch (\Exception $exc) {
+                $msg = $exc->getMessage();
+                $rc = back();
+            }
         }
-        return redirect('/user-index');
+        return $rc;
     }
 }

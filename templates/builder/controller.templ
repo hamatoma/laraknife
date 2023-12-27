@@ -2,73 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\#Module#;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Hamatoma\Laraknife\ViewHelpers;
+use App\Models\#Module#;
+use App\Models\SProperty;
+use App\Helpers\ViewHelper;
+use App\Helpers\DbHelper;
+use App\Helpers\Helper;
 
 class #Module#Controller extends Controller
 {
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('#module#.create');
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/#module#-index');
+        } else {
+            $rc = null;
+            $error = null;
+            if (count($_POST) > 0) {
+                $fields = $_POST;
+                try {
+                    $incomingFields = $request->validate($this->rules(true));
+                    $rc = $this->store($request);
+                } catch(\Exception $e ){ 
+                    $error = $e->getMessage();
+                }
+            } else {
+                $fields = [
+##FIELDS##
+                    '#field#' => '',
+##END.FIELDS##
+                ];
+            }
+            if ($rc == null){
+                $rc = view('#module#.create', ['fields' => $fields, 'error' => $error]);
+            }
+        }
+        return $rc;
     }
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(#Module# $#module#)
     {
-        return view('#module#.edit', ['#module#' => $#module#]);
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/#module#-index');
+        } else {
+            $rc = view('#module#.edit', ['#module#' => $#module#]);
+        }
+        return $rc;
     }
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(#Module# $#module#)
+    public function destroy(#Module# $#module#, Request $request)
     {
-        $#module#->delete();
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnDelete') {
+            $#module#->delete();
+        }
         return redirect('/#module#-index');
     }
     /**
-     * Display a listing of the resource.
+     * Display the database records of the resource.
      */
     public function index()
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
             return redirect('/#module#-create');
         } else {
-            $records = null;
+            $sql = 'SELECT * FROM #table#';
+            $parameters = [];
             if (count($_POST) == 0) {
                 $fields = [
 ##FIELDS##
                     '#field#' => '',
 ##END.FIELDS##
+                '_sortParams' => 'id:asc;#secondary#:desc'
                 ];
             } else {
                 $fields = $_POST;
                 $conditions = [];
-                $parameters = [];
-                ViewHelpers::addConditionComparism($conditions, $parameters, '#secondary#');
-                ViewHelpers::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
-                if (count($conditions) > 0) {
-                    $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
-                    $records = DB::select("select * from #table# where $condition order by scope,`order`,id", $parameters);
-                }
+                ViewHelper::addConditionComparism($conditions, $parameters, '#secondary#');
+                ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
+                $sql = DbHelper::addConditions($sql, $conditions);
             }
-            if ($records === null) {
-                $records = #Module#::orderBy('scope')->orderBy('order')->orderBy('id')->get();
-            }
+            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+            $records = DB::select($sql, $parameters);
+            $pagination = new Pagination($sql, $parameters, $fields);
             $scopes = #Module#::scopes();
-            $options = ViewHelpers::buildEntriesOfCombobox($scopes, null, 
+            $options = ViewHelper::buildEntriesOfCombobox($scopes, null, 
                 isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
             return view('#module#.index', [
                 'records' => $records,
                 'fields' => $fields,
                 'options' => $options,
-                'legend' => ''
+                'pagination' => $pagination
             ]);
         }
     }
@@ -102,7 +134,12 @@ class #Module#Controller extends Controller
      */
     public function show(#Module# $#module#)
     {
-        return view('#module#.show', ['#module#' => $#module#, 'mode' => 'delete']);
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/#module#-index');
+        } else {
+            $rc = view('#module#.show', ['#module#' => $#module#, 'mode' => 'delete']);
+        }
+        return $rc;
     }
 
     /**
@@ -110,7 +147,7 @@ class #Module#Controller extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
+        if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules());
             $incomingFields['info'] = strip_tags($incomingFields['info']);
             #Module#::create($incomingFields);
@@ -122,11 +159,18 @@ class #Module#Controller extends Controller
      */
     public function update(#Module# $#module#, Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
-            $incomingFields['info'] = strip_tags($incomingFields['info']);
-            $#module#->update($incomingFields);
+        if ($request->btnSubmit === 'btnStore') {
+            try {
+                $incomingFields = $request->validate($this->rules());
+                $incomingFields['info'] = strip_tags($incomingFields['info']);
+                $#module#->update($incomingFields);
+                $rc = redirect('/#module#-index');
+            } catch (\Exception $exc) {
+                $msg = $exc->getMessage();
+                $rc = back();
+            }
         }
-        return redirect('/#module#-index');
+        return $rc;
+
     }
 }

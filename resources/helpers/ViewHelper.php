@@ -23,8 +23,13 @@ class ViewHelper
         $filterField ??= $column;
         $value = array_key_exists($filterField, $_POST) ? $_POST[$filterField] : '';
         if ($value !== '' && $value !== $ignoreValue) {
-            array_push($conditions, "`$column`=:$column");
-            $parameters[":$column"] = $value;
+            if (strpos($column, '.') === false){
+                array_push($conditions, "`$column`=:$filterField");
+            } else {
+                $parts = explode('.', $column);
+                array_push($conditions, "$parts[0].`$parts[1]`=:$filterField");
+            }
+            $parameters[":$filterField"] = $value;
         }
     }
     /**

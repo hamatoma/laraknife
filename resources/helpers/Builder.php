@@ -1,16 +1,20 @@
 <?php
-namespace Hamatoma\Laraknife;
+namespace App\Helpers;
 
 if (is_dir(__DIR__ . '/../vendor')) {
     require __DIR__ . '/../vendor/autoload.php';
+} elseif (is_dir(__DIR__ . '/../../vendor')) {
+    require __DIR__ . '/../../vendor/autoload.php';
+    require_once 'StringHelper.php';
+    require_once 'OsHelper.php';
 } else {
     require __DIR__ . '/../autoload.php';
 }
 
-use Hamatoma\Laraknife\Helper;
-use Hamatoma\Laraknife\OsHelper;
+use App\Helpers\OsHelper;
+use App\Helpers\StringHelper;
 
-$VERSION = '2023.11.18';
+$VERSION = '2023.12.25';
 class Builder
 {
     protected array $lines = [];
@@ -26,7 +30,7 @@ class Builder
     public function createModule(string $templates, string $views, string $controllers, string $models)
     {
         $module = $this->module;
-        $moduleCapital = Helper::toCapital($module);
+        $moduleCapital = StringHelper::toCapital($module);
         foreach (['create', 'edit', 'index', 'show'] as $task) {
             $source = OsHelper::joinPath($templates, "$task.blade.templ");
             $target = OsHelper::joinPaths([$views, $module, "$task.blade.php"]);
@@ -78,8 +82,8 @@ class Builder
             if ($this->module == null) {
                 $this->setModule(preg_replace('/s$/', '', $this->tablename));
             }
-            $this->tableCapital = Helper::toCapital($this->tablename);
-            $this->moduleCapital = Helper::toCapital($this->module);
+            $this->tableCapital = StringHelper::toCapital($this->tablename);
+            $this->moduleCapital = StringHelper::toCapital($this->module);
             echo "Table: $this->tablename\n";
             while (($line = $this->nextLine(true)) != null) {
                 if (preg_match("/table->(\\w+)\\([\"'](\\w+)(.*)/", $line, $match)) {
@@ -112,7 +116,7 @@ class Builder
     {
         if ($module != null && $this->module == null) {
             $this->module = strtolower($module);
-            $this->moduleCapital = Helper::toCapital($this->module);
+            $this->moduleCapital = StringHelper::toCapital($this->module);
             echo "module: $this->module\n";
         }
     }
@@ -242,7 +246,7 @@ class FieldInfo
         $this->multiline = false;
         $this->reference = null;
         $this->name = $fieldname;
-        $this->nameCapital = Helper::toCapital($fieldname);
+        $this->nameCapital = StringHelper::toCapital($fieldname);
         switch ($type) {
             case 'binary':
             case 'date':
@@ -265,6 +269,9 @@ class FieldInfo
             case 'double':
                 $this->type = 'number';
                 break;
+            case 'tinyInteger':
+                $this->type = 'number';
+                break;
             case 'integer':
                 if ($isSProperty) {
                     $this->type = 'ref';
@@ -280,6 +287,8 @@ class FieldInfo
                     $this->reference = $match[2] . '.' . $match[1];
                 }
                 break;
+            default:
+                throw new \Exception("unknown column type: $type'\n");
         }
     }
     public function dump()
@@ -380,6 +389,7 @@ function main()
         ];
     }
     if (count($argv) < 3) {
+        $dummy = StringHelper::toCapital('x');
         usage("missing argument");
     } else {
         $args = [];

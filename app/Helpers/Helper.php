@@ -1,7 +1,7 @@
 <?php
-namespace Hamatoma\Laraknife;
+namespace App\Helpers;
 
-class Helper{
+class StringHelper{
     /**
      * Converts the $string into a capital string: the first character will be uppercase.
      */
@@ -13,5 +13,4 @@ class Helper{
         }
         return $rc;
     }
-
 }

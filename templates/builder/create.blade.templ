@@ -3,18 +3,10 @@
 @section('content')
     <form id="#module#-create" action="/#module#-create" method="POST">
         @csrf
-        @method('PUT')
-        <div id="main-content" class="container mt-5">
-            <x-laraknife.main-header title="{{ __('Creation of a #Module#') }}" />
+        <x-laraknife.create-panel title="{{ __('Creation of a #Module#') }}" error="{{$error}}">
 ##FIELDS##
             <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" width2="4" #attribute#/>
 ##END.FIELDS##
-            <x-laraknife.row-empty />
-            <div class="row">
-                <x-laraknife.btn-store width1="2" width2="4" />
-                <x-laraknife.btn-cancel url="/#module#-index" width1="2" width2="4" />
-            </div>
-            <x-laraknife.form-error/>
-        </div>
+        </x-laraknife.create-panel>
     </form>
 @endsection

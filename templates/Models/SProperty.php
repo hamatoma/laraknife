@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Helpers\DbHelper;
 use App\Helpers\ViewHelper;
 
 use Illuminate\Database\Eloquent\Collection;
@@ -32,30 +33,7 @@ class SProperty extends Model
         $rc = $record == null ? null : $record->id;
         return $rc;
     }
-    /**
-     * Returns the arrays used for combobox titles and values.
-     * @param string $scope Only record matching this scope will be used
-     * @param array $titles OUT: contains the text entries of the combobox
-     * @param array $value OUT: contains the values of the combobox
-     * @param string $titleField name of the table column used for $titles, normally "name"
-     * @param string $valueField name of the table column used for $value, normally "id"
-     */
-    public static function combobox(
-        string $scope,
-        array &$titles,
-        array &$values,
-        string $titleField = 'name',
-        string $valueField = 'id'
-    ) {
-        if (in_array($titleField, self::$fields) && in_array($valueField, self::$fields)) {
-            $recs = SProperty::byScope($scope);
-            foreach ($recs as &$rec) {
-                array_push($titles, $rec[$titleField]);
-                array_push($values, $rec[$valueField]);
-            }
-        }
-    }
-    /**
+      /**
      * Returns a list of all scopes: values of the column "scope" in the table sproproperties.
      */
     public static function scopes(): array
@@ -72,20 +50,31 @@ class SProperty extends Model
     /**
      * Builds the HTML selection options as string from all entries by a given scope.
      * @param string $scope defines the database records to use
-     * @param string $currentSelected the value which marks the selected entry
+     * @param string $selected the current field value (defines the selected entry)
+     * cted the value which marks the selected entry
      * @param NULL|string $titleUndefined  if not null the first entry has that title and the value ''
      * @param string $titleField the titles are taken from that column
      * @param string $valueField the value are taken from that column
      * @return string the HTML text of the options
      */
-    public static function optionsByScope(string $scope, string $currentSelected, 
-        ?string $titleUndefined = null, string $titleField = 'name', string $valueField = 'id'): string
+    public static function optionsByScope(string $scope, string $selected, 
+        ?string $titleUndefined = null, string $titleField = 'name', string $valueField = 'id'): array
     {
-        $titles = [];
-        $values = [];
-        self::combobox($scope, $titles, $values, $titleField, $valueField);
-        $options = ViewHelper::buildEntriesOfCombobox($titles, $values, $currentSelected, $titleUndefined, true);
-        return $options;
+        if ($titleUndefined === ''){
+            $rc = [];
+        } else {
+            $rc = [['text' => $titleUndefined, 'value' => '', 'active' => $selected === '']];
+        }
+        if (in_array($titleField, self::$fields) && in_array($valueField, self::$fields)) {
+            $recs = SProperty::byScope($scope);
+            foreach ($recs as &$rec) {
+                $rc ['text'] = $rec[$titleField];
+                $value = strval($rec[$valueField]);
+                $rc ['value'] = $value;
+                $rc ['active'] = $value === $selected;
+            }
+        }
+        return $rc;
     }
 }
 
