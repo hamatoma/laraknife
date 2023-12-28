@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.0.5 2023.12.28
+- ViewHelper::buildEntriesOfCombobox() refactoring: using array of items instead of texts + values
+- sproperty/index.blade.php: removing duplicate button
+
 ## 0.0.4 2023.12.27
 - Builder.php works in the project directory
 - Refactoring components / templates

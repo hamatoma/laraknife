@@ -17,13 +17,13 @@ class ViewHelper
      * @param string $operator the comparison operator: "=", ">", ">=", "<", "<=", "!="
      * @param string $ignoreValue if the filter value has that value no condition is created
      */
-    public static function addConditionComparism(array &$conditions, array &$parameters, string $column, 
+    public static function addConditionComparism(array &$conditions, array &$parameters, string $column,
         ?string $filterField = null, string $operator = "=", $ignoreValue = '-')
     {
         $filterField ??= $column;
         $value = array_key_exists($filterField, $_POST) ? $_POST[$filterField] : '';
         if ($value !== '' && $value !== $ignoreValue) {
-            if (strpos($column, '.') === false){
+            if (strpos($column, '.') === false) {
                 array_push($conditions, "`$column`=:$filterField");
             } else {
                 $parts = explode('.', $column);
@@ -40,7 +40,7 @@ class ViewHelper
      *   In this case each of the columns will be compared and combined with the OR operator
      * @param string $filterField name of the filter field (HTML input field). If null $column is taken
      */
-    public static function addConditionPattern(array &$conditions, array &$parameters, string $column, ?string $filterField=null)
+    public static function addConditionPattern(array &$conditions, array &$parameters, string $column, ?string $filterField = null)
     {
         $filterField ??= $column;
         $value = array_key_exists($filterField, $_POST) ? $_POST[$filterField] : '';
@@ -52,9 +52,9 @@ class ViewHelper
                 $fields = explode(',', $column);
                 $conditions2 = [];
                 $no = 0;
-                foreach($fields as $field){
+                foreach ($fields as $field) {
                     $no++;
-                    if (strpos($field, '.') === false){
+                    if (strpos($field, '.') === false) {
                         array_push($conditions2, "`$field` like :$field$no");
                         $parameters[":$field$no"] = $value;
                     } else {
@@ -78,31 +78,35 @@ class ViewHelper
      * @param string $selected '' or the value of the selected entry (from the request)
      * @param NULL|string $textUndefined null: no additional entry.
      *   Otherwise: an entry is added as first entry with that text and the value ''
+     * @return array a list of combobox entries, e.g. [['text' => 'x', 'value' => 'y', 'active' => false], ...]
      */
-    public static function buildEntriesOfCombobox(array $texts, ?array $values, string $selected = '', 
-        ?string $textUndefined = null, bool $translate = false): string
+    public static function buildEntriesOfCombobox(array $texts, ?array $values, string $selected = '',
+        ?string $textUndefined = null, bool $translate = false): array
     {
-        $rc = '';
-        if ($textUndefined != null) {
-            if ($translate){
-                $textUndefined = __($textUndefined);
-            }
-            $textUndefined = htmlentities($textUndefined);
-            $sel = $selected === '' ? 'selected ' : '';
-            $rc = "<option {$sel}value=\"\">$textUndefined</option>";
-        }
         if ($values == null) {
             $values = $texts;
         }
-        for ($ix = 0; $ix < count($texts); $ix++) {
-            $text = $texts[$ix];
-            if ($translate){
-                $text = __($text);
+        if (count($texts) != count($values)) {
+            $rc = [['text' => 'different length', 'value' => 1, 'active' => true]];
+        } else {
+            if ($textUndefined == null) {
+                $rc = [];
+            } else {
+                if ($translate) {
+                    $textUndefined = __($textUndefined);
+                }
+                $rc = [['text' => $textUndefined, 'value' => '', 'active' => $selected === '']];
             }
-            $text = htmlentities($text);
-            $value = strval($values[$ix]);
-            $sel = $value === $selected ? 'selected ' : '';
-            $rc .= "\n<option {$sel}value=\"$value\">$text</option>";
+            for ($ix = 0; $ix < count($texts); $ix++) {
+                $text = $texts[$ix];
+                if ($translate) {
+                    $text = __($text);
+                }
+                $text = htmlentities($text);
+                $value = strval($values[$ix]);
+                $sel = $value === $selected ? 'selected ' : '';
+                array_push($rc, ['text' => $text, 'value' => $value, 'active' => $selected === $value]);
+            }
         }
         return $rc;
     }

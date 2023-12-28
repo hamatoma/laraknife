@@ -9,9 +9,6 @@
                 width2="4" class="lkn-autoupdate" />
             <x-laraknife.text position="last" name="text" label="Text" value="{{ $fields['text'] }}"
                 width2="4" />
-            <div class="row">
-                <x-laraknife.btn-search width2="10" />
-            </div>
         </x-laraknife.filter-panel>
         <x-laraknife.index-button-panel buttonType="new"/>
         <x-laraknife.sortable-table-panel :fields="$fields" :pagination="$pagination">
