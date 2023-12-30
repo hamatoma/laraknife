@@ -50,7 +50,7 @@ class UserController extends Controller
             $rc = redirect('/user-index');
         } else {
             $rc = null;
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id);
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $$user->role_id ?? '', '');
             $rc = view('user.edit', ['user' => $user, 'roleOptions' => $options]);
         }
         return $rc;
@@ -73,7 +73,7 @@ class UserController extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
             $rc = redirect('/user-create');
         } else {
-            $sql = 'SELECT t0.*, t1.name as role FROM users t0 JOIN roles t1 on t0.role_id=t1.id ';
+            $sql = 'SELECT t0.*, t1.name as role FROM users t0 LEFT JOIN roles t1 on t0.role_id=t1.id ';
             $parameters = [];
             if (count($_POST) == 0) {
                 $fields = ['id' => '', 'text' => '', 'role' => '0', '_sortParams' => 'id:asc'];
@@ -130,6 +130,7 @@ class UserController extends Controller
         Route::post('/user-create', [UserController::class, 'create']);
         Route::put('/user-create', [UserController::class, 'store']);
         Route::get('/user-edit/{user}', [UserController::class, 'edit']);
+        Route::post('/user-edit/{user}', [UserController::class, 'edit']);
         Route::post('/user-update/{user}', [UserController::class, 'update']);
         Route::get('/user-show/{user}/delete', [UserController::class, 'show']);
         Route::delete('/user-show/{user}/delete', [UserController::class, 'destroy']);
@@ -142,7 +143,7 @@ class UserController extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id);
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
             $rc = view('user.show', ['user' => $user, 'mode' => 'delete', 'roleOptions' => $options]);
         }
         return $rc;
@@ -164,15 +165,18 @@ class UserController extends Controller
      */
     public function update(User $user, Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             try {
                 $incomingFields = $request->validate($this->rules(false));
                 $user->update($incomingFields);
-                $rc = redirect('/user-index');
             } catch (\Exception $exc) {
                 $msg = $exc->getMessage();
                 $rc = back();
             }
+        }
+        if ($rc == null){
+            $rc = redirect('/user-index');
         }
         return $rc;
     }

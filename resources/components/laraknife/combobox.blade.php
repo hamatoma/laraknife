@@ -1,4 +1,4 @@
-@props(['position' => 'alone', 'name' => 'combo', 'label' => '', 'options', 'width1' => 2, 'width2' => 10, 'class' => ''])
+@props(['position' => 'alone', 'name' => 'combo', 'label' => '', 'options', 'width1' => 2, 'width2' => 10, 'class' => '', 'attribute' => ''])
 @if ($position === 'alone' || $position === 'first')
     <div class="row">
 @endif
@@ -7,7 +7,7 @@
 </div>
 @endif
 <div class="col-md-{{ $width2 }}">
-    <select class="lkn-input expand100 {{$class}}" name="{{$name}}">
+    <select class="lkn-input expand100 {{$class}}" name="{{$name}}" @if ($attribute === 'readonly') disabled @ else {{$attribute}} @endif>
         @foreach($options as $option)
         @php 
         $v = $option['value'];

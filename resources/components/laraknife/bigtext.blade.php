@@ -8,7 +8,7 @@
 </div>
 @endif
 <div class="col-md-{{ $width2 }}">
-     <textarea class="lkn-expand100" id="{{$name}}" name="{{$name}}" rows="{{$rows}}" @if($placeholder !== '') placeholder="{{$placeholder}}" @endif>{{$value}} {{ $attribute }}</textarea>
+     <textarea class="lkn-expand100" id="{{$name}}" name="{{$name}}" rows="{{$rows}}" @if($placeholder !== '') placeholder="{{$placeholder}}" @endif {{ $attribute }}>{{$value}}</textarea>
 </div>
 @if($position === 'alone' || $position === 'last')
 </div>

@@ -388,9 +388,9 @@ function main()
             '/tmp/unittest/de_DE.json',
         ];
     }
-    if (count($argv) < 3) {
-        $dummy = StringHelper::toCapital('x');
-        usage("missing argument");
+    $count = count($argv);
+    if ($count < 1) {
+        usage("missing argument: $count");
     } else {
         $args = [];
         $options = [

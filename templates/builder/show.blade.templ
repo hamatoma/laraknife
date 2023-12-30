@@ -6,13 +6,14 @@
         @if($mode === 'delete')
         @method('DELETE')
         @endif
-        <x-laraknife.create-panel title="{{ __($mode === 'delete' ? 'A #Module#' : 'Deletion of a #Module#') }}" mode="{{$mode}}">
+        <x-laraknife.show-panel title="{{ __($mode !== 'delete' ? 'A #Module#' : 'Deletion of a #Module#') }}" mode="{{$mode}}">
             <x-laraknife.text position="first" name="id" label="Id" value="{{ $#module#->id }}" width2="4"
                 attribute="readonly" />
 ##FIELDS##
             <x-laraknife.text position="#position#" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4"
                 attribute="readonly" #attribute#/>
 ##END.FIELDS##
-        </x-laraknife.create-panel>
+            <x-laraknife.combobox position="alone" name="xxx" label="XXX" :options="$optionXXX" value="{{ $#module#->#field# }}" width2="4"/>
+</x-laraknife.create-panel>
     </form>
 @endsection

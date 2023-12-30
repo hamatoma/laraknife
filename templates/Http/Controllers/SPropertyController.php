@@ -48,7 +48,9 @@ class SPropertyController extends Controller
      */
     public function destroy(SProperty $sproperty)
     {
-        $sproperty->delete();
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnDelete') {
+            $sproperty->delete();
+        }
         return redirect('/sproperty-index');
     }
     /**

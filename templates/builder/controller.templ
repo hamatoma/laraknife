@@ -39,7 +39,13 @@ class #Module#Controller extends Controller
                 ];
             }
             if ($rc == null){
-                $rc = view('#module#.create', ['fields' => $fields, 'error' => $error]);
+                $optionsXXX = SProperty::optionsByScope('scopeXXX', $fields['xxx'], '-');
+                $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['yyy'], '-');
+                $rc = view('#module#.create', [
+                    'fields' => $fields,
+                    'optionsXXX' => $optionsXXX,
+                    'optionsYYY' => $optionsYYY,
+                    'error' => $error]);
             }
         }
         return $rc;
@@ -52,7 +58,13 @@ class #Module#Controller extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
-            $rc = view('#module#.edit', ['#module#' => $#module#]);
+            $optionsXXX = SProperty::optionsByScope('scopeXXX', $#module#->xxx, '');
+            $optionsYYY = SProperty::optionsByScope('scopeYYY', $#module#->yyy, '');
+            $rc = view('#module#.edit', [
+                '#module#' => $#module#,
+                'optionsXXX' => $optionsXXX,
+                'optionsYYY' => $optionsYYY,
+                ]);
         }
         return $rc;
     }
@@ -74,6 +86,8 @@ class #Module#Controller extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
             return redirect('/#module#-create');
         } else {
+            // $sql = 'SELECT t0.*, t1.name as category FROM #table#' 
+            //   . 'LEFT JOIN sproperty t1 ON t0.xxx_id=t1.name LEFT JOIN sproperty t2 ON t0.yyy_id=t2.name';
             $sql = 'SELECT * FROM #table#';
             $parameters = [];
             if (count($_POST) == 0) {
@@ -93,13 +107,13 @@ class #Module#Controller extends Controller
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
-            $scopes = #Module#::scopes();
-            $options = ViewHelper::buildEntriesOfCombobox($scopes, null, 
-                isset($fields['scope']) ? $fields['scope'] : '', '<all>', true);
+            $optionsXXX = SProperty::optionsByScope('scopeXXX', $fields['xxx'], 'all');
+            $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['yyy'], 'all');
             return view('#module#.index', [
                 'records' => $records,
                 'fields' => $fields,
-                'options' => $options,
+                'optionsXXX' => $optionsXXX,
+                'optionsYYY' => $optionsYYY,
                 'pagination' => $pagination
             ]);
         }
@@ -108,7 +122,7 @@ class #Module#Controller extends Controller
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(): array
+    private function rules(bool $isCreate=false): array
     {
         $rc = [
 ##FIELDS##
@@ -124,6 +138,7 @@ class #Module#Controller extends Controller
         Route::get('/#module#-create', [#Module#Controller::class, 'create']);
         Route::post('/#module#-create', [#Module#Controller::class, 'create']);
         Route::put('/#module#-create', [#Module#Controller::class, 'store']);
+        Route::post('/#module#-edit/{#module#}', [#Module#Controller::class, 'edit']);
         Route::get('/#module#-edit/{#module#}', [#Module#Controller::class, 'edit']);
         Route::post('/#module#-update/{#module#}', [#Module#Controller::class, 'update']);
         Route::get('/#module#-show/{#module#}/delete', [#Module#Controller::class, 'show']);
@@ -137,7 +152,16 @@ class #Module#Controller extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
-            $rc = view('#module#.show', ['#module#' => $#module#, 'mode' => 'delete']);
+            $optionsXXX = SProperty::optionsByScope('scopeXXX', $fields['xxx']);
+            $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['xxx']);
+            $rc = view('#module#.show', [
+                '#module#' => $#module#, 
+                'optionsXXX' => $optionsXXX;
+                'optionsYYY' => $optionsYYY;
+                'optionsXXX' => $optionsXXX,
+                'optionsYYY' => $optionsYYY,
+                'mode' => 'delete'
+                ]);
         }
         return $rc;
     }
@@ -159,6 +183,7 @@ class #Module#Controller extends Controller
      */
     public function update(#Module# $#module#, Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             try {
                 $incomingFields = $request->validate($this->rules());
@@ -170,7 +195,9 @@ class #Module#Controller extends Controller
                 $rc = back();
             }
         }
+        if ($rc == null){
+            $rc = redirect('/#module#-index');
+        }
         return $rc;
-
     }
 }

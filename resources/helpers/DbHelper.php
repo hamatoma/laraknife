@@ -93,11 +93,13 @@ class DbHelper
         string $orderBy = '',
         int $limit = 100
     ): array {
-        if ($undefinedText === ''){
+        if ($undefinedText == null || $undefinedText === ''){
             $rc = [];
         } else {
-            if ($undefinedText === 'all'){
+            if ($undefinedText == 'all'){
                 $undefinedText = __('<All>');
+            } elseif ($undefinedText == '-'){
+                $undefinedText = __('<Please select>');
             }
             $rc = [['text' => $undefinedText, 'value' => '', 'active' => $selected === '']];
         }

@@ -55,23 +55,33 @@ class SProperty extends Model
      * @param NULL|string $titleUndefined  if not null the first entry has that title and the value ''
      * @param string $titleField the titles are taken from that column
      * @param string $valueField the value are taken from that column
+     * @param bool $translate true: the title will be translated
      * @return string the HTML text of the options
      */
     public static function optionsByScope(string $scope, string $selected, 
-        ?string $titleUndefined = null, string $titleField = 'name', string $valueField = 'id'): array
+        ?string $titleUndefined = null, string $titleField = 'name', 
+        string $valueField = 'id', bool $translate=true): array
     {
-        if ($titleUndefined === ''){
+        if ($titleUndefined === '' or $titleUndefined == null){
             $rc = [];
         } else {
+            if ($titleUndefined == 'all'){
+                $titleUndefined = __('<All>');
+            } elseif ($titleUndefined == '-'){
+                $titleUndefined = __('<Please select>');
+            }
             $rc = [['text' => $titleUndefined, 'value' => '', 'active' => $selected === '']];
         }
         if (in_array($titleField, self::$fields) && in_array($valueField, self::$fields)) {
             $recs = SProperty::byScope($scope);
             foreach ($recs as &$rec) {
-                $rc ['text'] = $rec[$titleField];
                 $value = strval($rec[$valueField]);
-                $rc ['value'] = $value;
-                $rc ['active'] = $value === $selected;
+                $title = $rec[$titleField];
+                if ($translate){
+                    $title = __($title);
+                }
+                array_push($rc, ['text' => $title, 'value' => $value, 
+                    'active' => $value === $selected]);
             }
         }
         return $rc;

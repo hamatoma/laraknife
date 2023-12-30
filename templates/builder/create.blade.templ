@@ -7,6 +7,7 @@
 ##FIELDS##
             <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" width2="4" #attribute#/>
 ##END.FIELDS##
-        </x-laraknife.create-panel>
+            <x-laraknife.combobox position="alone" name="xxx" label="XXX" :options="$optionXXX" value="{{ $#module#->#field# }}" width2="4"/>
+</x-laraknife.create-panel>
     </form>
 @endsection

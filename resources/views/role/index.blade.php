@@ -6,9 +6,6 @@
     <x-laraknife.index-panel title="{{ __('Roles') }}">
         <x-laraknife.filter-panel legend="{{ $pagination->legendText() }}">
           <x-laraknife.text position="alone" name="name" label="Name" value="{{$fields['name']}}" width2="4" />
-          <div class="row">
-            <x-laraknife.btn-search width2="10" />
-          </div>
         </x-laraknife.filter-panel>
 
         <x-laraknife.index-button-panel buttonType="new"/>
