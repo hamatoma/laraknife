@@ -10,6 +10,7 @@ use App\Models\SProperty;
 use App\Helpers\ViewHelper;
 use App\Helpers\DbHelper;
 use App\Helpers\Helper;
+use App\Helpers\Pagination;
 
 class #Module#Controller extends Controller
 {
@@ -156,8 +157,6 @@ class #Module#Controller extends Controller
             $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['xxx']);
             $rc = view('#module#.show', [
                 '#module#' => $#module#, 
-                'optionsXXX' => $optionsXXX;
-                'optionsYYY' => $optionsYYY;
                 'optionsXXX' => $optionsXXX,
                 'optionsYYY' => $optionsYYY,
                 'mode' => 'delete'
