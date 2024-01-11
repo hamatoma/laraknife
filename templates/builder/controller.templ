@@ -34,18 +34,25 @@ class #Module#Controller extends Controller
                 }
             } else {
                 $fields = [
-##FIELDS##
-                    '#field#' => '',
-##END.FIELDS##
+##CASE(fields)##
+##ON nameLike(.)##
+                    '#field#' => ''#comma#
+##END.CASE##
                 ];
             }
             if ($rc == null){
-                $optionsXXX = SProperty::optionsByScope('scopeXXX', $fields['xxx'], '-');
-                $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['yyy'], '-');
+##CASE(fields)##
+##ON nameLike(_scope$)##
+                $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], '-');
+##ON nameLike(_id$)##
+                $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+##END.CASE##                
                 $rc = view('#module#.create', [
                     'fields' => $fields,
-                    'optionsXXX' => $optionsXXX,
-                    'optionsYYY' => $optionsYYY,
+##CASE(fields)##
+##ON nameLike(_scope$)##
+                    'options#Base#' => $options#Base#,
+##END.CASE##
                     'error' => $error]);
             }
         }
@@ -59,13 +66,19 @@ class #Module#Controller extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
-            $optionsXXX = SProperty::optionsByScope('scopeXXX', $#module#->xxx, '');
-            $optionsYYY = SProperty::optionsByScope('scopeYYY', $#module#->yyy, '');
+##CASE(fields)##
+##ON nameLike(_scope$)##
+            $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], '');
+##ON nameLike(_id$)##
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+##END.CASE##                
             $rc = view('#module#.edit', [
                 '#module#' => $#module#,
-                'optionsXXX' => $optionsXXX,
-                'optionsYYY' => $optionsYYY,
-                ]);
+##CASE(fields)##
+##ON nameLike(_(id|scope)$)##
+                'options#Base#' => $options#Base##comma#
+##END.CASE##
+            ]);
         }
         return $rc;
     }
@@ -87,15 +100,24 @@ class #Module#Controller extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
             return redirect('/#module#-create');
         } else {
-            // $sql = 'SELECT t0.*, t1.name as category FROM #table#' 
-            //   . 'LEFT JOIN sproperty t1 ON t0.xxx_id=t1.name LEFT JOIN sproperty t2 ON t0.yyy_id=t2.name';
-            $sql = 'SELECT * FROM #table#';
+            $sql = 'SELECT t0.*#Comma#'
+##CASE(fields)##
+##ON nameLike(_(scope|ix)$)##
+                . 't#no#.name as #base##comma# '
+##END.CASE##
+                . ' FROM #table# t0'
+##CASE(fields)##
+##ON nameLike(_(scope|ix)$)##
+                . ' LEFT JOIN t#no# ON t#no#.id=t0.#field#'
+##END.CASE##
+                ;
             $parameters = [];
             if (count($_POST) == 0) {
                 $fields = [
-##FIELDS##
-                    '#field#' => '',
-##END.FIELDS##
+##CASE(fields)##
+##ON nameLike(.)##
+                '#field#' => '',
+##END.CASE##
                 '_sortParams' => 'id:asc;#secondary#:desc'
                 ];
             } else {
@@ -108,13 +130,18 @@ class #Module#Controller extends Controller
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
-            $optionsXXX = SProperty::optionsByScope('scopeXXX', $fields['xxx'], 'all');
+##CASE(fields)##
+##ON nameLike(_scope$)##
+            $options#Base# = SProperty::optionsByScope('scope#Base#', $fields['#base#'], 'all');
+##END.CASE##
             $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['yyy'], 'all');
             return view('#module#.index', [
                 'records' => $records,
                 'fields' => $fields,
-                'optionsXXX' => $optionsXXX,
-                'optionsYYY' => $optionsYYY,
+##CASE(fields)##
+##ON nameLike(_scope$)##
+                'options#Base#' => $options#Base#,
+##END.CASE##
                 'pagination' => $pagination
             ]);
         }
@@ -126,9 +153,10 @@ class #Module#Controller extends Controller
     private function rules(bool $isCreate=false): array
     {
         $rc = [
-##FIELDS##
-            '#field#' => 'required',
-##END.FIELDS##
+##CASE(fields)##
+##ON nameLike(.)##
+            '#field#' => 'required'#comma#
+##END.CASE##
         ];
         return $rc;
     }
@@ -153,12 +181,18 @@ class #Module#Controller extends Controller
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
-            $optionsXXX = SProperty::optionsByScope('scopeXXX', $fields['xxx']);
-            $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['xxx']);
-            $rc = view('#module#.show', [
-                '#module#' => $#module#, 
-                'optionsXXX' => $optionsXXX,
-                'optionsYYY' => $optionsYYY,
+##CASE(fields)##
+##ON nameLike(_scope$)##
+            $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], '');
+##ON nameLike(_id$)##
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+##END.CASE##                
+            $rc = view('#module#.edit', [
+                '#module#' => $#module#,
+##CASE(fields)##
+##ON nameLike(_(id|scope)$)##
+                'options#Base#' => $options#Base#,
+##END.CASE##
                 'mode' => 'delete'
                 ]);
         }
@@ -172,7 +206,10 @@ class #Module#Controller extends Controller
     {
         if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules());
-            $incomingFields['info'] = strip_tags($incomingFields['info']);
+##CASE(fields)##
+##ON typeLike([tT]ext$)##
+            $incomingFields['#field#'] = strip_tags($incomingFields['#field#']);
+##END.CASE##            
             #Module#::create($incomingFields);
         }
         return redirect('/#module#-index');

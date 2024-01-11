@@ -1,0 +1,17 @@
+// Line1
+##CASE(fields)##
+##ON nameLike(_scope$)##
+Scope #no#:
+#ix#: F: #Field# f: #field# b: #base#
+##ON nameLike(_id$)##
+Index #no#
+#ix#: F: #Field# f: #field# b: #base#
+no: #no#
+##ON typeLike([tT]ext$)##
+Type #no#
+#ix#: F: #Field# f: #field# b: #base#
+no: #no#
+##ELSE##
+Rest: #no#
+#ix#: F: #Field# f: #field#
+##END.CASE##

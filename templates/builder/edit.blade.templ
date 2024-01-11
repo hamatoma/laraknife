@@ -4,10 +4,15 @@
     <form id="#module#-edit" action="/#module#-update/{{ $#module#->id }}" method="POST">
         @csrf
         <x-laraknife.edit-panel> title="{{ __('Change of a #Module#') }}">
-##FIELDS##
-            <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4"/>
-##END.FIELDS##
-            <x-laraknife.combobox position="alone" name="xxx" label="XXX" :options="$optionXXX" value="{{ $#module#->#field# }}" width2="4"/>
+        <x-laraknife.text position="alone" name="id" label="Id" value="{{ $#module#->id }}" width2="4" attribute="readonly"/>
+##CASE(fields)##
+##ON nameLike(_(scope|id)$)##
+        <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$option#Base#" value="{{ $#module#->#field# }}" width2="4"/>
+##ON typeLike([Tt]ext$)##
+        <x-laraknife.bigtext position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" #attribute#/>
+##ELSE##
+        <x-laraknife.#type# position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" #attribute#/>
+##END.CASE##
         </x-laraknife.edit-panel>
     </form>
 @endsection

@@ -14,8 +14,9 @@ class #Module# extends Model
     protected $table = '#table#';
     // editable fields:
     protected $fillable = [
-##FIELDS##
-        '#field#',
-##END.FIELDS##
+##CASE(fields)##
+##ON nameLike(.)##
+        '#field#'#comma#
+##END.CASE##
     ];
 }

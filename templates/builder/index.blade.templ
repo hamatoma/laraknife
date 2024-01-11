@@ -5,20 +5,22 @@
     @csrf
     <x-laraknife.index-panel title="{{ __('#Table#') }}">
       <x-laraknife.filter-panel legend="{{ $pagination->legendText() }}">
-        <x-laraknife.combobox position="first" name="genus" label="Gender" options="{!!$options!!}" width2="4" />
-        <x-laraknife.text position="last" name="text" label="Text" value="{{$fields['text']}}" width2="4" />
-        <div class="row">
-          <x-laraknife.btn-search width2="10" />
-        </div>
+##CASE(fields)##
+##ON nameLike(_(id|scope)$)##
+      <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="{$#base#}" width2="4" />
+##ELSE##
+      <x-laraknife.text position="alone" name="#field#" label="#Field#" value="{{$fields[#field#}}" width2="4" />
+##END.CASE##
       </x-laraknife.filter-panel>
       <x-laraknife.index-button-panel buttonType="new"/>
       <x-laraknife.sortable-table-panel :fields="$fields" :pagination="$pagination">
         <thead>
           <tr>
             <th></th>
-##FIELDS##
-            <th sortId="#field#">{{__('#Field#')}}</th>
-##END.FIELDS##
+##CASE(fields)##
+##ON nameLike(.)##
+            <th sortId="#field#">{{__('#Base#')}}</th>
+##END.CASE##
             <th></th>
           </tr>
         </thead>
@@ -26,9 +28,10 @@
       @foreach ($records as $#module#)
         <tr>
           <td><a href="/#module#-edit/{{$#module#->id}}">{{ __('Change')}}</a></td>
-##FIELDS##
+##CASE(fields)##
+##ON nameLike(.)##
           <td>{{$#module#->#field#}}</td>
-##END.FIELDS##
+##END.CASE##
           <td><a href="/#module#-show/{{$#module#->id}}/delete">{{ __('Delete')}}</a></td>
         </tr>
       @endforeach

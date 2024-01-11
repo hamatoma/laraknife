@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.2.0 2024.01.11 Template model switched to "CASE(fields)"
+- Builder.php: refactoring: pattern based conditions for field based templates
+- Builder.php: new modes: test:mini + test:maxi
+
 ## 0.1.0 2023.12.31 tutorial taskx works
 - corrections in controller.templ
 

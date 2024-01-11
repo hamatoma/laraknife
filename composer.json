@@ -14,7 +14,9 @@
             "email": "author@hamatoma.de"
         }
     ],
-    "require": {},
     "minimum-stability": "dev",
-    "bin": ["scripts/laraknife-tool.sh"]
+    "bin": ["scripts/laraknife-tool.sh"],
+    "require-dev": {
+        "phpunit/phpunit": "11.0.x-dev"
+    }
 }

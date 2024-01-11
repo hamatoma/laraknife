@@ -24,7 +24,9 @@ class Builder
     protected ?string $module = null;
     protected string $tableCapital = '';
     protected string $moduleCapital = '';
-    protected array $fields = [];
+    /// fieldname => fieldObject
+    public array $fields = [];
+    /// field objects:
     protected ?string $comment = null;
     public bool $force = false;
     public function createModule(string $templates, string $views, string $controllers, string $models)
@@ -58,7 +60,7 @@ class Builder
             } else {
                 $rc = $this->currentLine = $this->lines[++$this->ixLines];
             }
-            $again = preg_match('!^\s*//!', $this->currentLine);
+            $again = $this->currentLine != null && preg_match('!^\s*//!', $this->currentLine);
             if ($again) {
                 $this->comment = $this->currentLine;
             }
@@ -88,12 +90,13 @@ class Builder
             while (($line = $this->nextLine(true)) != null) {
                 if (preg_match("/table->(\\w+)\\([\"'](\\w+)(.*)/", $line, $match)) {
                     $fieldname = $match[2];
-                    $this->fields[$fieldname] = new FieldInfo(
+                    $field = new FieldInfo(
                         $fieldname,
                         $match[1],
                         $match[3],
                         $this->comment != null && strpos($this->comment, 'spropert') !== false
                     );
+                    array_push($this->fields, $field);
                 } else if (strpos($this->currentLine, '});') !== false) {
                     break;
                 }
@@ -148,7 +151,7 @@ class Builder
             $parent = dirname($fileTarget);
             if (OsHelper::ensureDirectory($parent)) {
                 foreach (scandir($dirSources) as $file) {
-                    if (! str_ends_with($file, '.json')){
+                    if (!str_ends_with($file, '.json')) {
                         continue;
                     }
                     $full = OsHelper::joinPath($dirSources, $file);
@@ -170,7 +173,7 @@ class Builder
                 $keys = array_keys($summary);
                 sort($keys);
                 $sorted = [];
-                foreach ($keys as $key){
+                foreach ($keys as $key) {
                     $sorted[$key] = $summary[$key];
                 }
                 $contents = json_encode($sorted, JSON_PRETTY_PRINT);
@@ -201,26 +204,26 @@ class Builder
                 } elseif ($line == null) {
                     break;
                 }
-                if (!str_starts_with($line, '##FIELDS##')) {
+                $loopInfo = CaseInfo::startCase($line, $this);
+                if ($loopInfo == null) {
                     array_push($output, $this->replaceVariables($line));
                 } else {
-                    $block = [];
-                    $start = 1 + $this->ixLines;
-                    while (($line = $this->nextLine()) != null) {
-                        if (!str_starts_with($line, '##END.FIELDS##')) {
-                            array_push($block, $this->replaceVariables($line));
-                        } else {
-                            foreach ($this->fields as $name => $field) {
-                                foreach ($block as $line2) {
-                                    array_push($output, $field->replaceVariables($line2));
-                                }
-                            }
+                    $sizeOutput = count($output);
+                    do {
+                        $line = $this->nextLine();
+                        if (str_starts_with($line, '##ON ') || $line === '##ELSE##') {
+                            $loopInfo->handleBlock($output);
+                            $loopInfo->setCondition($line);
+                        } elseif (str_starts_with($line, '##END.CASE##')) {
+                            $loopInfo->handleBlock($output);
                             break;
+                        } else {
+                            $loopInfo->addToBlock($this->replaceVariables($line));
                         }
-                    }
-                    if ($line == null) {
-                        $this->error("missing ##END.FIELDS##. Start in $source-$start");
-                        break;
+                    } while (true);
+                    $comma = count($output) > $sizeOutput ? ',' : '';
+                    if ($sizeOutput > 0){
+                        $output[$sizeOutput - 1] = str_replace('#Comma#', $comma, $output[$sizeOutput - 1]);
                     }
                 }
             } while (true);
@@ -231,10 +234,91 @@ class Builder
     }
 }
 
+class CaseInfo
+{
+    public array $fields;
+    public array $currentConditionFields;
+    public int $index;
+    public $lastField;
+    public array $block;
+    public function __construct(array $fields)
+    {
+        $this->index = -1;
+        $this->fields = $fields;
+        $this->lastField = $fields[count($fields) - 1];
+        $this->block = [];
+    }
+    public function addToBlock(string $line)
+    {
+        array_push($this->block, $line);
+    }
+    public function handleBlock(array &$output)
+    {
+        if (count($this->block) > 0){
+            foreach ($this->currentConditionFields as $field) {
+                $this->index++;
+                foreach ($this->block as $line) {
+                    $line = $field->replaceVariables($line);
+                    $line = $this->replaceVariables($line, $field);
+                    array_push($output, $line);
+                }
+            }
+            $this->block = [];
+        }
+        $this->currentConditionFields = [];
+    }
+    public function replaceVariables(string $line, FieldInfo $field): string
+    {
+        $line = str_replace('#ix#', strval($this->index), $line);
+        $line = str_replace('#no#', strval($this->index + 1), $line);
+        $line = str_replace('#comma#', $field === $this->lastField ? '' : ',', $line);
+        return $line;
+    }
+    public function setCondition(string $line)
+    {
+        $match = null;
+        if ($line === '##ELSE##') {
+            $this->currentConditionFields = $this->fields;
+            $this->fields = [];
+        } else {
+            if (preg_match('/^##ON nameLike\((.*?)\)##$/', $line, $match)) {
+                $regEx = $match[1];
+                foreach ($this->fields as $field) {
+                    if (preg_match("/$regEx/", $field->name)) {
+                        array_push($this->currentConditionFields, $field);
+                    }
+                }
+            } elseif (preg_match('/^##ON typeLike\((.*?)\)##$/', $line, $match)) {
+                $regEx = $match[1];
+                foreach ($this->fields as $field) {
+                    if (preg_match("/$regEx/", $field->type)) {
+                        array_push($this->currentConditionFields, $field);
+                    }
+                }
+            }
+        }
+        $count = count($this->currentConditionFields);
+        foreach ($this->currentConditionFields as $field) {
+            $ix = array_search($field, $this->fields);
+            array_splice($this->fields, $ix, 1);
+        }
+        $this->lastField = $count == 0 ? null :  $this->currentConditionFields[$count - 1];
+    }
+    public static function startCase(string $line, Builder $builder): ?CaseInfo
+    {
+        $rc = null;
+        if (str_starts_with($line, '##CASE(fields)##')) {
+            $rc = new CaseInfo($builder->fields);
+        }
+        return $rc;
+    }
+}
 class FieldInfo
 {
     public string $name;
     public string $nameCapital;
+    public string $baseName;
+    public string $baseNameCapital;
     // string text reference number
     public string $type;
     public bool $multiline;
@@ -247,6 +331,18 @@ class FieldInfo
         $this->reference = null;
         $this->name = $fieldname;
         $this->nameCapital = StringHelper::toCapital($fieldname);
+        $endLength = 0;
+        if (str_ends_with($fieldname, '_id')) {
+            $endLength = 3;
+        } elseif (str_ends_with($fieldname, '_scope')) {
+            $endLength = 6;
+        }
+        if ($endLength == 0) {
+            $this->baseName = $fieldname;
+        } else {
+            $this->baseName = substr($fieldname, 0, strlen($fieldname) - $endLength);
+        }
+        $this->baseNameCapital = StringHelper::toCapital($this->baseName);
         switch ($type) {
             case 'binary':
             case 'date':
@@ -260,15 +356,13 @@ class FieldInfo
                 $this->type = $type;
                 $this->multiline = true;
                 break;
-            case 'longtext':
+            case 'longText':
                 $this->multiline = true;
                 $this->type = 'text';
                 break;
             case 'decimal':
             case 'float':
             case 'double':
-                $this->type = 'number';
-                break;
             case 'tinyInteger':
                 $this->type = 'number';
                 break;
@@ -314,6 +408,8 @@ class FieldInfo
         $line = str_replace('#Field#', $this->nameCapital, $line);
         $line = str_replace('#attribute#', $this->multiline ? 'rows="2" ' : '', $line);
         $line = str_replace('#position#', 'alone', $line);
+        $line = str_replace('#base#', $this->baseName, $line);
+        $line = str_replace('#Base#', $this->baseNameCapital, $line);
         return $line;
     }
 }
@@ -393,9 +489,10 @@ function main()
         usage("missing argument: $count");
     } else {
         $args = [];
+        $templates = is_dir('templates/builder') ? 'templates/builder' : 'vendor/hamatoma/laraknife/templates/builder';
         $options = [
             'module' => null,
-            'templates' => 'vendor/hamatoma/laraknife/templates/builder',
+            'templates' => $templates,
             'views' => 'resources/views',
             'controllers' => 'app/Http/Controllers',
             'models' => 'app/Models',
@@ -423,12 +520,21 @@ function main()
                             usage("missing FILE_MIGRATION");
                         } else {
                             $builder->setModule($options['module']);
-                            $builder->readDefinition($args[1], );
+                            $builder->readDefinition($args[1]);
                             $views = $options['views'];
                             $controllers = $options['controllers'];
                             $models = $options['models'];
                             $builder->createModule($options['templates'], $views, $controllers, $models);
                         }
+                        break;
+                    case 'test:mini':
+                        $builder->readDefinition('tests/data/demo.input.php');
+                        $builder->writeTemplateToFile('tests/data/demo.templ', '/tmp/unittest/demo.out');
+                        break;
+                    case 'test:maxi':
+                        $builder->readDefinition('tests/data/demo.input.php');
+                        $controllers = $models = $views = '/tmp/unittest';
+                        $builder->createModule($options['templates'], $views, $controllers, $models);
                         break;
                     default:
                         $builder->error("unknown MODE: $args[0]");

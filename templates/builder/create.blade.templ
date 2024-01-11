@@ -4,10 +4,15 @@
     <form id="#module#-create" action="/#module#-create" method="POST">
         @csrf
         <x-laraknife.create-panel title="{{ __('Creation of a #Module#') }}" error="{{$error}}">
-##FIELDS##
-            <x-laraknife.#type# position="#position#" name="#field#" label="#Field#" width2="4" #attribute#/>
-##END.FIELDS##
-            <x-laraknife.combobox position="alone" name="xxx" label="XXX" :options="$optionXXX" value="{{ $#module#->#field# }}" width2="4"/>
+##CASE(fields)##
+##ON nameLike(_(scope|id)$)##
+        <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$option#Base#" value="{{ $#module#->#field# }}" width2="4"/>
+##ON typeLike([Tt]ext$)##
+        <x-laraknife.bigtext position="alone" name="#field#" label="#Field#" width2="4" #attribute#/>
+##ELSE##
+        <x-laraknife.#type# position="alone" name="#field#" label="#Field#" width2="4" #attribute#/>
+##END.CASE##
+            
 </x-laraknife.create-panel>
     </form>
 @endsection

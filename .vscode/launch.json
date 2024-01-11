@@ -29,6 +29,16 @@
             "port": 9082
         },
         {
+            "name": "Debug Builder",
+            "type": "php",
+            "request": "launch",
+            "program": "app/Helpers/Builder.php",
+            "cwd": "${workspaceRoot}",
+            "args": ["test:maxi", "--force"],
+            "externalConsole": false,
+            "port": 9082
+        },
+        {
             "name": "Listen for Xdebug",
             "type": "php",
             "request": "launch",
