@@ -1,5 +1,10 @@
 # Development phase
 
+## 0.2.1 2024.01.25 Refactoring of installation
+- laraknife-tool.sh: new tasks: init-i18n fill-db adapt-modules create-layout create-home
+- new: CreateLaraProj.sh IncludeLara.sh PutBug.sh
+- new: templates/home.templ + layout.templ
+
 ## 0.2.0 2024.01.11 Template model switched to "CASE(fields)"
 - Builder.php: refactoring: pattern based conditions for field based templates
 - Builder.php: new modes: test:mini + test:maxi
