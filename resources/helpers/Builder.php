@@ -3,6 +3,10 @@ namespace App\Helpers;
 
 if (is_dir(__DIR__ . '/../vendor')) {
     require __DIR__ . '/../vendor/autoload.php';
+} elseif (file_exists(__DIR__ . '/../../../../autoload.php')) {
+    require __DIR__ . '/../../../../autoload.php';
+    require_once 'StringHelper.php';
+    require_once 'OsHelper.php';
 } elseif (is_dir(__DIR__ . '/../../vendor')) {
     require __DIR__ . '/../../vendor/autoload.php';
     require_once 'StringHelper.php';

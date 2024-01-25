@@ -1,5 +1,8 @@
 # Development phase
 
+## 0.2.2 2024.01.25 Wrong finding autoload.php in Builder.php
+- additional path for autoload.php in Builder.php
+
 ## 0.2.1 2024.01.25 Refactoring of installation
 - laraknife-tool.sh: new tasks: init-i18n fill-db adapt-modules create-layout create-home
 - new: CreateLaraProj.sh IncludeLara.sh PutBug.sh

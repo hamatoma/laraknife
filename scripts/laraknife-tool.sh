@@ -120,6 +120,7 @@ EOS
   chmod +x $script
   test "$option" = "--force" && rm larascripts
   ln -s $base/scripts larascripts
+  composer dump-autoload
 }
 # ===
 function InitI18N(){
