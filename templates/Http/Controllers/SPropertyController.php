@@ -73,8 +73,8 @@ class SPropertyController extends Controller
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
-            $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
             $scopes = SProperty::scopes();
             $options = ViewHelper::buildEntriesOfCombobox($scopes, null,
                 isset($fields['scope']) ? $fields['scope'] : '', '<All>', true);

@@ -26,7 +26,7 @@ class UserController extends Controller
             if (count($_POST) > 0) {
                 $fields = $_POST;
                 try {
-                    $incomingFields = $request->validate($this->rules());
+                    $incomingFields = $request->validate($this->rules(true));
                     $rc = $this->store($request);
                 } catch (\Exception $e) {
                     $error = $e->getMessage();
@@ -44,14 +44,58 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit(User $user, Request $request)
+    {
+        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+            $rc = redirect('/user-index');
+        } elseif (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnSetPassword') {
+            $rc = redirect('/user-editpassword/' . strval($user->id));
+        } else {
+            $rc = null;
+            $error = null;
+            if (count($_POST) > 0) {
+                $fields = $_POST;
+                try {
+                    $incomingFields = $request->validate($this->rules(false));
+                    $rc = $this->update($user, $request);
+                } catch (\Exception $e) {
+                    $error = $e->getMessage();
+                }
+            }
+            if ($rc == null) {
+                $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $$user->role_id ?? '', '');
+                $rc = view('user.edit', ['user' => $user, 'roleOptions' => $options, 'error' => $error]);
+            }
+        }
+        return $rc;
+    }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function editPassword(User $user, Request $request)
     {
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
             $rc = null;
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $$user->role_id ?? '', '');
-            $rc = view('user.edit', ['user' => $user, 'roleOptions' => $options]);
+            $error = null;
+            if (count($_POST) > 0) {
+                $fields = $_POST;
+                try {
+                    unset($_POST['name']);
+                    $incomingFields = $request->validate([
+                        'password' => 'required|confirmed',
+                        'password_confirmation' => 'required'
+                    ]);
+                    $user->update($incomingFields);
+                    $rc = redirect('/user-index');
+                } catch (\Exception $e) {
+                    $error = $e->getMessage();
+                }
+            }
+            if ($rc == null) {
+                $rc = view('user.changepw', ['user' => $user, 'error' => $error]);
+            }
         }
         return $rc;
     }
@@ -87,8 +131,8 @@ class UserController extends Controller
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
-            $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
             $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role']);
             $rc = view('user.index', [
                 'records' => $records,
@@ -103,7 +147,7 @@ class UserController extends Controller
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreation = true): array
+    private function rules(bool $isCreation = false): array
     {
         if ($isCreation) {
             $rc = [
@@ -132,6 +176,8 @@ class UserController extends Controller
         Route::get('/user-edit/{user}', [UserController::class, 'edit']);
         Route::post('/user-edit/{user}', [UserController::class, 'edit']);
         Route::post('/user-update/{user}', [UserController::class, 'update']);
+        Route::get('/user-editpassword/{user}', [UserController::class, 'editPassword']);
+        Route::post('/user-editpassword/{user}', [UserController::class, 'editPassword']);
         Route::get('/user-show/{user}/delete', [UserController::class, 'show']);
         Route::delete('/user-show/{user}/delete', [UserController::class, 'destroy']);
     }
@@ -155,7 +201,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
+            $incomingFields = $request->validate($this->rules(true));
             User::create($incomingFields);
         }
         return redirect('/user-index');
@@ -175,7 +221,7 @@ class UserController extends Controller
                 $rc = back();
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/user-index');
         }
         return $rc;

@@ -7,12 +7,24 @@ var debug = function (message) {
 var autoClick = function(){
     document.getElementById('_btnInternal').click();
 }
+var paginationClick = function(){
+    const pageNo = Number.parseInt(this.innerHTML) - 1;
+    document.getElementsByName('pageIndex')[0].value = pageNo;
+    document.getElementById('_btnInternal').click();
+}
 var setAutoUpdate = function(){
     const elements = document.getElementsByClassName('lkn-autoupdate');
     for (let ix=0; ix < elements.length; ix++){
         let item = elements[ix];
         item.addEventListener("change", autoClick);
     }
+}
+var setPaginationClick = function(){
+    const elements = document.getElementsByClassName('page-link');
+    for (let ix=0; ix < elements.length; ix++){
+        let item = elements[ix];
+        item.addEventListener("click", paginationClick);
+    }   
 }
 var onClickSort = function (event) {
     if (window.globalSorter != null) {
@@ -146,4 +158,5 @@ ready(() => {
     window.globalSorter = new TableSorter();
     window.globalSorter.initializeForm();
     setAutoUpdate();
+    setPaginationClick();
 }); 

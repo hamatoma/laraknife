@@ -28,7 +28,7 @@ class Pagination
     public function __construct(string $sql, array $parameters, array $fields, ?string $sqlTotalCount = null,
         int $visiblePages = 9, int $defaultPageSize = 20)
     {
-        $this->defaultPageSize = $defaultPageSize;
+         $this->defaultPageSize = $defaultPageSize;
         $this->visiblePages = intval(max(5, $visiblePages) / 2) * 2 + 1;
         if ($sqlTotalCount == null) {
             $match = null;
@@ -56,6 +56,9 @@ class Pagination
         $this->filteredCount = $rec->count;
         $this->pageIndex = array_key_exists('pageIndex', $fields) ? intval($fields['pageIndex']) : 0;
         $this->pageSize = array_key_exists('pageSize', $fields) ? intval($fields['pageSize']) : $this->defaultPageSize;
+        $offset = $this->pageIndex * $this->pageSize;
+        $sql .= " limit $offset, $this->pageSize";
+        $this->records = DB::select($sql, $parameters);
     }
     public function legendText(int $countCriteria = 2): string
     {

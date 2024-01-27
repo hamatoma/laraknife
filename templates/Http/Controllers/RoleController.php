@@ -76,8 +76,8 @@ class RoleController extends Controller
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
-            $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
             return view('role.index', [
                 'records' => $records,
                 'fields' => $fields,

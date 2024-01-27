@@ -1,5 +1,14 @@
 # Development phase
 
+## 0.2.5 2024.01.28 Pagination links work, password change
+- new: setposition.blade.php
+- new: changepw.blade.php
+- edit.blade.php: new button "set password"
+- sortable-table-panel.blade.php: wrong value in field pageIndex
+- Pagination.php: records will be fetched inside. Limit and offset are used now
+- laraknife.js: new: paginationClick() and setPaginationClick()
+- RoleController, SPropertyController, UserController: index(): records from $pagination
+
 ## 0.2.4 2024.01.27 Example module "notes" works better
 - laraknife-tool.sh: new mode "rest"
 - controller.templ: corrections in index() and show()
