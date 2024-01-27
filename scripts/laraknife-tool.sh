@@ -105,11 +105,15 @@ EOS
     chmod +x $script
   fi
   script=Build
-  cat <<EOS >$script
+  cat <<'EOS' >$script
 #! /bin/bash
 composer update
 composer dump-autoload
-npm run build
+if [ "$1" = prod ]; then
+  npm run build
+else
+  npm run dev
+fi
 EOS
   chmod +x $script
   script=Lara

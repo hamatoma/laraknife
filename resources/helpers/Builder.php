@@ -18,7 +18,7 @@ if (is_dir(__DIR__ . '/../vendor')) {
 use App\Helpers\OsHelper;
 use App\Helpers\StringHelper;
 
-$VERSION = '2023.12.25';
+$VERSION = '2024.01.27';
 class Builder
 {
     protected array $lines = [];
@@ -30,6 +30,7 @@ class Builder
     protected string $moduleCapital = '';
     /// fieldname => fieldObject
     public array $fields = [];
+    public ?FieldInfo $secondary = null;
     /// field objects:
     protected ?string $comment = null;
     public bool $force = false;
@@ -100,6 +101,9 @@ class Builder
                         $match[3],
                         $this->comment != null && strpos($this->comment, 'spropert') !== false
                     );
+                    if ($fieldname !== 'id' && $this->secondary == null){
+                        $this->secondary = $field;
+                    }
                     array_push($this->fields, $field);
                 } else if (strpos($this->currentLine, '});') !== false) {
                     break;
@@ -245,12 +249,14 @@ class CaseInfo
     public int $index;
     public $lastField;
     public array $block;
-    public function __construct(array $fields)
+    public Builder $builder;
+    public function __construct(array $fields, Builder &$builder)
     {
         $this->index = -1;
         $this->fields = $fields;
         $this->lastField = $fields[count($fields) - 1];
         $this->block = [];
+        $this->builder = $builder;
     }
     public function addToBlock(string $line)
     {
@@ -299,6 +305,8 @@ class CaseInfo
                         array_push($this->currentConditionFields, $field);
                     }
                 }
+            } elseif (preg_match('/^##ON isSecondary##$/', $line, $match)) {
+                array_push($this->currentConditionFields, $this->builder->secondary);
             }
         }
         $count = count($this->currentConditionFields);
@@ -312,7 +320,7 @@ class CaseInfo
     {
         $rc = null;
         if (str_starts_with($line, '##CASE(fields)##')) {
-            $rc = new CaseInfo($builder->fields);
+            $rc = new CaseInfo($builder->fields, $builder);
         }
         return $rc;
     }

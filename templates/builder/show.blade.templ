@@ -7,16 +7,14 @@
         @method('DELETE')
         @endif
         <x-laraknife.show-panel title="{{ __($mode !== 'delete' ? 'A #Module#' : 'Deletion of a #Module#') }}" mode="{{$mode}}">
-            <x-laraknife.text position="first" name="id" label="Id" value="{{ $#module#->id }}" width2="4"
-                attribute="readonly" />
-
+            <x-laraknife.text position="first" name="id" label="Id" value="{{ $#module#->id }}" width2="4" attribute="readonly" />
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-            <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$option#Base#" value="{{ $#module#->#field# }}" width2="4"/>
+            <x-laraknife.combobox position="alone" name="#field#" label="#Base#" :options="$options#Base#" value="{{ $#module#->#field# }}" width2="4" attribute="readonly"/>
 ##ON typeLike([Tt]ext$)##
-            <x-laraknife.bigtext position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" #attribute#/>
+            <x-laraknife.bigtext position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" attribute="readonly" rows="2" />
 ##ELSE##
-            <x-laraknife.#type# position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" #attribute#/>
+            <x-laraknife.#type# position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" attribute="readonly" />
 ##END.CASE##
         </x-laraknife.show-panel>
     </form>

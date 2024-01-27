@@ -43,14 +43,14 @@ class #Module#Controller extends Controller
             if ($rc == null){
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-                $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], '-');
+                $options#Base# = SProperty::optionsByScope('#base#', $fields['#field#'], '-');
 ##ON nameLike(_id$)##
                 $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
 ##END.CASE##                
                 $rc = view('#module#.create', [
                     'fields' => $fields,
 ##CASE(fields)##
-##ON nameLike(_scope$)##
+##ON nameLike(_(scope|id)$)##
                     'options#Base#' => $options#Base#,
 ##END.CASE##
                     'error' => $error]);
@@ -61,24 +61,38 @@ class #Module#Controller extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(#Module# $#module#)
+    public function edit(#Module# $#module#, Request $request)
     {
         if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
+            $rc = null;
+            $error = null;
+            if (count($_POST) > 0) {
+                $fields = $_POST;
+                try {
+                    $incomingFields = $request->validate($this->rules(false));
+                    $rc = $this->update($note, $request);
+                } catch(\Exception $e ){ 
+                    $error = $e->getMessage();
+                }
+            }
+            if ($rc == null){
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-            $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], '');
+                $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+                $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
 ##END.CASE##                
-            $rc = view('#module#.edit', [
-                '#module#' => $#module#,
+                $rc = view('#module#.edit', [
+                    '#module#' => $#module#,
 ##CASE(fields)##
 ##ON nameLike(_(id|scope)$)##
-                'options#Base#' => $options#Base##comma#
+                    'options#Base#' => $options#Base#,
 ##END.CASE##
-            ]);
+                    'error' => $error
+                ]);
+            }
         }
         return $rc;
     }
@@ -108,7 +122,7 @@ class #Module#Controller extends Controller
                 . ' FROM #table# t0'
 ##CASE(fields)##
 ##ON nameLike(_(scope|ix)$)##
-                . ' LEFT JOIN t#no# ON t#no#.id=t0.#field#'
+                . ' LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#'
 ##END.CASE##
                 ;
             $parameters = [];
@@ -118,13 +132,23 @@ class #Module#Controller extends Controller
 ##ON nameLike(.)##
                 '#field#' => '',
 ##END.CASE##
-                '_sortParams' => 'id:asc;#secondary#:desc'
+                '_sortParams' => 'id:asc' 
+##CASE(fields)##
+##ON isSecondary##
+                                . ';#field#:desc'
+##END.CASE##
                 ];
             } else {
                 $fields = $_POST;
                 $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, '#secondary#');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
+##CASE(fields)##
+##ON nameLike(_(scope|id)$)##
+                ViewHelper::addConditionComparism($conditions, $parameters, '#field#');
+##ON typeLike((tring|[tT]ext)$)##
+                ViewHelper::addConditionPattern($conditions, $parameters, '#field#,other_field', 'text');
+##ELSE##
+                ViewHelper::addConditionComparism($conditions, $parameters, '#field#', null, '=');
+##END.CASE##
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
@@ -132,14 +156,16 @@ class #Module#Controller extends Controller
             $pagination = new Pagination($sql, $parameters, $fields);
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-            $options#Base# = SProperty::optionsByScope('scope#Base#', $fields['#base#'], 'all');
+            $options#Base# = SProperty::optionsByScope('scope#Base#', $fields['#field#'], 'all');
+##ON nameLike(_id$)##
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#']);
+
 ##END.CASE##
-            $optionsYYY = SProperty::optionsByScope('scopeYYY', $fields['yyy'], 'all');
             return view('#module#.index', [
                 'records' => $records,
                 'fields' => $fields,
 ##CASE(fields)##
-##ON nameLike(_scope$)##
+##ON nameLike((_scope|id)$)##
                 'options#Base#' => $options#Base#,
 ##END.CASE##
                 'pagination' => $pagination
@@ -183,9 +209,9 @@ class #Module#Controller extends Controller
         } else {
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-            $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], '');
+            $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
 ##END.CASE##                
             $rc = view('#module#.edit', [
                 '#module#' => $#module#,
@@ -223,9 +249,11 @@ class #Module#Controller extends Controller
         if ($request->btnSubmit === 'btnStore') {
             try {
                 $incomingFields = $request->validate($this->rules());
-                $incomingFields['info'] = strip_tags($incomingFields['info']);
+##CASE(fields)##
+##ON typeLike([tT]ext$)##
+                $incomingFields['#field#'] = strip_tags($incomingFields['#field#']);
+##END.CASE##            
                 $#module#->update($incomingFields);
-                $rc = redirect('/#module#-index');
             } catch (\Exception $exc) {
                 $msg = $exc->getMessage();
                 $rc = back();

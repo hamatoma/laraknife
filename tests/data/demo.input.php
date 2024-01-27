@@ -14,12 +14,11 @@ return new class extends Migration
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('word_id')->references('id')->on('words');
             $table->string('title', 64);
             $table->longText('body');
             // foreign key of sproperties: but sproperties.id is integer, not biginteger
             $table->integer('category_scope');
-            $table->integer('group_scope');
+            $table->integer('status_scope');
             // foreign key of users
             $table->foreignId('user_id')->nullable()->default(null)->references('id')->on('users');
         });

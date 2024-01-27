@@ -6,7 +6,7 @@
         <x-laraknife.create-panel title="{{ __('Creation of a #Module#') }}" error="{{$error}}">
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-        <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$option#Base#" value="{{ $#module#->#field# }}" width2="4"/>
+        <x-laraknife.combobox position="alone" name="#field#" label="#Base#" :options="$options#Base#" value="{{ $fields['#field#'] }}" width2="4"/>
 ##ON typeLike([Tt]ext$)##
         <x-laraknife.bigtext position="alone" name="#field#" label="#Field#" width2="4" #attribute#/>
 ##ELSE##
