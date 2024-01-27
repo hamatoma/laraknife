@@ -1,5 +1,16 @@
 # Development phase
 
+## 0.2.4 2024.01.27 Example module "notes" works better
+- laraknife-tool.sh: new mode "rest"
+- controller.templ: corrections in index() and show()
+- index.templ: class "lkn-autoupdate" for sproperties comboboxes
+
+## 0.2.3 2024.01.27 Example module "notes" works
+- edit-panel.blade: added: error
+- Builder: new condition isSecondary in ##CASE## construct
+- laraknife-tool.sh: created "Build": parameter "prod" for production
+- *.templ: many errors corrected
+
 ## 0.2.2 2024.01.25 Wrong finding autoload.php in Builder.php
 - additional path for autoload.php in Builder.php
 

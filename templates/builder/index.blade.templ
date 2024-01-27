@@ -7,7 +7,7 @@
       <x-laraknife.filter-panel legend="{{ $pagination->legendText() }}">
 ##CASE(fields)##
 ##ON nameLike(_(id|scope)$)##
-      <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$options#Base#" width2="4" />
+      <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$options#Base#" class="lkn-autoupdate" width2="4" />
 ##ELSE##
       <x-laraknife.text position="alone" name="#field#" label="#Field#" value="{{$fields['#field#']}}" width2="4" />
 ##END.CASE##

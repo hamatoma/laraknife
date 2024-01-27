@@ -228,6 +228,13 @@ create-layout)
 create-home)
   CreateHome
   ;;
+rest)
+  InitI18N
+  FillDb
+  AdaptModules
+  CreateLayout
+  CreateHome
+  ;;
 *)
   Usage "unknown TASK: $MODE"
   ;;

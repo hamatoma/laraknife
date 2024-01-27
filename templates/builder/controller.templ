@@ -116,12 +116,12 @@ class #Module#Controller extends Controller
         } else {
             $sql = 'SELECT t0.*#Comma#'
 ##CASE(fields)##
-##ON nameLike(_(scope|ix)$)##
-                . 't#no#.name as #base##comma# '
+##ON nameLike(_(scope|id)$)##
+                . 't#no#.name as #field##comma# '
 ##END.CASE##
                 . ' FROM #table# t0'
 ##CASE(fields)##
-##ON nameLike(_(scope|ix)$)##
+##ON nameLike(_(scope|id)$)##
                 . ' LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#'
 ##END.CASE##
                 ;
@@ -129,7 +129,9 @@ class #Module#Controller extends Controller
             if (count($_POST) == 0) {
                 $fields = [
 ##CASE(fields)##
-##ON nameLike(.)##
+##ON nameLike(_(scope|id)$)##
+                '#base#' => '',
+##ELSE##
                 '#field#' => '',
 ##END.CASE##
                 '_sortParams' => 'id:asc' 
@@ -143,7 +145,7 @@ class #Module#Controller extends Controller
                 $conditions = [];
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-                ViewHelper::addConditionComparism($conditions, $parameters, '#field#');
+                ViewHelper::addConditionComparism($conditions, $parameters, '#field#', '#base#');
 ##ON typeLike((tring|[tT]ext)$)##
                 ViewHelper::addConditionPattern($conditions, $parameters, '#field#,other_field', 'text');
 ##ELSE##
@@ -156,10 +158,9 @@ class #Module#Controller extends Controller
             $pagination = new Pagination($sql, $parameters, $fields);
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-            $options#Base# = SProperty::optionsByScope('scope#Base#', $fields['#field#'], 'all');
+            $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], 'all');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#']);
-
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#base#']);
 ##END.CASE##
             return view('#module#.index', [
                 'records' => $records,
@@ -213,7 +214,7 @@ class #Module#Controller extends Controller
 ##ON nameLike(_id$)##
             $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
 ##END.CASE##                
-            $rc = view('#module#.edit', [
+            $rc = view('#module#.show', [
                 '#module#' => $#module#,
 ##CASE(fields)##
 ##ON nameLike(_(id|scope)$)##
