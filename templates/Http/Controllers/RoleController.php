@@ -22,8 +22,8 @@ class RoleController extends Controller
     {
         $rc = null;
         $error = null;
-        if (count($_POST) > 0) {
-            $fields = $_POST;
+        $fields = $request->all();
+        if (count($fields) > 0) {
             try {
                 $incomingFields = $request->validate($this->rules());
                 $rc = $this->store($request);
@@ -56,21 +56,21 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
+        if ($request->btnSubmit === 'btnNew') {
             return redirect('/role-create');
         } else {
             $sql = 'SELECT * FROM roles';
             $parameters = [];
-            if (count($_POST) == 0) {
+            $fields = $request->all();
+            if (count($fields) == 0) {
                 $fields = [
                     'name' => '',
                     'priority' => '',
                     '_sortParams' => 'name:asc;priority:asc'
                 ];
             } else {
-                $fields = $_POST;
                 $conditions = [];
                 ViewHelper::addConditionPattern($conditions, $parameters, 'name', 'name');
                 $sql = DbHelper::addConditions($sql, $conditions);
@@ -122,7 +122,7 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
+        if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules());
             Role::create($incomingFields);
         }
@@ -133,7 +133,7 @@ class RoleController extends Controller
      */
     public function update(Role $role, Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
+        if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules());
             $role->update($incomingFields);
         }

@@ -18,13 +18,13 @@ class UserController extends Controller
      */
     public function create(Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        $fields = $request->all();
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
             $rc = null;
             $error = null;
-            if (count($_POST) > 0) {
-                $fields = $_POST;
+            if (count($fields) > 0) {
                 try {
                     $incomingFields = $request->validate($this->rules(true));
                     $rc = $this->store($request);
@@ -46,15 +46,15 @@ class UserController extends Controller
      */
     public function edit(User $user, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/user-index');
-        } elseif (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnSetPassword') {
+        } elseif ($request->btnSubmit === 'btnSetPassword') {
             $rc = redirect('/user-editpassword/' . strval($user->id));
         } else {
             $rc = null;
             $error = null;
-            if (count($_POST) > 0) {
-                $fields = $_POST;
+            $fields = $request->all();
+            if (count($fields) > 0) {
                 try {
                     $incomingFields = $request->validate($this->rules(false));
                     $rc = $this->update($user, $request);
@@ -74,13 +74,13 @@ class UserController extends Controller
      */
     public function editPassword(User $user, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
             $rc = null;
             $error = null;
-            if (count($_POST) > 0) {
-                $fields = $_POST;
+            $fields = $request->all();
+            if (count($fields) > 0) {
                 try {
                     unset($_POST['name']);
                     $incomingFields = $request->validate([
@@ -112,17 +112,17 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
+        if ($request->btnSubmit === 'btnNew') {
             $rc = redirect('/user-create');
         } else {
             $sql = 'SELECT t0.*, t1.name as role FROM users t0 LEFT JOIN roles t1 on t0.role_id=t1.id ';
             $parameters = [];
-            if (count($_POST) == 0) {
+            $fields = $request->all();
+            if (count($fields) == 0) {
                 $fields = ['id' => '', 'text' => '', 'role' => '0', '_sortParams' => 'id:asc'];
             } else {
-                $fields = $_POST;
                 $conditions = [];
                 $parameters = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 't0.role_id', 'role');
@@ -184,12 +184,12 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(User $user, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id ?? '', '');
             $rc = view('user.show', ['user' => $user, 'mode' => 'delete', 'roleOptions' => $options]);
         }
         return $rc;

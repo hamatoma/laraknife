@@ -19,8 +19,8 @@ class SPropertyController extends Controller
     {
         $rc = null;
         $error = null;
-        if (count($_POST) > 0) {
-            $fields = $_POST;
+        $fields = $request->all();
+        if (count($fields) > 0) {
             try {
                 $incomingFields = $request->validate($this->rules(true));
                 $rc = $this->store($request);
@@ -46,9 +46,9 @@ class SPropertyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SProperty $sproperty)
+    public function destroy(SProperty $sproperty, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnDelete') {
+        if ($request->btnSubmit === 'btnDelete') {
             $sproperty->delete();
         }
         return redirect('/sproperty-index');
@@ -56,17 +56,17 @@ class SPropertyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] == 'btnNew') {
+        if ($request->btnSubmit === 'btnNew') {
             return redirect('/sproperty-create');
         } else {
             $sql = 'SELECT * FROM sproperties';
             $parameters = [];
-            if (count($_POST) == 0) {
+            $fields = $request->all();
+            if (count($fields) == 0) {
                 $fields = ['scope' => '', 'text' => '', '_sortParams' => 'scope:asc;order:asc;name:asc'];
             } else {
-                $fields = $_POST;
                 $conditions = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'scope');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
@@ -130,7 +130,7 @@ class SPropertyController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
+        if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules(true));
             $incomingFields['info'] = strip_tags($incomingFields['info']);
             SProperty::create($incomingFields);
@@ -142,7 +142,7 @@ class SPropertyController extends Controller
      */
     public function update(SProperty $sproperty, Request $request)
     {
-        if ($request->btnSubmit == 'btnStore') {
+        if ($request->btnSubmit === 'btnStore') {
             $incomingFields = $request->validate($this->rules());
             $incomingFields['info'] = strip_tags($incomingFields['info']);
             $sproperty->update($incomingFields);

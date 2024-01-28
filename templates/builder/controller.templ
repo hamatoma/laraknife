@@ -19,13 +19,13 @@ class #Module#Controller extends Controller
      */
     public function create(Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
             $rc = null;
             $error = null;
-            if (count($_POST) > 0) {
-                $fields = $_POST;
+            $fields = $request->all();
+            if (count($fields) > 0) {
                 try {
                     $incomingFields = $request->validate($this->rules(true));
                     $rc = $this->store($request);
@@ -63,16 +63,16 @@ class #Module#Controller extends Controller
      */
     public function edit(#Module# $#module#, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
             $rc = null;
             $error = null;
-            if (count($_POST) > 0) {
-                $fields = $_POST;
+            $fields = $request->all();
+            if (count($fields) > 0) {
                 try {
                     $incomingFields = $request->validate($this->rules(false));
-                    $rc = $this->update($note, $request);
+                    $rc = $this->update($#module#, $request);
                 } catch(\Exception $e ){ 
                     $error = $e->getMessage();
                 }
@@ -101,7 +101,7 @@ class #Module#Controller extends Controller
      */
     public function destroy(#Module# $#module#, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnDelete') {
+        if ($request->btnSubmit === 'btnDelete') {
             $#module#->delete();
         }
         return redirect('/#module#-index');
@@ -109,9 +109,9 @@ class #Module#Controller extends Controller
     /**
      * Display the database records of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnNew') {
+        if ($request->btnSubmit === 'btnNew') {
             return redirect('/#module#-create');
         } else {
             $sql = 'SELECT t0.*#Comma#'
@@ -126,7 +126,8 @@ class #Module#Controller extends Controller
 ##END.CASE##
                 ;
             $parameters = [];
-            if (count($_POST) == 0) {
+            $fields = $request->all();
+            if (count($fields) == 0) {
                 $fields = [
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
@@ -141,7 +142,6 @@ class #Module#Controller extends Controller
 ##END.CASE##
                 ];
             } else {
-                $fields = $_POST;
                 $conditions = [];
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
@@ -154,8 +154,8 @@ class #Module#Controller extends Controller
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
-            $records = DB::select($sql, $parameters);
             $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], 'all');
@@ -203,9 +203,9 @@ class #Module#Controller extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(#Module# $#module#)
+    public function show(#Module# $#module#, Request $request)
     {
-        if (array_key_exists('btnSubmit', $_POST) && $_POST['btnSubmit'] === 'btnCancel') {
+        if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
 ##CASE(fields)##

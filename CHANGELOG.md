@@ -1,5 +1,11 @@
 # Development phase
 
+## 0.2.6 2024.01.28 Refactoring controller
+- refactoring controller.templ, RoleController, UserController, SPropertyController
+  - detection of the current button
+  - $_POST replaced by $request->all()
+  - index(): $records will be fetched from $pagination
+
 ## 0.2.5 2024.01.28 Pagination links work, password change
 - new: setposition.blade.php
 - new: changepw.blade.php
