@@ -8,6 +8,7 @@
 @endif
 <div class="col-md-{{ $width2 }}">
     <input class="lkn-expand100" id="fld_{{$name}}" name="{{ $name }}" value="{{ $value }}" @if($placeholder !== '')) placeholder="{{ $placeholder }}" @endif {{$attribute}}>
+    <x-laraknife.field-error name="{{$name}}" />
 </div>
 @if($position === 'alone' || $position === 'last')
 </div>

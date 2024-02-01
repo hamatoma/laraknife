@@ -82,3 +82,6 @@ ul.lkn-pagination{
     border: 0.075rem black solid;
     border-radius: 0.25rem;
 }
+.lkn-field-error {
+    color: red;
+}

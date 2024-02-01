@@ -4,11 +4,12 @@
 @endif
 @if ($width1 > 0)
 <div class="col-md-{{$width1}}">
-    <label for="{{$name}}">{{ __($label) }}</label>
+    <label for="fld_{{$name}}">{{ __($label) }}</label>
 </div>
 @endif
 <div class="col-md-{{ $width2 }}">
-     <textarea class="lkn-expand100" id="{{$name}}" name="{{$name}}" rows="{{$rows}}" @if($placeholder !== '') placeholder="{{$placeholder}}" @endif {{ $attribute }}>{{$value}}</textarea>
+     <textarea class="lkn-expand100" id="fld_{{$name}}" name="{{$name}}" rows="{{$rows}}" @if($placeholder !== '') placeholder="{{$placeholder}}" @endif {{ $attribute }}>{{$value}}</textarea>
+     <x-laraknife.field-error name="{{$name}}" />
 </div>
 @if($position === 'alone' || $position === 'last')
 </div>

@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use App\Models\SProperty;
-use App\Helpers\DbHelper;
-use App\Helpers\ViewHelper;
-use App\Helpers\Pagination;
+use Illuminate\Support\Facades\Validator;
 
 class SPropertyController extends Controller
 {
@@ -20,28 +23,33 @@ class SPropertyController extends Controller
         $rc = null;
         $error = null;
         $fields = $request->all();
-        if (count($fields) > 0) {
-            try {
-                $incomingFields = $request->validate($this->rules(true));
-                $rc = $this->store($request);
-            } catch(\Exception $e ){ 
-                $error = $e->getMessage();
-            }
-        } else {
-            $fields = ['id' => '', 'scope' => '', 'name' => '', 'shortname' => '',
-                'order' => '', 'value' => '', 'info' => ''];
+        if (count($fields) === 0) {
+            $fields = [
+                'id' => '',
+                'scope' => '',
+                'name' => '',
+                'shortname' => '',
+                'order' => '10',
+                'value' => '',
+                'info' => ''
+            ];
         }
-        if ($rc == null){
-            $rc = view('sproperty.create', ['fields' => $fields, 'error' => $error]);
-        }
+        $context = new ContextLaraKnife($request, $fields);
+        $rc = view('sproperty.create', ['context' => $context]);
         return $rc;
     }
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SProperty $sproperty)
+    public function edit(SProperty $sproperty, Request $request)
     {
-        return view('sproperty.edit', ['sproperty' => $sproperty]);
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/sproperty-index');
+        } else {
+            $context = new ContextLaraKnife($request, null, $sproperty);
+            $rc = view('sproperty.edit', ['context' => $context]);
+        }
+        return $rc;
     }
     /**
      * Remove the specified resource from storage.
@@ -59,7 +67,7 @@ class SPropertyController extends Controller
     public function index(Request $request)
     {
         if ($request->btnSubmit === 'btnNew') {
-            return redirect('/sproperty-create');
+            $rc = redirect('/sproperty-create');
         } else {
             $sql = 'SELECT * FROM sproperties';
             $parameters = [];
@@ -76,32 +84,39 @@ class SPropertyController extends Controller
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $scopes = SProperty::scopes();
-            $options = ViewHelper::buildEntriesOfCombobox($scopes, null,
-                isset($fields['scope']) ? $fields['scope'] : '', '<All>', true);
-            return view('sproperty.index', [
+            $scopeOptions = ViewHelper::buildEntriesOfCombobox(
+                $scopes,
+                null,
+                isset($fields['scope']) ? $fields['scope'] : '',
+                '<All>',
+                true
+            );
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('sproperty.index', [
+                'context' => $context,
                 'records' => $records,
-                'fields' => $fields,
-                'options' => $options,
-                'pagination' => $pagination
+                'pagination' => $pagination,
+                'options' => $scopeOptions
             ]);
         }
+        return $rc;
     }
     /**
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreate = false): array
+    private function rules(bool $isCreate = false, ?SProperty $sproperty = null): array
     {
         $rc = [
-            'scope' => 'required|alpha',
-            'name' => 'required',
+            'scope' => 'required|alpha_num',
+            'name' => 'required|alpha_num',
             'order' => 'integer|min:1|max:9999',
             'shortname' => 'required|alpha_num',
             'value' => 'nullable',
             'info' => 'nullable'
         ];
         if ($isCreate) {
-            $rc['id'] = 'required|integer|min:1|unique:sproperties';
+            $rc['id'] = ['required', 'min:1', 'max:100000', Rule::unique('sproperties')->ignore($sproperty)];
         }
         return $rc;
     }
@@ -110,9 +125,9 @@ class SPropertyController extends Controller
         Route::get('/sproperty-index', [SPropertyController::class, 'index']);
         Route::post('/sproperty-index', [SPropertyController::class, 'index']);
         Route::get('/sproperty-create', [SPropertyController::class, 'create']);
-        Route::post('/sproperty-create', [SPropertyController::class, 'create']);
-        Route::put('/sproperty-create', [SPropertyController::class, 'store']);
+        Route::put('/sproperty-store', [SPropertyController::class, 'store']);
         Route::get('/sproperty-edit/{sproperty}', [SPropertyController::class, 'edit']);
+        Route::put('/sproperty-store', [SPropertyController::class, 'store']);
         Route::post('/sproperty-update/{sproperty}', [SPropertyController::class, 'update']);
         Route::get('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'show']);
         Route::delete('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'destroy']);
@@ -120,9 +135,14 @@ class SPropertyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SProperty $sproperty)
+    public function show(SProperty $sproperty, Request $request)
     {
-        return view('sproperty.show', ['sproperty' => $sproperty, 'mode' => 'delete']);
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/sproperty-index');
+        } else {
+            $rc = view('sproperty.show', ['sproperty' => $sproperty, 'mode' => 'delete']);
+        }
+        return $rc;
     }
 
     /**
@@ -131,9 +151,15 @@ class SPropertyController extends Controller
     public function store(Request $request)
     {
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules(true));
-            $incomingFields['info'] = strip_tags($incomingFields['info']);
-            SProperty::create($incomingFields);
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(true));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $validated = $validator->validated();
+                $validated['info'] = strip_tags($validated['info']);
+                SProperty::create($validated);
+            }
         }
         return redirect('/sproperty-index');
     }
@@ -142,11 +168,21 @@ class SPropertyController extends Controller
      */
     public function update(SProperty $sproperty, Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
-            $incomingFields['info'] = strip_tags($incomingFields['info']);
-            $sproperty->update($incomingFields);
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(false, $sproperty));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $validated = $validator->validated();
+                $validated['info'] = strip_tags($validated['info']);
+                $sproperty->update($validated);
+            }
         }
-        return redirect('/sproperty-index');
+        if ($rc == null) {
+            $rc = redirect('/sproperty-index');
+        }
+        return $rc;
     }
 }

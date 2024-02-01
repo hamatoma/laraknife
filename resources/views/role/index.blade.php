@@ -10,7 +10,7 @@
 
         <x-laraknife.index-button-panel buttonType="new"/>
         
-        <x-laraknife.sortable-table-panel :fields="$fields" :pagination="$pagination">
+        <x-laraknife.sortable-table-panel :context="$context" :pagination="$pagination">
           <thead>
             <tr>
               <th></th>

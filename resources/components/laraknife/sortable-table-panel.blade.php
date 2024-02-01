@@ -1,7 +1,7 @@
-@props(['fields', 'pagination'])
+@props(['context', 'pagination'])
 <div class="lkn-form-table">
     <x-laraknife.hidden-button />
-    <input name="_sortParams" id="_sortParams" type="hidden" value="{{ $fields['_sortParams'] }}">
+    <input name="_sortParams" id="_sortParams" type="hidden" value="{{ $context->valueOf('_sortParams') }}">
     <input type="hidden" name="pageIndex" id="_pageIndex" value="{{ $pagination->pageIndex }}">
     <div class="lkn-pagination-block">
         <ul class="pagination lkn-pagination">

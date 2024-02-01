@@ -58,10 +58,11 @@ class SProperty extends Model
      * @param bool $translate true: the title will be translated
      * @return string the HTML text of the options
      */
-    public static function optionsByScope(string $scope, string $selected, 
+    public static function optionsByScope(string $scope, ?string $selected, 
         ?string $titleUndefined = null, string $titleField = 'name', 
         string $valueField = 'id', bool $translate=true): array
     {
+        $selected ??= '';
         if ($titleUndefined === '' or $titleUndefined == null){
             $rc = [];
         } else {

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use App\Models\#Module#;
 use App\Models\SProperty;
+use App\Helpers\ContextLaraKnife;
 use App\Helpers\ViewHelper;
 use App\Helpers\DbHelper;
 use App\Helpers\Helper;
@@ -22,17 +24,8 @@ class #Module#Controller extends Controller
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
-            $rc = null;
-            $error = null;
             $fields = $request->all();
-            if (count($fields) > 0) {
-                try {
-                    $incomingFields = $request->validate($this->rules(true));
-                    $rc = $this->store($request);
-                } catch(\Exception $e ){ 
-                    $error = $e->getMessage();
-                }
-            } else {
+            if (count($fields) === 0) {
                 $fields = [
 ##CASE(fields)##
 ##ON nameLike(.)##
@@ -40,21 +33,20 @@ class #Module#Controller extends Controller
 ##END.CASE##
                 ];
             }
-            if ($rc == null){
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-                $options#Base# = SProperty::optionsByScope('#base#', $fields['#field#'], '-');
+            $options#Base# = SProperty::optionsByScope('#base#', $fields['#field#'], '-');
 ##ON nameLike(_id$)##
-                $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
-##END.CASE##                
-                $rc = view('#module#.create', [
-                    'fields' => $fields,
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+##END.CASE##
+            $context = new ContextLaraKnife($request, $fields);     
+            $rc = view('#module#.create', [
+                'context' => $context,
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-                    'options#Base#' => $options#Base#,
+                'options#Base#' => $options#Base#,
 ##END.CASE##
-                    'error' => $error]);
-            }
+                ]);
         }
         return $rc;
     }
@@ -66,33 +58,29 @@ class #Module#Controller extends Controller
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/#module#-index');
         } else {
-            $rc = null;
-            $error = null;
             $fields = $request->all();
-            if (count($fields) > 0) {
-                try {
-                    $incomingFields = $request->validate($this->rules(false));
-                    $rc = $this->update($#module#, $request);
-                } catch(\Exception $e ){ 
-                    $error = $e->getMessage();
-                }
+            if (count($fields) === 0) {
+                $fields = [
+##CASE(fields)##
+##ON nameLike(.)##
+                    '#field#' => ''#comma#
+##END.CASE##
+                    ];
             }
-            if ($rc == null){
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-                $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
+            $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
-                $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
-##END.CASE##                
-                $rc = view('#module#.edit', [
-                    '#module#' => $#module#,
+            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
+##END.CASE##        
+            $context = new ContextLaraKnife($request, null, $#module#);
+            $rc = view('#module#.edit', [
+                'context' => $context,
 ##CASE(fields)##
 ##ON nameLike(_(id|scope)$)##
-                    'options#Base#' => $options#Base#,
+                'options#Base#' => $options#Base#,
 ##END.CASE##
-                    'error' => $error
                 ]);
-            }
         }
         return $rc;
     }
@@ -162,9 +150,10 @@ class #Module#Controller extends Controller
 ##ON nameLike(_id$)##
             $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#base#']);
 ##END.CASE##
+            $context = new ContextLaraKnife($request, $fields);
             return view('#module#.index', [
+                'context' => $context,
                 'records' => $records,
-                'fields' => $fields,
 ##CASE(fields)##
 ##ON nameLike((_scope|id)$)##
                 'options#Base#' => $options#Base#,
@@ -192,8 +181,7 @@ class #Module#Controller extends Controller
         Route::get('/#module#-index', [#Module#Controller::class, 'index']);
         Route::post('/#module#-index', [#Module#Controller::class, 'index']);
         Route::get('/#module#-create', [#Module#Controller::class, 'create']);
-        Route::post('/#module#-create', [#Module#Controller::class, 'create']);
-        Route::put('/#module#-create', [#Module#Controller::class, 'store']);
+        Route::put('/#module#-store', [#Module#Controller::class, 'store']);
         Route::post('/#module#-edit/{#module#}', [#Module#Controller::class, 'edit']);
         Route::get('/#module#-edit/{#module#}', [#Module#Controller::class, 'edit']);
         Route::post('/#module#-update/{#module#}', [#Module#Controller::class, 'update']);
@@ -213,9 +201,10 @@ class #Module#Controller extends Controller
             $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
             $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
-##END.CASE##                
+##END.CASE##
+            $context = new ContextLaraKnife($request, null, $#module#);
             $rc = view('#module#.show', [
-                '#module#' => $#module#,
+                'context' => $context,
 ##CASE(fields)##
 ##ON nameLike(_(id|scope)$)##
                 'options#Base#' => $options#Base#,
@@ -231,15 +220,25 @@ class #Module#Controller extends Controller
      */
     public function store(Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(true));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $validated = $validator->validated();
 ##CASE(fields)##
 ##ON typeLike([tT]ext$)##
-            $incomingFields['#field#'] = strip_tags($incomingFields['#field#']);
+            $validated['#field#'] = strip_tags($validated['#field#']);
 ##END.CASE##            
-            #Module#::create($incomingFields);
+                #Module#::create($validated);
+            }
         }
-        return redirect('/#module#-index');
+        if ($rc == null){
+            $rc = redirect('/#module#-index');
+        }
+        return $rc;
     }
     /**
      * Update the specified resource in storage.
@@ -248,16 +247,17 @@ class #Module#Controller extends Controller
     {
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            try {
-                $incomingFields = $request->validate($this->rules());
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(false, $#module#));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $validated = $validator->validated();
 ##CASE(fields)##
 ##ON typeLike([tT]ext$)##
-                $incomingFields['#field#'] = strip_tags($incomingFields['#field#']);
+                $validated['#field#'] = strip_tags($validated['#field#']);
 ##END.CASE##            
-                $#module#->update($incomingFields);
-            } catch (\Exception $exc) {
-                $msg = $exc->getMessage();
-                $rc = back();
+                $#module#->update($validated);
             }
         }
         if ($rc == null){

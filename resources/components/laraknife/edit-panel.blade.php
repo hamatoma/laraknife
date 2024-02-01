@@ -7,6 +7,6 @@
             <x-laraknife.btn-store width1="2" width2="4" />
             <x-laraknife.btn-cancel width1="2" width2="4" />
         </div>
-        <x-laraknife.form-error error="{{$error}}"/>
+        <x-laraknife.form-error/>
     </fieldset>
 </div>

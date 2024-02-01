@@ -34,7 +34,7 @@ class RoleController extends Controller
             $fields = ['name' => '', 'priority' => ''];
         }
         if ($rc == null) {
-            $rc = view('role.create', ['fields' => $fields, 'error' => $error]);
+            $rc = view('role.create', ['context' => $context, 'error' => $error]);
         }
         return $rc;
     }
@@ -80,7 +80,7 @@ class RoleController extends Controller
             $records = $pagination->records;
             return view('role.index', [
                 'records' => $records,
-                'fields' => $fields,
+                'context' => $context,
                 'pagination' => $pagination
             ]);
         }

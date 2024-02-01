@@ -9,11 +9,11 @@
 ##ON nameLike(_(id|scope)$)##
       <x-laraknife.combobox position="alone" name="#base#" label="#Base#" :options="$options#Base#" class="lkn-autoupdate" width2="4" />
 ##ELSE##
-      <x-laraknife.text position="alone" name="#field#" label="#Field#" value="{{$fields['#field#']}}" width2="4" />
+      <x-laraknife.text position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" />
 ##END.CASE##
       </x-laraknife.filter-panel>
       <x-laraknife.index-button-panel buttonType="new"/>
-      <x-laraknife.sortable-table-panel :fields="$fields" :pagination="$pagination">
+      <x-laraknife.sortable-table-panel :context="$context" :pagination="$pagination">
         <thead>
           <tr>
             <th></th>

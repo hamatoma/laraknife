@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SProperty;
+use App\Helpers\ContextLaraKnife;
 use App\Models\User;
-use App\Helpers\ViewHelper;
 use App\Helpers\DbHelper;
+use App\Models\SProperty;
 use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -18,26 +22,16 @@ class UserController extends Controller
      */
     public function create(Request $request)
     {
-        $fields = $request->all();
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
-            $rc = null;
-            $error = null;
-            if (count($fields) > 0) {
-                try {
-                    $incomingFields = $request->validate($this->rules(true));
-                    $rc = $this->store($request);
-                } catch (\Exception $e) {
-                    $error = $e->getMessage();
-                }
-            } else {
+            $fields = $request->all();
+            if (count($fields) == 0) {
                 $fields = ['name' => '', 'email' => '', 'password' => '', 'password_confirmation' => '', 'role_id' => ''];
             }
-            if ($rc == null) {
-                $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
-                $rc = view('user.create', ['fields' => $fields, 'roleOptions' => $options, 'error' => $error]);
-            }
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('user.create', ['context' => $context, 'roleOptions' => $options]);
         }
         return $rc;
     }
@@ -51,21 +45,9 @@ class UserController extends Controller
         } elseif ($request->btnSubmit === 'btnSetPassword') {
             $rc = redirect('/user-editpassword/' . strval($user->id));
         } else {
-            $rc = null;
-            $error = null;
-            $fields = $request->all();
-            if (count($fields) > 0) {
-                try {
-                    $incomingFields = $request->validate($this->rules(false));
-                    $rc = $this->update($user, $request);
-                } catch (\Exception $e) {
-                    $error = $e->getMessage();
-                }
-            }
-            if ($rc == null) {
-                $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $$user->role_id ?? '', '');
-                $rc = view('user.edit', ['user' => $user, 'roleOptions' => $options, 'error' => $error]);
-            }
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
+            $context = new ContextLaraKnife($request, null, $user);
+            $rc = view('user.edit', ['context' => $context, 'roleOptions' => $options]);
         }
         return $rc;
     }
@@ -94,7 +76,7 @@ class UserController extends Controller
                 }
             }
             if ($rc == null) {
-                $rc = view('user.changepw', ['user' => $user, 'error' => $error]);
+                $rc = view('user.changepw', ['user' => $user]);
             }
         }
         return $rc;
@@ -127,16 +109,17 @@ class UserController extends Controller
                 $parameters = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 't0.role_id', 'role');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'role_id');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'name,email', 'text');
+                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,email', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role']);
+            $context = new ContextLaraKnife($request, $fields);
             $rc = view('user.index', [
+                'context' => $context,
                 'records' => $records,
-                'fields' => $fields,
                 'pagination' => $pagination,
                 'roleOptions' => $options
             ]);
@@ -147,7 +130,7 @@ class UserController extends Controller
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreation = false): array
+    private function rules(bool $isCreation = false, ?User $user = null): array
     {
         if ($isCreation) {
             $rc = [
@@ -159,8 +142,8 @@ class UserController extends Controller
             ];
         } else {
             $rc = [
-                'name' => 'required',
-                'email' => 'required|email',
+                'name' => ['required', Rule::unique('users')->ignore($user)],
+                'email' => 'required|unique:users,id,' . strval($user->id),
                 'role_id' => 'required'
             ];
         }
@@ -172,7 +155,7 @@ class UserController extends Controller
         Route::post('/user-index', [UserController::class, 'index']);
         Route::get('/user-create', [UserController::class, 'create']);
         Route::post('/user-create', [UserController::class, 'create']);
-        Route::put('/user-create', [UserController::class, 'store']);
+        Route::put('/user-store', [UserController::class, 'store']);
         Route::get('/user-edit/{user}', [UserController::class, 'edit']);
         Route::post('/user-edit/{user}', [UserController::class, 'edit']);
         Route::post('/user-update/{user}', [UserController::class, 'update']);
@@ -200,11 +183,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules(true));
-            User::create($incomingFields);
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(true));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                // Retrieve the validated input...
+                $validated = $validator->validated();
+                User::create($validated);
+            }
         }
-        return redirect('/user-index');
+        if ($rc == null) {
+            $rc = redirect('/user-index');
+        }
+        return $rc;
     }
     /**
      * Update the specified resource in storage.
@@ -213,12 +207,12 @@ class UserController extends Controller
     {
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            try {
-                $incomingFields = $request->validate($this->rules(false));
-                $user->update($incomingFields);
-            } catch (\Exception $exc) {
-                $msg = $exc->getMessage();
-                $rc = back();
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(false, $user));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $user->update($validator->validated());
             }
         }
         if ($rc == null) {

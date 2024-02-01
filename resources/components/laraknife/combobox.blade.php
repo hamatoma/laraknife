@@ -3,11 +3,11 @@
     <div class="row">
 @endif
 @if ($width1 > 0)
-<div class="col-md-{{ $width1 }}"><label for="{{ $name }}">{{ __($label) }}</label>
+<div class="col-md-{{ $width1 }}"><label for="fld_{{ $name }}">{{ __($label) }}</label>
 </div>
 @endif
 <div class="col-md-{{ $width2 }}">
-    <select class="lkn-input expand100 {{$class}}" name="{{$name}}" @if ($attribute === 'readonly') disabled @ else {{$attribute}} @endif>
+    <select class="lkn-input expand100 {{$class}}" id="fld_{{$name}}" name="{{$name}}" @if ($attribute === 'readonly') disabled @ else {{$attribute}} @endif>
         @foreach($options as $option)
         @php 
         $v = $option['value'];
@@ -17,6 +17,7 @@
         <option value="{{$v}}"{{$a}}>{{$t}}</option>
         @endforeach
     </select>
+    <x-laraknife.field-error name="{{$name}}" />
 </div>
 @if ($position === 'alone' || $position === 'last')
     </div>

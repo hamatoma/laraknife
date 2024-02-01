@@ -3,7 +3,7 @@
 if (count($errors) == 1){
     $error = $errors->all()[0];
 }
-$hasError = $error !== '' || count($errors) == 1;
+$hasError = $error !== '' || count($errors) > 0;
 @endphp
 @if ($hasError)
 <div class = "text-danger">

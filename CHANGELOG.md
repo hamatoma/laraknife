@@ -1,5 +1,28 @@
 # Development phase
 
+## 0.3.0 2024.02.01 Refactoring module handling, field specific errors
+
+- new: class ContextLaraKnife
+- components:
+  - all input fields get a error handling:  <x-laraknife.field-error>
+  - the id of input fields is now fld_&lt;name>
+  - x-form-error: removed: attribute "error"
+  - x-sort-table-panel: using $context instead of $fields
+- views:
+  - all views uses $context now instead of $fields
+  - create.blade.php uses the form action of &lt;module>-store
+  - edit.blade.php uses the form action of &lt;module>-update
+  - usage of $context->valueOf() for receiving the current value
+- calling of view receives the parameter context
+- DbHelper::comboboxDataOfTable(): $select is nullable now
+- controller.templ:
+  - using $context
+  - create(): no more call of validate(): this is done in store()
+  - edit(): no more call of validate(): this is done in update()
+  - store() and update(): using back()->withErrors()->withInput() for error recovering
+  - routes(): defining put(..store...)
+
+
 ## 0.2.6 2024.01.28 Refactoring controller
 - refactoring controller.templ, RoleController, UserController, SPropertyController
   - detection of the current button

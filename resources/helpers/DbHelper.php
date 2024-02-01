@@ -87,12 +87,13 @@ class DbHelper
         string $table,
         string $titleField,
         string $valueField,
-        string $selected,
+        ?string $selected,
         string $undefinedText = 'all',
         string $where = '',
         string $orderBy = '',
         int $limit = 100
     ): array {
+        $selected ??= '';
         if ($undefinedText == null || $undefinedText === ''){
             $rc = [];
         } else {

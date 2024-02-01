@@ -7,10 +7,10 @@
     <x-laraknife.index-panel  title="{{$t}}">
         <x-laraknife.filter-panel legend="{{ $l }}">
             <x-laraknife.combobox position="first" name="role" label="Role" :options="$roleOptions" class="lkn-autoupdate" width2="4" />
-            <x-laraknife.text position="last" name="text" label="Text" value="{{ $fields['text'] }}" width2="4" />
+            <x-laraknife.text position="last" name="text" label="Text" value="{{ $context->valueOf('text') }}" width2="4" />
         </x-laraknife.filter-panel>
         <x-laraknife.index-button-panel buttonType="new" />
-        <x-laraknife.sortable-table-panel :fields="$fields" :pagination="$pagination">
+        <x-laraknife.sortable-table-panel :context="$context" :pagination="$pagination">
             <thead>
                 <tr>
                     <th></th>
