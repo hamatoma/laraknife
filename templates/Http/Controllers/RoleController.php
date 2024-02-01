@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
-use Hamatoma\Laraknife\ViewHelpers;
 use App\Models\Role;
-use App\Models\SProperty;
 use App\Helpers\DbHelper;
-use App\Helpers\ViewHelper;
+use App\Models\SProperty;
 use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
+use Illuminate\Http\Request;
+use App\Helpers\ContextLaraKnife;
+use Illuminate\Support\Facades\DB;
+use Hamatoma\Laraknife\ViewHelpers;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 
 
 class RoleController extends Controller
@@ -20,37 +22,39 @@ class RoleController extends Controller
      */
     public function create(Request $request)
     {
-        $rc = null;
-        $error = null;
-        $fields = $request->all();
-        if (count($fields) > 0) {
-            try {
-                $incomingFields = $request->validate($this->rules());
-                $rc = $this->store($request);
-            } catch (\Exception $e) {
-                $error = $e->getMessage();
-            }
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/role-index');
         } else {
-            $fields = ['name' => '', 'priority' => ''];
-        }
-        if ($rc == null) {
-            $rc = view('role.create', ['context' => $context, 'error' => $error]);
+            $fields = $request->all();
+            if (count($fields) == 0) {
+                $fields = ['name' => '', 'priority' => ''];
+            }
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('role.create', ['context' => $context]);
         }
         return $rc;
     }
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Role $role)
+    public function edit(Role $role, Request $request)
     {
-        return view('role.edit', ['role' => $role]);
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/role-index');
+        } else {
+            $context = new ContextLaraKnife($request, null, $role);
+            $rc = view('role.edit', ['context' => $context]);
+        }
+        return $rc;
     }
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
+    public function destroy(Role $role, Request $request)
     {
-        $role->delete();
+        if ($request->btnSubmit === 'btnDelete') {
+            $role->delete();
+        }
         return redirect('/role-index');
     }
     /**
@@ -59,7 +63,7 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         if ($request->btnSubmit === 'btnNew') {
-            return redirect('/role-create');
+            $rc = redirect('/role-create');
         } else {
             $sql = 'SELECT * FROM roles';
             $parameters = [];
@@ -78,12 +82,14 @@ class RoleController extends Controller
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
-            return view('role.index', [
-                'records' => $records,
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('role.index', [
                 'context' => $context,
+                'records' => $records,
                 'pagination' => $pagination
             ]);
         }
+        return $rc;
     }
     /**
      * Returns the validation rules.
@@ -103,7 +109,7 @@ class RoleController extends Controller
         Route::post('/role-index', [RoleController::class, 'index']);
         Route::get('/role-create', [RoleController::class, 'create']);
         Route::post('/role-create', [RoleController::class, 'create']);
-        Route::put('/role-create', [RoleController::class, 'store']);
+        Route::put('/role-store', [RoleController::class, 'store']);
         Route::get('/role-edit/{role}', [RoleController::class, 'edit']);
         Route::post('/role-update/{role}', [RoleController::class, 'update']);
         Route::get('/role-show/{role}/delete', [RoleController::class, 'show']);
@@ -112,9 +118,15 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Role $role)
+    public function show(Role $role, Request $request)
     {
-        return view('role.show', ['role' => $role, 'mode' => 'delete']);
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/role-index');
+        } else {
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('role.show', ['context' => $context, 'mode' => 'delete']);
+        }
+        return $rc;
     }
 
     /**
@@ -122,21 +134,41 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
-            Role::create($incomingFields);
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(true));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                // Retrieve the validated input...
+                $validated = $validator->validated();
+                Role::create($validated);
+            }
         }
-        return redirect('/role-index');
+        if ($rc == null) {
+            $rc = redirect('/role-index');
+        }
+        return $rc;
     }
     /**
      * Update the specified resource in storage.
      */
     public function update(Role $role, Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnStore') {
-            $incomingFields = $request->validate($this->rules());
-            $role->update($incomingFields);
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules());
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $role->update($validator->validated());
+            }
         }
-        return redirect('/role-index');
+        if ($rc == null) {
+            $rc = redirect('/role-index');
+        }
+        return $rc;
     }
 }

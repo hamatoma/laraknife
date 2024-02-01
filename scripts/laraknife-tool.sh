@@ -96,6 +96,10 @@ EOS
     mkdir -p resources/lang/sources
     test "$option" = "--force" && rm -fv resources/lang/sources/laraknife.de.json
     ln -s ../../../$dirResources/lang/de_DE.json resources/lang/sources/laraknife.de.json
+    mkdir -p resources/lang/de_DE
+    local fn=resources/lang/de_DE/validation.php
+    test "$option" = "--force" && rm -fv $fn
+    ln -s ../../../$dirResources/lang/de_DE/validation.php $fn
     # Scripts:
     local script=Join
     cat <<EOS >$script

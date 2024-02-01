@@ -172,8 +172,9 @@ class UserController extends Controller
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/user-index');
         } else {
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id ?? '', '');
-            $rc = view('user.show', ['user' => $user, 'mode' => 'delete', 'roleOptions' => $options]);
+            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
+            $context = new ContextLaraKnife($request, null, $user);
+            $rc = view('user.show', ['context' => $context, 'mode' => 'delete', 'roleOptions' => $options]);
         }
         return $rc;
     }
