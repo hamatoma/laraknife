@@ -21,6 +21,8 @@ Usage: laraknife-tool.sh TASK
     Creates a layout blade file
   create-home
     Creates a homepage
+  move-to-laraknife <module>
+    Moves all files of the given module to the laraknife directory.
 EOS
   echo "+++ $*"
 }
@@ -213,6 +215,32 @@ function CreateHome(){
   sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/home.templ >$fn
   echo "= home $fn has been created"
 }
+# ===
+function MoveToLaraknife(){
+  . project.env
+  local module="$1"
+  if [ -z "$module" ]; then
+    Usage "missing <module>"
+  elif [ ! -d resources/views/$module ]; then
+    Usage "unknown module: $module (missing resources/views/$module)"
+  elif [ -d vendor/hamatoma/laraknife/resources/views/$module ]; then
+    Usage "$module already exists"
+  else
+    local Module="$(echo ${module:0:1} | tr '[:lower:]' '[:upper:]')${module:1}"
+    mv -v resources/views/$module vendor/hamatoma/laraknife/resources/views
+    ln -sv  ../../vendor/hamatoma/laraknife/resources/views/$module resources/views
+    mv -v app/Http/Controllers/${Module}Controller.php vendor/hamatoma/laraknife/templates/Http/Controllers
+    ln -sv ../../../vendor/hamatoma/laraknife/templates/Http/Controllers/${Module}Controller.php app/Http/Controllers
+    mv -v app/Models/${Module}.php vendor/hamatoma/laraknife/templates/Models
+    ln -sv ../../vendor/hamatoma/laraknife/templates/Models/${Module}.php app/Models
+    local fn=$(ls -1 database/migrations/*create_${module}*.php | head -n1)
+    if [ -f $fn ]; then
+      local node=$(basename $fn)
+      mv -v $fn vendor/hamatoma/laraknife/templates/database/migrations
+      ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations
+    fi
+  fi
+}
 case $MODE in
 build-links)
   BuildLinks $2
@@ -238,6 +266,9 @@ rest)
   AdaptModules
   CreateLayout
   CreateHome
+  ;;
+move-to-laraknife)
+  MoveToLaraknife "$2"
   ;;
 *)
   Usage "unknown TASK: $MODE"

@@ -6,18 +6,18 @@
         @if($mode === 'delete')
         @method('DELETE')
         @endif
-        <x-laraknife.show-panel title="{{ __($mode !== 'delete' ? 'A #Module#' : 'Deletion of a #Module#') }}" mode="{{$mode}}">
-            <x-laraknife.text position="first" name="id" label="Id" value="{{ $context->model->id }}" width2="4" attribute="readonly" />
+        <x-laraknife.panels.show title="{{ __($mode !== 'delete' ? 'A #Module#' : 'Deletion of a #Module#') }}" mode="{{$mode}}">
+            <x-laraknife.forms.text position="first" name="id" label="Id" value="{{ $context->model->id }}" width2="4" attribute="readonly" />
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-            <x-laraknife.combobox position="alone" name="#field#" label="#Base#" :options="$options#Base#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly"/>
+            <x-laraknife.forms.combobox position="alone" name="#field#" label="#Base#" :options="$options#Base#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly"/>
 ##ON typeLike([Tt]ext$)##
-            <x-laraknife.bigtext position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly" rows="2" />
+            <x-laraknife.forms.bigtext position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly" rows="2" />
 ##ON typeLike([Ss]tring$)##
-            <x-laraknife.text position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly" rows="2" />
+            <x-laraknife.forms.text position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly" rows="2" />
 ##ELSE##
             <x-laraknife.#type# position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" attribute="readonly" />
 ##END.CASE##
-        </x-laraknife.show-panel>
+        </x-laraknife.panels.show>
     </form>
 @endsection

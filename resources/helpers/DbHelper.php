@@ -119,4 +119,36 @@ class DbHelper
         }
         return $rc;
     }
+    /**
+     * Returns the selected value of a item list created by comboboxDataOfTable().
+     * @param array $items  the items of the combobox
+     * @return string the value of the first "active" item in the list or the value of the first item.
+     */
+    public static function findCurrentSelectedInCombobox(array &$items): string{
+        $rc = strval($items[0]['value']);
+        foreach ($items as &$item) {
+            if ($item['active']){
+                $rc = strval($item['value']);
+                break;
+            }
+        }
+        return $rc;
+    }
+    /**
+     * Extracts the number of a numbered button.
+     * @param array $fields the form fields
+     * @param string $name the name of the numbered button
+     * @return int|NULL NULL: no button found. Otherwise: the number of the button
+     */
+    public static function numberOfButton(array $fields, string $name): ?int{
+        $rc = null;
+        $fieldname = '_lknAction';
+        if (array_key_exists($fieldname, $fields)){
+            $value =  $fields[$fieldname];
+            if (str_starts_with($value, $name)){
+                $rc = intval(substr($value, strlen($name) + 1));
+            }
+        }
+        return $rc;
+    }
 }

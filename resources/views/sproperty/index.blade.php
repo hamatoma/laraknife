@@ -3,15 +3,15 @@
 @section('content')
 <form id="sproperty-index" action="/sproperty-index" method="POST">
     @csrf
-    <x-laraknife.index-panel title="{{ __('Scoped Properties') }}">
-        <x-laraknife.filter-panel legend="{{ $pagination->legendText() }}">
-            <x-laraknife.combobox position="first" name="scope" label="Scope" :options="$options"
+    <x-laraknife.panels.index title="{{ __('Scoped Properties') }}">
+        <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
+            <x-laraknife.forms.combobox position="first" name="scope" label="Scope" :options="$options"
                 width2="4" class="lkn-autoupdate" />
-            <x-laraknife.text position="last" name="text" label="Text" value="{{ $context->valueOf('text') }}"
+            <x-laraknife.forms.text position="last" name="text" label="Text" value="{{ $context->valueOf('text') }}"
                 width2="4" />
-        </x-laraknife.filter-panel>
-        <x-laraknife.index-button-panel buttonType="new"/>
-        <x-laraknife.sortable-table-panel :context="$context" :pagination="$pagination">
+        </x-laraknife.panels.filter>
+        <x-laraknife.panels.index-button buttonType="new"/>
+        <x-laraknife.panels.sortable-table :context="$context" :pagination="$pagination">
             <thead>
                 <tr>
                     <th></th>
@@ -27,18 +27,18 @@
             <tbody>
                 @foreach ($records as $sproperty)
                     <tr>
-                        <td><x-laraknife.change-record module="sproperty" key="{{ $sproperty->id }}" /></td>
+                        <td><x-laraknife.icons.change-record module="sproperty" no="{{ $sproperty->id }}" /></td>
                         <td>{{ $sproperty->id }}</td>
                         <td>{{ $sproperty->scope }}</td>
                         <td>{{ $sproperty->name }}</td>
                         <td>{{ $sproperty->order }}</td>
                         <td>{{ $sproperty->shortname }}</td>
                         <td>{{ $sproperty->value }}</td>
-                        <td><x-laraknife.delete-record module="sproperty" key="{{ $sproperty->id }}" /></td>
+                        <td><x-laraknife.icons.delete-record module="sproperty" key="{{ $sproperty->id }}" /></td>
                     </tr>
                 @endforeach
             </tbody>
-        </x-laraknife.sortable-table-panel>
-    </x-laraknife.index-panel>
+        </x-laraknife.tables.sortable>
+    </x-laraknife.panels.index>
 </form>
 @endsection

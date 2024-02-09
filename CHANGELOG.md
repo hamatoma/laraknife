@@ -1,5 +1,14 @@
 # Development phase
 
+## 0.4.0 2024.02.09 module menu, renaming of the components
+- sub directories: buttons, forms, panels
+- new module: menu
+
+## 0.3.1 2024.02.01 module role, build links
+
+- module role: adapted to new module handling
+- laraknife-tool.sh: building link to lang/de_DE/validation.php
+
 ## 0.3.0 2024.02.01 Refactoring module handling, field specific errors
 
 - new: class ContextLaraKnife

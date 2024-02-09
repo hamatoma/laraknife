@@ -95,7 +95,7 @@ class RoleController extends Controller
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(): array
+    private function rules(bool $isCreation = false): array
     {
         $rc = [
             'name' => 'required|alpha_num',
@@ -123,7 +123,7 @@ class RoleController extends Controller
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/role-index');
         } else {
-            $context = new ContextLaraKnife($request, $fields);
+            $context = new ContextLaraKnife($request, null, $role);
             $rc = view('role.show', ['context' => $context, 'mode' => 'delete']);
         }
         return $rc;

@@ -3,15 +3,17 @@
 @section('content')
     <form id="role-index" action="/role-index" method="POST">
         @csrf
-        <x-laraknife.index-panel title="{{ __('Roles') }}">
-            <x-laraknife.filter-panel legend="{{ $pagination->legendText() }}">
-                <x-laraknife.text position="alone" name="name" label="Name" value="{{ $context->valueOf('name') }}"
+        <x-laraknife.panels.index title="{{ __('Roles') }}">
+            <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
+                <x-laraknife.forms.text position="alone" name="name" label="Name" value="{{ $context->valueOf('name') }}"
                     width2="4" />
-            </x-laraknife.filter-panel>
+            </x-laraknife.panels.filter>
 
-            <x-laraknife.index-button-panel buttonType="new" />
-
-            <x-laraknife.sortable-table-panel :context="$context" :pagination="$pagination">
+            <x-laraknife.panels.index-button buttonType="new" />
+            <x-laraknife.forms.set-position position="first" />
+            <x-laraknife.forms.icon-action name="action" no="3" icon="bi bi-trash" />
+            <x-laraknife.forms.set-position position="last" />
+            <x-laraknife.panels.sortable-table :context="$context" :pagination="$pagination">
                 <thead>
                     <tr>
                         <th></th>
@@ -22,13 +24,13 @@
                 <tbody>
                     @foreach ($records as $role)
                         <tr>
-                            <td><a href="/role-edit/{{ $role->id }}">{{ __('Change') }}</a></td>
+                            <td><x-laraknife.icons.change-record module="role" no="{{ $role->id }}" /></td>
                             <td>{{ $role->name }}</td>
                             <td>{{ $role->priority }}</td>
                         </tr>
                     @endforeach
                 </tbody>
-            </x-laraknife.sortable-table-panel>
-        </x-laraknife.index-panel>
+                </x-laraknife.tables.sortable>
+        </x-laraknife.panels.index>
     </form>
 @endsection

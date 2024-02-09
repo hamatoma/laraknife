@@ -7,6 +7,11 @@ var debug = function (message) {
 var autoClick = function(){
     document.getElementById('_btnInternal').click();
 }
+var numberedButtonClick = function(event){
+    const name = event.currentTarget.getAttribute("name");
+    document.getElementById('_lknAction').value = name;
+    document.getElementById('_btnInternal').click();
+}
 var paginationClick = function(){
     const pageNo = Number.parseInt(this.innerHTML) - 1;
     document.getElementsByName('pageIndex')[0].value = pageNo;
@@ -18,6 +23,13 @@ var setAutoUpdate = function(){
         let item = elements[ix];
         item.addEventListener("change", autoClick);
     }
+}
+var setNumberedButtonClick = function(){
+    const elements = document.getElementsByClassName('lkn-numbered-button');
+    for (let ix=0; ix < elements.length; ix++){
+        let item = elements[ix];
+        item.addEventListener("click", numberedButtonClick);
+    }   
 }
 var setPaginationClick = function(){
     const elements = document.getElementsByClassName('page-link');
@@ -159,4 +171,5 @@ ready(() => {
     window.globalSorter.initializeForm();
     setAutoUpdate();
     setPaginationClick();
+    setNumberedButtonClick();
 }); 
