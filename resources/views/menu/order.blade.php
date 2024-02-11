@@ -6,6 +6,7 @@
         <x-laraknife.panels.index title="{{ __('Assign Roles') }}">
             <div class="lkn-form-table">
                 <input type="hidden" name="selectedMenus" value="{{ $context->valueOf('selectedMenus') }}">
+                <input type="hidden" name="lastRole" value="{{ $context->valueOf('lastRole') }}">
                 <x-laraknife.forms.combobox position="alone" name="role" label="Role" :options="$roleOptions"
                     class="lkn-autoupdate" width2="10" />
                 <x-laraknife.layout.row-empty />
@@ -16,17 +17,20 @@
                             <th>{{ __('Position') }}</th>
                             <th>{{ __('Name') }}</th>
                             <th>{{ __('Label') }}</th>
+                            <th>{{ __('Id') }}</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($records as $menu)
                             <tr><td>
-                                <x-laraknife.actions.down no="{{ $menu->id }}" />
+                                <x-laraknife.actions.down no="{{ $menu->id }}" />&nbsp;
                                 <x-laraknife.actions.up no="{{ $menu->id }}" />
                                 </td>
+                                <td>{{ $context->currentNo()}}</td>
                                 <td>{{ __($menu->name) }}</td>
                                 <td>{{ __($menu->label) }}</td>
+                                <td>{{ __($menu->id) }}</td>
                                 <td>
                                     <x-laraknife.actions.delete no="{{ $menu->id }}" />
                                 </td>

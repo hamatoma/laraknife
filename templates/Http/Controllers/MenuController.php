@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
+use App\Models\User;
+use App\Helpers\Helper;
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Menu;
-use App\Models\SProperty;
-use App\Helpers\ContextLaraKnife;
-use App\Helpers\ViewHelper;
-use App\Helpers\DbHelper;
-use App\Helpers\Helper;
-use App\Helpers\Pagination;
 
 class MenuController extends Controller
 {
@@ -113,49 +115,106 @@ class MenuController extends Controller
             ]);
         }
     }
+    public function menu(Request $request, string $scope='main'){
+        if (Auth::check()){
+            $userId = Auth::user()->id;
+            $role = $userId == null ? 1 : User::get($userId)->role_id;
+        } else {
+            $role = 3;
+        }
+        $records = DB::select("SELECT DISTINCT t0.id AS role FROM menus t0 
+        LEFT JOIN menus_roles t1 on t1.menu_id=t0.id
+        LEFT JOIN roles t2 on t2.id=t1.role_id
+        WHERE t1.role_id=$role ORDER BY t1.`order`");
+        $fields = $request->all();
+        $context = new ContextLaraKnife($request, $fields);
+        $cols = 4;
+        $rows = intval((count($records) + $cols - 1) / $cols);
+        $rc = view('menu.menu', [
+            'context' => $context,
+            'records' => $records,
+            'rows' => $rows,
+            'cols' => $cols,
+        ]);
+        return $rc;
+    }
     public function order(Request $request)
     {
-        if ($request->btnSubmit === '') {
-            $rc = back();
+        $rc = null;
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/menu-index');
         } else {
             $fields = $request->all();
             if (count($fields) == 0) {
-                $fields = ['role' => '', 'position' => '1', 'selectedMenus' => ''];
+                $fields = ['role' => '', 'position' => '1', 'selectedMenus' => '', 'lastRole' => ''];
             }
-            if (($no = DbHelper::numberOfButton($fields, 'insert')) != null) {
-                $ids = empty($fields['selectedMenus']) ? [] : explode(',', $fields['selectedMenus']);
+            if ($fields['role'] != $fields['lastRole']){
+                $fields['selectedMenus'] = '';
+            }
+            $ids = empty($fields['selectedMenus']) ? [] : explode(',', $fields['selectedMenus']);
+            if ($request->btnSubmit === 'btnStore') {
+                $role = $fields['role'];
+                DB::delete("DELETE FROM menus_roles where role_id=$role");
+                for ($ix = 0; $ix < count($ids); $ix++){
+                    $order = ($ix+1)*10;
+                    $menu = $ids[$ix];
+                    DB::insert("INSERT INTO menus_roles (`order`, menu_id, role_id) VALUES ($order, $menu, $role)"); 
+                }
+                $rc = redirect('/menu-index');
+            } elseif (($no = DbHelper::numberOfButton($fields, 'insert')) != null) {
                 $position = intval($fields['position']);
                 if ($position <= 0 || $position > count($ids)) {
                     $position = $fields['position'] = 1;
                 }
                 array_splice($ids, $position - 1, 0, $no);
-                $fields['selectedMenus'] = implode(',', $ids);
-            }
-            $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role'], '');
-            $role = intval(DbHelper::findCurrentSelectedInCombobox($roleOptions));
-            if (empty($fields['selectedMenus'])) {
-
-                $ids = DB::select("SELECT t0.id AS role FROM menus t0 
-                LEFT JOIN menus_roles t1 on t1.role_id=t0.id
-                LEFT JOIN roles t2 on t2.id=t1.role_id
-                WHERE t2.id=$role ORDER BY t1.`order`");
-                $ids2 = [];
-                foreach ($ids as &$id) {
-                    array_push($ids2, $id['id']);
+            } elseif (($no = DbHelper::numberOfButton($fields, 'delete')) != null) {
+                $ix = array_search(strval($no), $ids);
+                array_splice($ids, $ix, 1);
+            } elseif (($no = DbHelper::numberOfButton($fields, 'up')) != null) {
+                $no2 = strval($no);
+                $ix = array_search($no2, $ids);
+                if ($ix > 0) {
+                    array_splice($ids, $ix, 1);
+                    array_splice($ids, $ix - 1, 0, $no2);
                 }
-                $fields['selectedMenus'] = implode(',', $ids2);
+            } elseif (($no = DbHelper::numberOfButton($fields, 'down')) != null) {
+                $no2 = strval($no);
+                $ix = array_search($no2, $ids);
+                if ($ix < count($ids) - 1) {
+                    array_splice($ids, $ix, 1);
+                    array_splice($ids, $ix + 1, 0, $no2);
+                }
             }
-            $ids3 = $fields['selectedMenus'];
-            $records = empty($ids3) ? [] : DB::select("SELECT * FROM menus WHERE id in ($ids3)");
-            $where = empty($ids3) ? '' : " WHERE id NOT IN ($ids3)";
-            $records2 = DB::select("SELECT * FROM menus$where");
-            $context = new ContextLaraKnife($request, $fields);
-            $rc = view('menu.order', [
-                'context' => $context,
-                'records' => $records,
-                'records2' => $records2,
-                'roleOptions' => $roleOptions,
-            ]);
+            if ($rc == null) {
+                $fields['selectedMenus'] = implode(',', $ids);
+
+                $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role'], '');
+                $role = intval(DbHelper::findCurrentSelectedInCombobox($roleOptions));
+                if (empty($fields['selectedMenus'])) {
+                    $records = DB::select("SELECT DISTINCT t0.id AS role FROM menus t0 
+                LEFT JOIN menus_roles t1 on t1.menu_id=t0.id
+                LEFT JOIN roles t2 on t2.id=t1.role_id
+                WHERE t1.role_id=$role ORDER BY t1.`order`");
+                    $ids2 = [];
+                    foreach ($records as &$rec) {
+                        array_push($ids2, $rec->role);
+                    }
+                    $fields['selectedMenus'] = implode(',', $ids2);
+                }
+                $ids3 = $fields['selectedMenus'];
+                $records = empty($ids3) ? [] : DB::select("SELECT * FROM menus WHERE id in ($ids3)");
+                $records = DbHelper::resortById($records, explode(',', $ids3));
+                $where = empty($ids3) ? '' : " WHERE id NOT IN ($ids3)";
+                $records2 = DB::select("SELECT * FROM menus$where");
+                $fields['lastRole'] = $role;
+                $context = new ContextLaraKnife($request, $fields);
+                $rc = view('menu.order', [
+                    'context' => $context,
+                    'records' => $records,
+                    'records2' => $records2,
+                    'roleOptions' => $roleOptions,
+                ]);
+            }
         }
         return $rc;
     }
@@ -187,6 +246,8 @@ class MenuController extends Controller
         Route::delete('/menu-show/{menu}/delete', [MenuController::class, 'destroy']);
         Route::get('/menu-order', [MenuController::class, 'order']);
         Route::post('/menu-order', [MenuController::class, 'order']);
+        Route::get('/menu-menu', [MenuController::class, 'menu']);
+        Route::post('/menu-menu', [MenuController::class, 'menu']);
     }
     /**
      * Display the specified resource.

@@ -151,4 +151,22 @@ class DbHelper
         }
         return $rc;
     }
+    /**
+     * Brings the $records in the order of $ids (using column 'id').
+     * @param $records the database records
+     * @param $ids a list of ids (integer)
+     * @return array all entries of $records with the order given by ids
+     */
+    public static function resortById(array $records, array $ids): array{
+        $rc = [];
+        foreach($ids as &$id){
+            foreach ($records as &$rec){
+                if ($rec->id == $id){
+                    array_push($rc, $rec);
+                    break;
+                }
+            }
+        }
+        return $rc;
+    }
 }

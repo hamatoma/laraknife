@@ -1,5 +1,5 @@
 @props(['name' => '', 'no' => '', 'icon' => '', 'alt' => ''])
 
-<div id="{{ $name }}_{{ $no }}" name="{{ $name }}_{{ $no }}" class="lkn-numbered-button">
+<span id="{{ $name }}_{{ $no }}" name="{{ $name }}_{{ $no }}" class="lkn-numbered-button text-primary">
     <i class="{{ $icon }}"></i>
-</div>
+</span>

@@ -21,6 +21,7 @@
                         <th sortId="icon">{{ __('Icon') }}</th>
                         <th sortId="section">{{ __('Section') }}</th>
                         <th sortId="link">{{ __('Link') }}</th>
+                        <th sortId="Id">{{ __('Id') }}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -33,6 +34,7 @@
                             <td>{{ $menu->icon }}</td>
                             <td>{{ $menu->section }}</td>
                             <td>{{ $menu->link }}</td>
+                            <td>{{ $menu->id }}</td>
                             <td><a href="/menu-show/{{ $menu->id }}/delete">{{ __('Delete') }}</a></td>
                             <td><x-laraknife.icons.delete-record module="menu" no="{{ $menu->id }}" /></td>
                         </tr>

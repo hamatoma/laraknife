@@ -1,1 +1,2 @@
-<i class="bi bi-pencil-fill"></i>
+@props(['class' => ''])
+<i class="bi bi-pencil-fill {{$class}}"></i>

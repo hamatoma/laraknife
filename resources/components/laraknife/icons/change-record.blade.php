@@ -1,2 +1,2 @@
 @props(['module' => '', 'no' => ''])
-<a href="/{{$module}}-edit/{{$no}}"><x-laraknife.icons.edit /></a>
+<a href="/{{$module}}-edit/{{$no}}"><x-laraknife.icons.edit class="text-primary" /></a>
