@@ -6,7 +6,7 @@
         <x-laraknife.panels.standard title="{{ __('Login') }}">
             <x-laraknife.forms.set-position position="first" />
             <x-laraknife.layout.col-empty width="3" />
-            <x-laraknife.forms.text position="last" name="email" label="Email" value="{{ $context->valueOf('email') }}"
+            <x-laraknife.forms.string position="last" name="email" label="Email" value="{{ $context->valueOf('email') }}"
                 width2="4" />
             <x-laraknife.forms.set-position position="first" />
             <x-laraknife.layout.col-empty width="3" />

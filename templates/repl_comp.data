@@ -5,14 +5,14 @@ laraknife.btn-search;laraknife.buttons.search
 laraknife.btn-store;laraknife.buttons.store
 laraknife.button ;laraknife.buttons.button 
 
-laraknife.bigtext;laraknife.forms.bigtext
+laraknife.bigtext;laraknife.forms.text
 laraknife.combobox;laraknife.forms.combobox
 laraknife.field-error;laraknife.forms.field-error
 laraknife.form-error;laraknife.forms.form-error
 laraknife.hidden-button;laraknife.forms.hidden-elements
 laraknife.password;laraknife.forms.password
 laraknife.setposition;laraknife.forms.set-position
-laraknife.text;laraknife.forms.text
+laraknife.text;laraknife.forms.string
 
 laraknife.change-icon;laraknife.icons.change
 laraknife.change-record;laraknife.icons.change-record

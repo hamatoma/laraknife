@@ -131,11 +131,13 @@ class #Module#Controller extends Controller
                 ];
             } else {
                 $conditions = [];
+                // Search in multiple columns (field1..field3) with filter field "text":
+                // ViewHelper::addConditionPattern($conditions, $parameters, 'field1,field2,field3', 'text');
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
                 ViewHelper::addConditionComparism($conditions, $parameters, '#field#', '#base#');
 ##ON typeLike((tring|[tT]ext)$)##
-                ViewHelper::addConditionPattern($conditions, $parameters, '#field#,other_field', 'text');
+                ViewHelper::addConditionPattern($conditions, $parameters, '#field#);
 ##ELSE##
                 ViewHelper::addConditionComparism($conditions, $parameters, '#field#', null, '=');
 ##END.CASE##
@@ -248,7 +250,8 @@ class #Module#Controller extends Controller
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
-            $validator = Validator::make($fields, $this->rules(false, $#module#));
+            // ViewHelper::addFieldIfMissing($fields, 'user_id', auth()->id());
+            $validator = Validator::make($fields, $this->rules(false));
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();
             } else {

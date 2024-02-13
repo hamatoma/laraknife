@@ -5,7 +5,7 @@
         @csrf
         <x-laraknife.panels.index title="{{ __('Roles') }}">
             <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
-                <x-laraknife.forms.text position="alone" name="name" label="Name" value="{{ $context->valueOf('name') }}"
+                <x-laraknife.forms.string position="alone" name="name" label="Name" value="{{ $context->valueOf('name') }}"
                     width2="4" />
             </x-laraknife.panels.filter>
 

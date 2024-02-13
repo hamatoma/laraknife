@@ -11,7 +11,7 @@
             <x-laraknife.panels.filter legend="{{ $l }}">
                 <x-laraknife.forms.combobox position="first" name="role" label="Role" :options="$roleOptions"
                     class="lkn-autoupdate" width2="4" />
-                <x-laraknife.forms.text position="last" name="text" label="Text"
+                <x-laraknife.forms.string position="last" name="text" label="Text"
                     value="{{ $context->valueOf('text') }}" width2="4" />
             </x-laraknife.panels.filter>
             <x-laraknife.panels.index-button buttonType="new" />

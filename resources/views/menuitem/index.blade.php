@@ -5,7 +5,7 @@
         @csrf
         <x-laraknife.panels.index title="{{ __('Menu Items') }}">
             <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
-                <x-laraknife.forms.text position="alone" name="text" label="Name" value="{{ $context->valueOf('text') }}"
+                <x-laraknife.forms.string position="alone" name="text" label="Name" value="{{ $context->valueOf('text') }}"
                     width2="4" />
             </x-laraknife.panels.filter>
             <x-laraknife.forms.set-position position="first" />

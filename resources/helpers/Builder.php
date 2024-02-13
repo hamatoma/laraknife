@@ -478,22 +478,16 @@ function main()
     global $argv;
     //echo 'current dir: ', getcwd(), "\n";
     if (count($argv) > 1 && $argv[1] === '--test') {
+        $base = realpath(__DIR__ . '/../..');
         $argv = [
             'dummy',
             'create:module',
-            '/../scripts/data/migration_test.php',
+            "$base/scripts/data/migration_test.php",
             '--force',
-            '--module=noun',
-            '--templates=../templates/builder',
+            "--templates=$base/templates/builder",
             '--views=/tmp/unittest',
             '--controllers=/tmp/unittest',
             '--models=/tmp/unittest'
-        ];
-        $argv = [
-            'dummy',
-            'update:languages',
-            '../scripts/data/lang',
-            '/tmp/unittest/de_DE.json',
         ];
     }
     $count = count($argv);

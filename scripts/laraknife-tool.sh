@@ -61,7 +61,7 @@ function BuildLinks(){
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
     # === Modules
-    for module in SProperty Role User ; do
+    for module in SProperty Role User Note Menuitem; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
@@ -69,7 +69,7 @@ function BuildLinks(){
       ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
     done
     # === Views
-    for module in laraknife sproperty role user ; do
+    for module in laraknife sproperty role user menuitem note; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
@@ -113,6 +113,12 @@ EOS
       test "$option" = "--force" && rm -fv database/migrations/$node
       ln -sv ../../$dirTemplates/database/migrations/$node database/migrations/$node
     done
+    for file in $dirTemplates/database/seeders/*.php; do
+      node=$(basename $file)
+      test "$option" = "--force" && rm -fv database/seeders/$node
+      ln -sv ../../$dirTemplates/database/seeders/$node database/seeders/$node
+    done
+
     # === Components
     mkdir -p resources/views/components
     test "$option" = "--force" && rm -fv resources/views/components/laraknife
@@ -175,23 +181,7 @@ function CreateLayout(){
 # ===
 function FillDb(){
   php artisan migrate
-  sudo mysql lrv$PROJ <<'EOS'
-insert into roles (name, priority, created_at, updated_at) values 
-('Administrator', 10, '2023.12.28', '2023-12-28'),
-('Manager', 20, '2023.12.28', '2023-12-28'),
-('User', 30, '2023.12.28', '2023-12-28'),
-('Guest', 90, '2023.12.28', '2023-12-28');
-insert into sproperties (id, scope, name, `order`, shortname, created_at) values
-(1001, 'status', 'active', 10, 'A', '2023-12-28'),
-(1002, 'status', 'inactive', 20, 'I', '2023-12-28'),
-(2001, 'category', 'standard', 10, '-', '2023-12-28'),
-(2002, 'category', 'private', 20, 'P', '2023-12-28'),
-(2003, 'category', 'work', 30, 'W', '2023-12-28'),
-(2601, 'notestatus', 'open', 10, 'O', '2023-12-28'),
-(2602, 'notestatus', 'closed', 20, 'C', '2023-12-28');
-select count(*) from roles as role_count;
-select count(*) from sproperties as sproperty_count;
-EOS
+  php artisan db:seed
 }
 # ===
 function InitI18N(){
@@ -235,6 +225,8 @@ function LinkModule(){
       node=$(basename $file)
       ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations/$node
     done
+    ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/${Module}Seeder.php database/seeders/${Module}Seeder.php
+    done
   fi
 }
 # ===
@@ -260,6 +252,12 @@ function MoveToLaraknife(){
       local node=$(basename $fn)
       mv -v $fn vendor/hamatoma/laraknife/templates/database/migrations
       ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations
+    fi
+    fn=$(ls -1 database/seeders/${Module}Seeder.php | head -n1)
+    if [ -f $fn ]; then
+      local node=$(basename $fn)
+      mv -v $fn vendor/hamatoma/laraknife/templates/database/seeders
+      ln -sv ../../vendor/hamatoma/laraknife/templates/database/seeders/$node database/seeders/$node
     fi
   fi
 }

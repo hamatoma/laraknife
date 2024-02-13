@@ -1,5 +1,13 @@
 # Development phase
 
+## 0.4.3 2024.02.13 database seeders, refactoring
+- database is filled by seeders now
+- renamed: forms/text.blade.php -> forms/string.php
+- renamed: forms/bigtext.blade.php -> forms/text.php
+- Builder: corrected path to test data
+- numberOfButtons() moved from DbHelper to ViewHelper
+- new module: note
+
 ## 0.4.2 2024.02.13 module menu, renaming of the components
 - sub directories: buttons, forms, panels
 - module menu renamed to menuitem

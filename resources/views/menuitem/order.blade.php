@@ -38,7 +38,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <x-laraknife.forms.text position="first" name="position" label="Insert Position"
+                <x-laraknife.forms.string position="first" name="position" label="Insert Position"
                     value="{{ $context->valueOf('position') }}" width1="3" width2="1" />
                 <x-laraknife.buttons.button name="btnStore" label="Store Menu" width1="0" width2="4" />
                 <x-laraknife.buttons.button name="btnCancel" label="Cancel" width1="0" width2="4" />
@@ -57,7 +57,7 @@
                         @foreach ($records2 as $menuitem)
                             <tr>
                                 <td>
-                                    <x-laraknife.actions.up name="insert" no="{{ $menuitem->id }}"
+                                    <x-laraknife.actions.action name="insert" no="{{ $menuitem->id }}"
                                         icon="bi bi-box-arrow-in-up" />
                                 </td>
                                 <td>{{ $menuitem->name }}</td>

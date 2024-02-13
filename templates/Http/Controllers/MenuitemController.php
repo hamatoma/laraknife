@@ -168,23 +168,23 @@ class MenuitemController extends Controller
                     DB::insert("INSERT INTO menuitems_roles (`order`, menuitem_id, role_id) VALUES ($order, $menuitem, $role)");
                 }
                 $rc = redirect('/menuitem-index');
-            } elseif (($no = DbHelper::numberOfButton($fields, 'insert')) != null) {
+            } elseif (($no = ViewHelper::numberOfButton($fields, 'insert')) != null) {
                 $position = intval($fields['position']);
                 if ($position <= 0 || $position > count($ids)) {
                     $position = $fields['position'] = 1;
                 }
                 array_splice($ids, $position - 1, 0, $no);
-            } elseif (($no = DbHelper::numberOfButton($fields, 'delete')) != null) {
+            } elseif (($no = ViewHelper::numberOfButton($fields, 'delete')) != null) {
                 $ix = array_search(strval($no), $ids);
                 array_splice($ids, $ix, 1);
-            } elseif (($no = DbHelper::numberOfButton($fields, 'up')) != null) {
+            } elseif (($no = ViewHelper::numberOfButton($fields, 'up')) != null) {
                 $no2 = strval($no);
                 $ix = array_search($no2, $ids);
                 if ($ix > 0) {
                     array_splice($ids, $ix, 1);
                     array_splice($ids, $ix - 1, 0, $no2);
                 }
-            } elseif (($no = DbHelper::numberOfButton($fields, 'down')) != null) {
+            } elseif (($no = ViewHelper::numberOfButton($fields, 'down')) != null) {
                 $no2 = strval($no);
                 $ix = array_search($no2, $ids);
                 if ($ix < count($ids) - 1) {

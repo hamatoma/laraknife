@@ -8,7 +8,7 @@
                  <x-laraknife.forms.set-position position="first" />
                  @for ($col = 0; $col < $cols && $row * $cols + $col < count($records); $col++)
                      @php($menuitem = $records[$row * $cols + $col])
-                     <x-laraknife.icons.icon-as-link icon="{{ $menuitem->icon }}" label="{{ $menuitem->label }}"
+                     <x-laraknife.icons.menuitem icon="{{ $menuitem->icon }}" label="{{ $menuitem->label }}"
                          link="{{ $menuitem->link }}" width1="0" width2="{{intval(12/$cols)}}"/>
                  @endfor()
                  <x-laraknife.forms.set-position position="last" />

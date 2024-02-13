@@ -135,23 +135,6 @@ class DbHelper
         return $rc;
     }
     /**
-     * Extracts the number of a numbered button.
-     * @param array $fields the form fields
-     * @param string $name the name of the numbered button
-     * @return int|NULL NULL: no button found. Otherwise: the number of the button
-     */
-    public static function numberOfButton(array $fields, string $name): ?int{
-        $rc = null;
-        $fieldname = '_lknAction';
-        if (array_key_exists($fieldname, $fields)){
-            $value =  $fields[$fieldname];
-            if (str_starts_with($value, $name)){
-                $rc = intval(substr($value, strlen($name) + 1));
-            }
-        }
-        return $rc;
-    }
-    /**
      * Brings the $records in the order of $ids (using column 'id').
      * @param $records the database records
      * @param $ids a list of ids (integer)
