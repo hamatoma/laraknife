@@ -105,15 +105,15 @@ class RoleController extends Controller
     }
     public static function routes()
     {
-        Route::get('/role-index', [RoleController::class, 'index']);
-        Route::post('/role-index', [RoleController::class, 'index']);
-        Route::get('/role-create', [RoleController::class, 'create']);
-        Route::post('/role-create', [RoleController::class, 'create']);
-        Route::put('/role-store', [RoleController::class, 'store']);
-        Route::get('/role-edit/{role}', [RoleController::class, 'edit']);
-        Route::post('/role-update/{role}', [RoleController::class, 'update']);
-        Route::get('/role-show/{role}/delete', [RoleController::class, 'show']);
-        Route::delete('/role-show/{role}/delete', [RoleController::class, 'destroy']);
+        Route::get('/role-index', [RoleController::class, 'index'])->middleware('auth');
+        Route::post('/role-index', [RoleController::class, 'index'])->middleware('auth');
+        Route::get('/role-create', [RoleController::class, 'create'])->middleware('auth');
+        Route::post('/role-create', [RoleController::class, 'create'])->middleware('auth');
+        Route::put('/role-store', [RoleController::class, 'store'])->middleware('auth');
+        Route::get('/role-edit/{role}', [RoleController::class, 'edit'])->middleware('auth');
+        Route::post('/role-update/{role}', [RoleController::class, 'update'])->middleware('auth');
+        Route::get('/role-show/{role}/delete', [RoleController::class, 'show'])->middleware('auth');
+        Route::delete('/role-show/{role}/delete', [RoleController::class, 'destroy'])->middleware('auth');
     }
     /**
      * Display the specified resource.

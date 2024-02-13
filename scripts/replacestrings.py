@@ -2,10 +2,12 @@
 import os.path
 import sys
 import re
+import argparse
 
 class ReplaceEngine:
-    def __init__(self, separator: str) -> None:
+    def __init__(self, separator: str, comment: str) -> None:
         self._separator = separator
+        self._comment = comment if comment != '' else None
         self._replacements = {}
         self._filename = None
         self._lineNo = 0
@@ -73,7 +75,7 @@ class ReplaceEngine:
             for line in fp:
                 self._lineNo += 1
                 line = line.rstrip('\n\c')
-                if line.strip() == '':
+                if line.strip() == '' or (self._comment is not None and line.startswith(self._comment)):
                     continue
                 parts = line.split(self._separator)
                 if len(parts) == 1:
@@ -87,24 +89,11 @@ class ReplaceEngine:
         return rc
 
     def setPattern(self, pattern: str) -> None:           
-        self._nodeRegExpr = re.compile(pattern)
+        self._nodeRegExpr = None if pattern == '.*' else re.compile(pattern)
         
-def usage(msg: str):
-    print(f'''Usage: replacestrings <replacement-file> <file-or-directory> [<file-regex-pattern>]
-  Does the replacements read from <replacement-file> in the specified <file-or-directory>..
-  If <file-or-directory> is a directory all files matching the <file-regex-pattern> will be inspected.
-  The search is recursive: subdirectories will be inspected too.
-  Format of the <replacement-file>: each line contains a search string, a TAB as separator and the replacement.
-<options>:
-  --separator=<separator> or -s<separator>
-    The separator in the <replacement-file> between search string and replacement.add()
-    Default: TAB (tabulator)
-
-Examples: 
-replacestrings data/replacements.txt /ws/myproject '(.*\.[ch]pp|.*\.txt)$'
-replacestrings data/replacements.txt --separator=, /ws/myproject/main.cpp
-+++ {msg}
-''')        
+def usage(msg: str, parser):
+    parser.print_help()
+    print(f'+++ {msg}')
     sys.exit(1)   
 
 def test():
@@ -120,41 +109,56 @@ With a little help from my friends.
 ''')
         with open(fnData, 'w') as fp:
             fp.write('''line;Line
+# comment
 f;X
 ''')
-    argv = ['--separator=;', fnData, base, '^.*\.demo$']
+    argv = ['--separator=;', fnData, base, '-f^.*\.demo$']
     return argv
     
 def main(argv):
-    if len(argv) == 0 or (len(argv) == 1 and argv[0] == '--test'):
+    if len(argv) == 99 or (len(argv) == 1 and argv[0] == '--test'):
         argv = test()
-    if len(argv) < 2:
-        usage('missing arguments')
-    else:
+    parser = argparse.ArgumentParser(description='Replaces strings with replacements read from a file in a file or directory.',
+                                        usage='''replacestrings.py [<options>] <file-with-replacements> <file-or-directory> [<file-regexpr-pattern>]
+examples:
+replacestrings --separator=; data/repl.data /home/ws '^.*\.(txt|[ch]pp)$'
+replacestrings '--comment=' data/repl.data /home/ws/test.cpp
+''')
+    parser.add_argument("-s", "--separator", dest="separator", 
+                        help="Separates the string from the replacements in <file-with-replacements>. Default: TAB",
+                        default='\t')
+    parser.add_argument("-c", "--comment", dest="comment", 
+                        help="If a line <file-with-replacements> starts with that string the line is ignored. Default: #",
+                        default='#')
+    parser.add_argument('replacementData', type=str, help="The file with the string-separator-replacement lines")
+    parser.add_argument('fileOrDirectory', type=str, help="The file or the directory to process")
+    parser.add_argument('-f', '--file-pattern', dest='filePattern', type=str, help="The regular expression specifying the files to to process. Default: .*",
+                        default=".*")
+    
+    # Process arguments
+    args = parser.parse_args(argv)
+    separator = args.separator
+    comment = args.comment
+    if separator == '':
         separator = '\t'
-        while len(argv) > 0 and argv[0].startswith('-'):
-            arg = argv[0]
-            if arg.startswith('-s'):
-                separator = arg[2:]
-            elif arg.startswith('--separator='):
-                separator = arg[12:]
-            else:
-                usage(f'unknown option: {arg}')
-            argv = argv[1:]
-        if separator == '':
-            separator = '\t'
-        engine = ReplaceEngine(separator)
-        if not engine.readReplacements(argv[0]):
-            usage(f'error in configuration file: {argv[0]}')
+    engine = ReplaceEngine(separator, comment)
+    fnData = args.replacementData
+    fileOrDirectory = args.fileOrDirectory
+    
+    if not os.path.exists(fnData):
+        usage(f'missing {fnData}', parser)
+    if not engine.readReplacements(fnData):
+        usage(f'error in configuration file: {fnData}', parser)
+    else:
+        if not os.path.exists(fileOrDirectory):
+            usage(f'missing {fileOrDirectory}', parser)
+        elif not os.path.isdir(fileOrDirectory):
+            engine.oneFile(fileOrDirectory)
         else:
-            source = argv[1]
-            if not os.path.isdir(source):
-                engine.oneFile(source)
-            else:
-                if len(argv) > 2:
-                    engine.setPattern(argv[2])
-                    engine.oneDirectory(source)
-                    engine.logStatistics()
+            if len(argv) > 2:
+                engine.setPattern(args.filePattern)
+                engine.oneDirectory(fileOrDirectory)
+                engine.logStatistics()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

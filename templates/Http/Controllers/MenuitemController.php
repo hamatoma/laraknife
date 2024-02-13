@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu;
+use App\Models\Menuitem;
 use App\Models\User;
 use App\Helpers\Helper;
 use App\Helpers\DbHelper;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
-class MenuController extends Controller
+class MenuitemController extends Controller
 {
     /**
      * Show the form for creating a new resource.
@@ -24,7 +24,7 @@ class MenuController extends Controller
     public function create(Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/menu-index');
+            $rc = redirect('/menuitem-index');
         } else {
             $fields = $request->all();
             if (count($fields) === 0) {
@@ -37,7 +37,7 @@ class MenuController extends Controller
                 ];
             }
             $context = new ContextLaraKnife($request, $fields);
-            $rc = view('menu.create', [
+            $rc = view('menuitem.create', [
                 'context' => $context,
             ]);
         }
@@ -46,10 +46,10 @@ class MenuController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Menu $menu, Request $request)
+    public function edit(Menuitem $menuitem, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/menu-index');
+            $rc = redirect('/menuitem-index');
         } else {
             $fields = $request->all();
             if (count($fields) === 0) {
@@ -61,8 +61,8 @@ class MenuController extends Controller
                     'link' => ''
                 ];
             }
-            $context = new ContextLaraKnife($request, null, $menu);
-            $rc = view('menu.edit', [
+            $context = new ContextLaraKnife($request, null, $menuitem);
+            $rc = view('menuitem.edit', [
                 'context' => $context,
             ]);
         }
@@ -71,12 +71,12 @@ class MenuController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Menu $menu, Request $request)
+    public function destroy(Menuitem $menuitem, Request $request)
     {
         if ($request->btnSubmit === 'btnDelete') {
-            $menu->delete();
+            $menuitem->delete();
         }
-        return redirect('/menu-index');
+        return redirect('/menuitem-index');
     }
     /**
      * Display the database records of the resource.
@@ -84,12 +84,12 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         if ($request->btnSubmit === 'btnNew') {
-            return redirect('/menu-create');
+            return redirect('/menuitem-create');
         } elseif ($request->btnSubmit === 'btnAssign') {
-            return redirect('/menu-order');
+            return redirect('/menuitem-order');
         } else {
             $sql = 'SELECT t0.*'
-                . ' FROM menus t0'
+                . ' FROM menuitems t0'
             ;
             $parameters = [];
             $fields = $request->all();
@@ -108,29 +108,31 @@ class MenuController extends Controller
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $context = new ContextLaraKnife($request, $fields);
-            return view('menu.index', [
+            return view('menuitem.index', [
                 'context' => $context,
                 'records' => $records,
                 'pagination' => $pagination
             ]);
         }
     }
-    public function menu(Request $request, string $scope='main'){
-        if (Auth::check()){
+    public function menu(Request $request, string $section = 'main')
+    {
+        if (Auth::check()) {
             $userId = Auth::user()->id;
-            $role = $userId == null ? 1 : User::get($userId)->role_id;
+            $role = $userId == null ? 1 : User::find($userId)->role_id;
         } else {
             $role = 3;
         }
-        $records = DB::select("SELECT DISTINCT t0.id AS role FROM menus t0 
-        LEFT JOIN menus_roles t1 on t1.menu_id=t0.id
+        $records = DB::select("SELECT DISTINCT t0.* FROM menuitems t0 
+        LEFT JOIN menuitems_roles t1 on t1.menuitem_id=t0.id
         LEFT JOIN roles t2 on t2.id=t1.role_id
-        WHERE t1.role_id=$role ORDER BY t1.`order`");
+        WHERE t1.role_id=$role AND t0.section='$section' ORDER BY t1.`order`");
         $fields = $request->all();
         $context = new ContextLaraKnife($request, $fields);
         $cols = 4;
         $rows = intval((count($records) + $cols - 1) / $cols);
-        $rc = view('menu.menu', [
+        $name = "menuitem.menu_$section";
+        $rc = view($name, [
             'context' => $context,
             'records' => $records,
             'rows' => $rows,
@@ -138,29 +140,34 @@ class MenuController extends Controller
         ]);
         return $rc;
     }
+    public function menuMain(Request $request)
+    {
+        $rc = $this->menu($request, 'main');
+        return $rc;
+    }
     public function order(Request $request)
     {
         $rc = null;
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/menu-index');
+            $rc = redirect('/menuitem-index');
         } else {
             $fields = $request->all();
             if (count($fields) == 0) {
-                $fields = ['role' => '', 'position' => '1', 'selectedMenus' => '', 'lastRole' => ''];
+                $fields = ['role' => '', 'position' => '1', 'selectedMenuItems' => '', 'lastRole' => ''];
             }
-            if ($fields['role'] != $fields['lastRole']){
-                $fields['selectedMenus'] = '';
+            if ($fields['role'] != $fields['lastRole']) {
+                $fields['selectedMenuItems'] = '';
             }
-            $ids = empty($fields['selectedMenus']) ? [] : explode(',', $fields['selectedMenus']);
+            $ids = empty($fields['selectedMenuItems']) ? [] : explode(',', $fields['selectedMenuItems']);
             if ($request->btnSubmit === 'btnStore') {
                 $role = $fields['role'];
-                DB::delete("DELETE FROM menus_roles where role_id=$role");
-                for ($ix = 0; $ix < count($ids); $ix++){
-                    $order = ($ix+1)*10;
-                    $menu = $ids[$ix];
-                    DB::insert("INSERT INTO menus_roles (`order`, menu_id, role_id) VALUES ($order, $menu, $role)"); 
+                DB::delete("DELETE FROM menuitems_roles where role_id=$role");
+                for ($ix = 0; $ix < count($ids); $ix++) {
+                    $order = ($ix + 1) * 10;
+                    $menuitem = $ids[$ix];
+                    DB::insert("INSERT INTO menuitems_roles (`order`, menuitem_id, role_id) VALUES ($order, $menuitem, $role)");
                 }
-                $rc = redirect('/menu-index');
+                $rc = redirect('/menuitem-index');
             } elseif (($no = DbHelper::numberOfButton($fields, 'insert')) != null) {
                 $position = intval($fields['position']);
                 if ($position <= 0 || $position > count($ids)) {
@@ -186,29 +193,29 @@ class MenuController extends Controller
                 }
             }
             if ($rc == null) {
-                $fields['selectedMenus'] = implode(',', $ids);
+                $fields['selectedMenuItems'] = implode(',', $ids);
 
                 $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role'], '');
                 $role = intval(DbHelper::findCurrentSelectedInCombobox($roleOptions));
-                if (empty($fields['selectedMenus'])) {
-                    $records = DB::select("SELECT DISTINCT t0.id AS role FROM menus t0 
-                LEFT JOIN menus_roles t1 on t1.menu_id=t0.id
+                if (empty($fields['selectedMenuItems'])) {
+                    $records = DB::select("SELECT DISTINCT t0.id AS role FROM menuitems t0 
+                LEFT JOIN menuitems_roles t1 on t1.menuitem_id=t0.id
                 LEFT JOIN roles t2 on t2.id=t1.role_id
                 WHERE t1.role_id=$role ORDER BY t1.`order`");
                     $ids2 = [];
                     foreach ($records as &$rec) {
                         array_push($ids2, $rec->role);
                     }
-                    $fields['selectedMenus'] = implode(',', $ids2);
+                    $fields['selectedMenuItems'] = implode(',', $ids2);
                 }
-                $ids3 = $fields['selectedMenus'];
-                $records = empty($ids3) ? [] : DB::select("SELECT * FROM menus WHERE id in ($ids3)");
+                $ids3 = $fields['selectedMenuItems'];
+                $records = empty($ids3) ? [] : DB::select("SELECT * FROM menuitems WHERE id in ($ids3)");
                 $records = DbHelper::resortById($records, explode(',', $ids3));
                 $where = empty($ids3) ? '' : " WHERE id NOT IN ($ids3)";
-                $records2 = DB::select("SELECT * FROM menus$where");
+                $records2 = DB::select("SELECT * FROM menuitems$where");
                 $fields['lastRole'] = $role;
                 $context = new ContextLaraKnife($request, $fields);
-                $rc = view('menu.order', [
+                $rc = view('menuitem.order', [
                     'context' => $context,
                     'records' => $records,
                     'records2' => $records2,
@@ -235,30 +242,30 @@ class MenuController extends Controller
     }
     public static function routes()
     {
-        Route::get('/menu-index', [MenuController::class, 'index']);
-        Route::post('/menu-index', [MenuController::class, 'index']);
-        Route::get('/menu-create', [MenuController::class, 'create']);
-        Route::put('/menu-store', [MenuController::class, 'store']);
-        Route::post('/menu-edit/{menu}', [MenuController::class, 'edit']);
-        Route::get('/menu-edit/{menu}', [MenuController::class, 'edit']);
-        Route::post('/menu-update/{menu}', [MenuController::class, 'update']);
-        Route::get('/menu-show/{menu}/delete', [MenuController::class, 'show']);
-        Route::delete('/menu-show/{menu}/delete', [MenuController::class, 'destroy']);
-        Route::get('/menu-order', [MenuController::class, 'order']);
-        Route::post('/menu-order', [MenuController::class, 'order']);
-        Route::get('/menu-menu', [MenuController::class, 'menu']);
-        Route::post('/menu-menu', [MenuController::class, 'menu']);
+        Route::get('/menuitem-index', [MenuitemController::class, 'index'])->middleware('auth');
+        Route::post('/menuitem-index', [MenuitemController::class, 'index'])->middleware('auth');
+        Route::get('/menuitem-create', [MenuitemController::class, 'create'])->middleware('auth');
+        Route::put('/menuitem-store', [MenuitemController::class, 'store'])->middleware('auth');
+        Route::post('/menuitem-edit/{menuitem}', [MenuitemController::class, 'edit'])->middleware('auth');
+        Route::get('/menuitem-edit/{menuitem}', [MenuitemController::class, 'edit'])->middleware('auth');
+        Route::post('/menuitem-update/{menuitem}', [MenuitemController::class, 'update'])->middleware('auth');
+        Route::get('/menuitem-show/{menuitem}/delete', [MenuitemController::class, 'show'])->middleware('auth');
+        Route::delete('/menuitem-show/{menuitem}/delete', [MenuitemController::class, 'destroy'])->middleware('auth');
+        Route::get('/menuitem-order', [MenuitemController::class, 'order'])->middleware('auth');
+        Route::post('/menuitem-order', [MenuitemController::class, 'order'])->middleware('auth');
+        Route::get('/menuitem-menu_main', [MenuitemController::class, 'menuMain'])->middleware('auth');
+        Route::post('/menuitem-menu_main', [MenuitemController::class, 'menuMain'])->middleware('auth');
     }
     /**
      * Display the specified resource.
      */
-    public function show(Menu $menu, Request $request)
+    public function show(Menuitem $menuitem, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/menu-index');
+            $rc = redirect('/menuitem-index');
         } else {
-            $context = new ContextLaraKnife($request, null, $menu);
-            $rc = view('menu.show', [
+            $context = new ContextLaraKnife($request, null, $menuitem);
+            $rc = view('menuitem.show', [
                 'context' => $context,
                 'mode' => 'delete'
             ]);
@@ -279,18 +286,18 @@ class MenuController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-                Menu::create($validated);
+                Menuitem::create($validated);
             }
         }
         if ($rc == null) {
-            $rc = redirect('/menu-index');
+            $rc = redirect('/menuitem-index');
         }
         return $rc;
     }
     /**
      * Update the specified resource in storage.
      */
-    public function update(Menu $menu, Request $request)
+    public function update(Menuitem $menuitem, Request $request)
     {
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
@@ -300,11 +307,11 @@ class MenuController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-                $menu->update($validated);
+                $menuitem->update($validated);
             }
         }
         if ($rc == null) {
-            $rc = redirect('/menu-index');
+            $rc = redirect('/menuitem-index');
         }
         return $rc;
     }

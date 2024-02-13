@@ -1,9 +1,9 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="menu-index" action="/menu-index" method="POST">
+    <form id="menuitem-index" action="/menuitem-index" method="POST">
         @csrf
-        <x-laraknife.panels.index title="{{ __('Menus') }}">
+        <x-laraknife.panels.index title="{{ __('Menu Items') }}">
             <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
                 <x-laraknife.forms.text position="alone" name="text" label="Name" value="{{ $context->valueOf('text') }}"
                     width2="4" />
@@ -26,17 +26,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($records as $menu)
+                    @foreach ($records as $menuitem)
                         <tr>
-                            <td><x-laraknife.icons.change-record module="menu" no="{{ $menu->id }}" /></td>
-                            <td>{{ $menu->name }}</td>
-                            <td>{{ $menu->label }}</td>
-                            <td>{{ $menu->icon }}</td>
-                            <td>{{ $menu->section }}</td>
-                            <td>{{ $menu->link }}</td>
-                            <td>{{ $menu->id }}</td>
-                            <td><a href="/menu-show/{{ $menu->id }}/delete">{{ __('Delete') }}</a></td>
-                            <td><x-laraknife.icons.delete-record module="menu" no="{{ $menu->id }}" /></td>
+                            <td><x-laraknife.icons.change-record module="menuitem" no="{{ $menuitem->id }}" /></td>
+                            <td>{{ $menuitem->name }}</td>
+                            <td>{{ $menuitem->label }}</td>
+                            <td><i class="{{ $menuitem->icon }}"></i> {{ $menuitem->icon }}</td>
+                            <td>{{ $menuitem->section }}</td>
+                            <td>{{ $menuitem->link }}</td>
+                            <td>{{ $menuitem->id }}</td>
+                            <td><a href="/menuitem-show/{{ $menuitem->id }}/delete">{{ __('Delete') }}</a></td>
+                            <td><x-laraknife.icons.delete-record module="menuitem" no="{{ $menuitem->id }}" /></td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -122,15 +122,15 @@ class SPropertyController extends Controller
     }
     public static function routes()
     {
-        Route::get('/sproperty-index', [SPropertyController::class, 'index']);
-        Route::post('/sproperty-index', [SPropertyController::class, 'index']);
-        Route::get('/sproperty-create', [SPropertyController::class, 'create']);
-        Route::put('/sproperty-store', [SPropertyController::class, 'store']);
-        Route::get('/sproperty-edit/{sproperty}', [SPropertyController::class, 'edit']);
-        Route::put('/sproperty-store', [SPropertyController::class, 'store']);
-        Route::post('/sproperty-update/{sproperty}', [SPropertyController::class, 'update']);
-        Route::get('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'show']);
-        Route::delete('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'destroy']);
+        Route::get('/sproperty-index', [SPropertyController::class, 'index'])->middleware('auth');
+        Route::post('/sproperty-index', [SPropertyController::class, 'index'])->middleware('auth');
+        Route::get('/sproperty-create', [SPropertyController::class, 'create'])->middleware('auth');
+        Route::put('/sproperty-store', [SPropertyController::class, 'store'])->middleware('auth');
+        Route::get('/sproperty-edit/{sproperty}', [SPropertyController::class, 'edit'])->middleware('auth');
+        Route::put('/sproperty-store', [SPropertyController::class, 'store'])->middleware('auth');
+        Route::post('/sproperty-update/{sproperty}', [SPropertyController::class, 'update'])->middleware('auth');
+        Route::get('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'show'])->middleware('auth');
+        Route::delete('/sproperty-show/{sproperty}/delete', [SPropertyController::class, 'destroy'])->middleware('auth');
     }
     /**
      * Display the specified resource.

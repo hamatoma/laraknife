@@ -1,9 +1,9 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="menu-edit" action="/menu-update/{{ $context->model->id  }}" method="POST">
+    <form id="menuitem-edit" action="/menuitem-update/{{ $context->model->id  }}" method="POST">
         @csrf
-        <x-laraknife.panels.edit title="{{ __('Change of a Menu') }}">
+        <x-laraknife.panels.edit title="{{ __('Change of a Menu Item') }}">
         <x-laraknife.forms.text position="first" name="name" label="Name" value="{{ $context->valueOf('name') }}" width2="4" />
         <x-laraknife.forms.text position="last" name="label" label="Label" value="{{ $context->valueOf('label') }}" width2="4" />
         <x-laraknife.forms.text position="first" name="icon" label="Icon" value="{{ $context->valueOf('icon') }}" width2="4" />

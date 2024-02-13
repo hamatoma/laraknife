@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('menuitems_roles', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('name', 64);
-            $table->string('label', 64);
-            $table->string('icon', 64);
-            $table->string('section', 64);
-            $table->string('link');
+            $table->integer('order');
+            $table->foreignId('menuitem_id')->references('id')->on('menuitems');
+            $table->foreignId('role_id')->references('id')->on('roles');
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('menus_roles');
     }
 };

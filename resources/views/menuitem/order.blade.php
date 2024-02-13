@@ -1,11 +1,11 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="menu-order" action="/menu-order" method="POST">
+    <form id="menuitem-order" action="/menuitem-order" method="POST">
         @csrf
         <x-laraknife.panels.index title="{{ __('Assign Roles') }}">
             <div class="lkn-form-table">
-                <input type="hidden" name="selectedMenus" value="{{ $context->valueOf('selectedMenus') }}">
+                <input type="hidden" name="selectedMenuItems" value="{{ $context->valueOf('selectedMenuItems') }}">
                 <input type="hidden" name="lastRole" value="{{ $context->valueOf('lastRole') }}">
                 <x-laraknife.forms.combobox position="alone" name="role" label="Role" :options="$roleOptions"
                     class="lkn-autoupdate" width2="10" />
@@ -22,17 +22,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($records as $menu)
+                        @foreach ($records as $menuitem)
                             <tr><td>
-                                <x-laraknife.actions.down no="{{ $menu->id }}" />&nbsp;
-                                <x-laraknife.actions.up no="{{ $menu->id }}" />
+                                <x-laraknife.actions.down no="{{ $menuitem->id }}" />&nbsp;
+                                <x-laraknife.actions.up no="{{ $menuitem->id }}" />
                                 </td>
                                 <td>{{ $context->currentNo()}}</td>
-                                <td>{{ __($menu->name) }}</td>
-                                <td>{{ __($menu->label) }}</td>
-                                <td>{{ __($menu->id) }}</td>
+                                <td>{{ __($menuitem->name) }}</td>
+                                <td>{{ __($menuitem->label) }}</td>
+                                <td>{{ __($menuitem->id) }}</td>
                                 <td>
-                                    <x-laraknife.actions.delete no="{{ $menu->id }}" />
+                                    <x-laraknife.actions.delete no="{{ $menuitem->id }}" />
                                 </td>
                             </tr>
                         @endforeach
@@ -54,15 +54,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($records2 as $menu)
+                        @foreach ($records2 as $menuitem)
                             <tr>
                                 <td>
-                                    <x-laraknife.actions.up name="insert" no="{{ $menu->id }}"
+                                    <x-laraknife.actions.up name="insert" no="{{ $menuitem->id }}"
                                         icon="bi bi-box-arrow-in-up" />
                                 </td>
-                                <td>{{ $menu->name }}</td>
-                                <td>{{ $menu->label }}</td>
-                                <td>{{ $menu->link }}</td>
+                                <td>{{ $menuitem->name }}</td>
+                                <td>{{ $menuitem->label }}</td>
+                                <td>{{ $menuitem->link }}</td>
                             </tr>
                         @endforeach
                     </tbody>

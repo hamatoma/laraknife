@@ -27,6 +27,29 @@ EOS
   echo "+++ $*"
 }
 # ===
+function AdaptModules(){
+  local fn=app/Models/User.php
+  found=$(grep role_id $fn)
+  if [ -n "$found" ]; then
+    echo "= role_id already found"
+  else
+    sed -i -e "s/'password'/'password',#N#    'role_id'/" -e 's/#N#/\n/g' $fn
+  fi
+  grep -A5 fillable $fn
+  fn=routes/web.php
+  found=$(grep RoleController::routes $fn)
+  if [ -n "$found" ]; then
+    echo "= RoleController::routes already found"
+  else
+    sed -i -e 's/Route;/Route;#N#use App\\Http\\Controllers\\RoleController;#N#use App\\Http\\Controllers\\UserController;#N#use App\\Http\\Controllers\\SPropertyController;/' \
+      -e 's/Auth::routes..;/Auth::routes();#N#RoleController::routes();#N#SPropertyController::routes();#N#UserController::routes();/' \
+      -e 's/#N#/\n/g' \
+      $fn
+    echo "= routes adapted:"
+  fi
+  grep -A3 RoleController::routes $fn
+}
+# ===
 function BuildLinks(){
   local option="$1"
   local base=vendor/hamatoma/laraknife
@@ -133,26 +156,21 @@ EOS
   composer dump-autoload
 }
 # ===
-function InitI18N(){
-  local fn=config/app.php
-  if [ ! -f $fn ]; then
-    echo "++ missing $fn"
-  else
-    sed -i -e "s/'locale' => 'en'/'locale' => 'de_DE',#N#'available_locales' => [#N#  'English' => 'en',#N#  'German' => 'de_DE'#N#]/" \
-    -e 's/#N#/\n/g' $fn
-    grep -A4 "locale.*de_DE" $fn
-    local fn=resources/lang/sources/$PROJ.de.json
-    if [ ! -f $fn ]; then
-      cat <<EOS >$fn
-{
-"!comment": "Bitte alphabetisch sortiert eintragen",
-"ZZZZZ_last": ""
+function CreateHome(){
+ . project.env
+  local fn=resources/views/home.blade.php
+  sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/home.templ >$fn
+  echo "= home $fn has been created"
 }
-EOS
-      echo "created: $fn"
-      ls -l $fn
-    fi
-  fi
+# ===
+function CreateLayout(){
+  . project.env
+  local fn=resources/views/layouts/$PROJ.blade.php
+  sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/layout.templ >$fn
+  cd resources/views/layouts
+  ln -sv $PROJ.blade.php backend.blade.php
+  cd ../../..
+  echo "= layout $fn and backend.blade.php have been created"
 }
 # ===
 function FillDb(){
@@ -176,44 +194,48 @@ select count(*) from sproperties as sproperty_count;
 EOS
 }
 # ===
-function AdaptModules(){
-  local fn=app/Models/User.php
-  found=$(grep role_id $fn)
-  if [ -n "$found" ]; then
-    echo "= role_id already found"
+function InitI18N(){
+  local fn=config/app.php
+  if [ ! -f $fn ]; then
+    echo "++ missing $fn"
   else
-    sed -i -e "s/'password'/'password',#N#    'role_id'/" -e 's/#N#/\n/g' $fn
+    sed -i -e "s/'locale' => 'en'/'locale' => 'de_DE',#N#'available_locales' => [#N#  'English' => 'en',#N#  'German' => 'de_DE'#N#]/" \
+    -e 's/#N#/\n/g' $fn
+    grep -A4 "locale.*de_DE" $fn
+    local fn=resources/lang/sources/$PROJ.de.json
+    if [ ! -f $fn ]; then
+      cat <<EOS >$fn
+{
+"!comment": "Bitte alphabetisch sortiert eintragen",
+"ZZZZZ_last": ""
+}
+EOS
+      echo "created: $fn"
+      ls -l $fn
+    fi
   fi
-  grep -A5 fillable $fn
-  fn=routes/web.php
-  found=$(grep RoleController::routes $fn)
-  if [ -n "$found" ]; then
-    echo "= RoleController::routes already found"
-  else
-    sed -i -e 's/Route;/Route;#N#use App\\Http\\Controllers\\RoleController;#N#use App\\Http\\Controllers\\UserController;#N#use App\\Http\\Controllers\\SPropertyController;/' \
-      -e 's/Auth::routes..;/Auth::routes();#N#RoleController::routes();#N#SPropertyController::routes();#N#UserController::routes();/' \
-      -e 's/#N#/\n/g' \
-      $fn
-    echo "= routes adapted:"
-  fi
-  grep -A3 RoleController::routes $fn
 }
 # ===
-function CreateLayout(){
-  . project.env
-  local fn=resources/views/layouts/$PROJ.blade.php
-  sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/layout.templ >$fn
-  cd resources/views/layouts
-  ln -sv $PROJ.blade.php backend.blade.php
-  cd ../../..
-  echo "= layout $fn and backend.blade.php have been created"
-}
-# ===
-function CreateHome(){
- . project.env
-  local fn=resources/views/home.blade.php
-  sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/home.templ >$fn
-  echo "= home $fn has been created"
+function LinkModule(){
+  local module="$1"
+  if [ -z "$module" ]; then
+    Usage "missing <module>"
+  elif [ ! -d vendor/hamatoma/laraknife/resources/views/$module ]; then
+    Usage "unknown module: $module (missing vendor/hamatoma/laraknife/resources/views/$module)"
+  elif [ -d resources/views/$module ]; then
+    Usage "$module already exists: resources/views/$module"
+  else
+    local Module="$(echo ${module:0:1} | tr '[:lower:]' '[:upper:]')${module:1}"
+    ln -sv  ../../vendor/hamatoma/laraknife/resources/views/$module resources/views/
+    ln -sv ../../../vendor/hamatoma/laraknife/templates/Http/Controllers/${Module}Controller.php app/Http/Controllers
+    ln -sv ../../vendor/hamatoma/laraknife/templates/Models/${Module}.php app/Models
+    local src=vendor/hamatoma/laraknife/templates/database/migrations
+    local node
+    for file in $src/*_${module}*.php; do
+      node=$(basename $file)
+      ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations/$node
+    done
+  fi
 }
 # ===
 function MoveToLaraknife(){
@@ -242,17 +264,11 @@ function MoveToLaraknife(){
   fi
 }
 case $MODE in
-build-links)
-  BuildLinks $2
-  ;;
-init-i18n)
-  InitI18N
-  ;;
-fill-db)
-  FillDb
-  ;;
 adapt-modules)
   AdaptModules
+  ;;
+build-links)
+  BuildLinks $2
   ;;
 create-layout)
   CreateLayout
@@ -260,15 +276,24 @@ create-layout)
 create-home)
   CreateHome
   ;;
+fill-db)
+  FillDb
+  ;;
+init-i18n)
+  InitI18N
+  ;;
+link-module)
+  LinkModule "$2"
+  ;;
+move-to-laraknife)
+  MoveToLaraknife "$2"
+  ;;
 rest)
   InitI18N
   FillDb
   AdaptModules
   CreateLayout
   CreateHome
-  ;;
-move-to-laraknife)
-  MoveToLaraknife "$2"
   ;;
 *)
   Usage "unknown TASK: $MODE"

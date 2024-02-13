@@ -1,12 +1,12 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="menu-show" action="/menu-show/{{ $context->model->id }}/{{ $mode }}" method="POST">
+    <form id="menuitem-show" action="/menuitem-show/{{ $context->model->id }}/{{ $mode }}" method="POST">
         @csrf
         @if($mode === 'delete')
         @method('DELETE')
         @endif
-        <x-laraknife.panels.show title="{{ __($mode !== 'delete' ? 'A Menu' : 'Deletion of a Menu') }}" mode="{{$mode}}">
+        <x-laraknife.panels.show title="{{ __($mode !== 'delete' ? 'A Menu' : 'Deletion of a Menu Item') }}" mode="{{$mode}}">
             <x-laraknife.forms.text position="first" name="name" label="Name" value="{{ $context->valueOf('name') }}" width2="4" attribute="readonly" />
             <x-laraknife.forms.text position="last" name="label" label="Label" value="{{ $context->valueOf('label') }}" width2="4" attribute="readonly" />
             <x-laraknife.forms.text position="first" name="icon" label="Icon" value="{{ $context->valueOf('icon') }}" width2="4" attribute="readonly" />

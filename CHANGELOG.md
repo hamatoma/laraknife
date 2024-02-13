@@ -1,5 +1,17 @@
 # Development phase
 
+## 0.4.2 2024.02.13 module menu, renaming of the components
+- sub directories: buttons, forms, panels
+- module menu renamed to menuitem
+- UserController: new login(), logout(), editCurrentUser()
+- backend.blade.php: logout is now a link (not a button)
+- XxxController::routes(): using middleware('auth')
+- Auth::routes() removed
+
+## 0.4.1 2024.02.11 main menu, bootstrap icons
+- usage of bootstrap icons
+- new module: menu
+
 ## 0.4.0 2024.02.09 module menu, renaming of the components
 - sub directories: buttons, forms, panels
 - new module: menu

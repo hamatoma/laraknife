@@ -8,10 +8,10 @@ use Hamatoma\Laraknife\ViewHelpers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Menu extends Model
+class Menuitem extends Model
 {
     use HasFactory;
-    protected $table = 'menus';
+    protected $table = 'menuitems';
     protected $fillable = [
         'name',
         'label',

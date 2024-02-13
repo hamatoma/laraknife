@@ -20,6 +20,9 @@ class ContextLaraKnife {
         $this->model = $model;
         $this->currentNo = 0;
     }
+    public function text(string $text): string{
+        return $text;
+    }
     public function valueOf(string $name){
         if ($this->model != null){
             $rc = old($name, $this->model[$name]);
@@ -27,7 +30,7 @@ class ContextLaraKnife {
             if ($this->fields == null){
                 $this->fields = $this->request->all();
             }
-            $rc = old($name, $this->fields[$name]);
+            $rc = array_key_exists($name, $this->fields) ? old($name, $this->fields[$name]) : '';
         }
         return $rc;
     }
