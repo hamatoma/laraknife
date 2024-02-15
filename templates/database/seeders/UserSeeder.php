@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name' => 'Guest',
             'email' => $email,
-            'password' => UserController::hash($email, $pw),,
+            'password' => UserController::hash($email, $pw),
             'role_id' => 4
         ]);
     }

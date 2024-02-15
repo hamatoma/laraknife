@@ -179,6 +179,7 @@ function CreateHome(){
 # ===
 function CreateLayout(){
   . project.env
+  mkdir -p resources/views/layouts
   local fn=resources/views/layouts/$PROJ.blade.php
   sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/layout.templ >$fn
   cd resources/views/layouts

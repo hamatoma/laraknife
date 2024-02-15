@@ -1,6 +1,11 @@
 # Development phase
 
 ## 0.4.5 2024.02.15 corrections
+- laraknife-tool.sh: creating resources/views/layouts
+- CreateLaraProj.sh: "php artisan ui bootstrap" without "-auth"
+- UserSeeder.php: wrong ','
+
+## 0.4.5 2024.02.15 corrections
 - menuitem/index.blade.php: wrong column
 - user/create.blade.php: missing role_id
 - laraknife-tool.sh: call of seeders

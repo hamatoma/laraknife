@@ -34,7 +34,7 @@ BASE=$BASE
 EOS
   composer require laravel/ui
   composer require spatie/laravel-permission
-  php artisan ui bootstrap --auth
+  php artisan ui bootstrap
   Wait "laravel installed"
   sudo mysql mysql <<EOS
 CREATE DATABASE lrv$PROJ;
