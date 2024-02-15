@@ -1,5 +1,15 @@
 # Development phase
 
+## 0.4.4 2024.02.15 other password encryption
+- new: StringHelper::createPassword()
+- laraknife-tool.sh:
+  - AdaptModules(): corrections for role_id
+  - AdaptModules(): correction in web.php
+  - layout.blade.php: correction: user-edit-current
+  - UserSeeder: creation of a random password for the admin,  writing into .lrv.credentials
+  - UserController: many corrections. Now using another password encryption
+     
+
 ## 0.4.3 2024.02.13 database seeders, refactoring
 - database is filled by seeders now
 - renamed: forms/text.blade.php -> forms/string.php

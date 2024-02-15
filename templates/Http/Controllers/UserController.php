@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -56,7 +57,8 @@ class UserController extends Controller
     /**
      * Shows the form for changing the password for the current user.
      */
-    public function editCurrentUser(Request $request){
+    public function editCurrentUser(Request $request)
+    {
         $user = User::find(auth()->id());
         $rc = $this->editPassword($user, $request, '/menuitem-menu_main');
         return $rc;
@@ -66,7 +68,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function editPassword(User $user, Request $request, ?string $redirect=null)
+    public function editPassword(User $user, Request $request, ?string $redirect = null)
     {
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect($redirect ?? '/menuitem-menu_main');
@@ -75,16 +77,19 @@ class UserController extends Controller
             $error = null;
             $fields = $request->all();
             if (count($fields) > 0) {
-                try {
-                    unset($_POST['name']);
-                    $incomingFields = $request->validate([
-                        'password' => 'required|confirmed',
-                        'password_confirmation' => 'required'
-                    ]);
-                    $user->update($incomingFields);
+                unset($_POST['name']);
+                $validator = Validator::make($fields, [
+                    'password' => 'required|confirmed',
+                    'password_confirmation' => 'required'
+                ]);
+                if ($validator->failed()) {
+                    $rc = back()->withErrors($validator)->withInput();
+                } else {
+                    $email = strtolower($user->email);
+                    $pw = $fields['password'];
+                    $hash = UserController::hash($email, $pw);
+                    $user->update(['email' => $email, 'password' => $hash]);
                     $rc = redirect($redirect ?? '/user-index');
-                } catch (\Exception $e) {
-                    $error = $e->getMessage();
                 }
             }
             if ($rc == null) {
@@ -102,6 +107,12 @@ class UserController extends Controller
             $user->delete();
         }
         return redirect('/user-index');
+    }
+    public static function hash(string $email, string $password)
+    {
+        $email = strtolower($email);
+        $rc = Hash::make("$email\t$password");
+        return $rc;
     }
     /**
      * Display a listing of the resource.
@@ -141,21 +152,41 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $rc = null;
+        $userId = null;
         $fields = $request->all();
         if (count($fields) === 0) {
             $fields = ['email' => '', 'password' => ''];
         } else {
-            $credentials = $request->validate([
-                'email' => ['required', 'email'],
-                'password' => ['required'],
-            ]);
-            if (Auth::attempt($credentials)) {
-                $request->session()->regenerate();
-                $rc = redirect('/menuitem-menu_main');
-            } else {
+            $refresh = 2 % 2 == 1;
+            $email = strtolower($fields['email']);
+            $pw = $fields['password'];
+            $hash = Hash::make("$email\t$pw");
+            $records = DB::select('SELECT id,password FROM users WHERE email=?', [$email]);
+            $ok = count($records) === 1;
+            if ($ok) {
+                $pw2 = $records[0]->password;
+                $userId = $records[0]->id;
+                $ok = $pw2 === $hash;
+            }
+            $validator = Validator::make($fields, ['email' => ['required', 'email'], 'password' => ['required']]);
+            if (! $validator->failed() && !$ok) {
+                $validator->errors()->add(
+                    'password',
+                    'The provided credentials do not match our records.'
+                );
+            }
+            if ($validator->failed()) {
                 $rc = back()->withErrors([
                     'email' => __('The provided credentials do not match our records.'),
                 ])->onlyInput('email');
+            } else {
+                if ($refresh) {
+                    $userId = 1;
+                }
+                $user = User::find($userId);
+                auth()->login($user);
+                $request->session()->regenerate();
+                $rc = redirect('/menuitem-menu_main');
             }
         }
         if ($rc == null) {
@@ -210,8 +241,10 @@ class UserController extends Controller
         Route::delete('/user-show/{user}/delete', [UserController::class, 'destroy'])->middleware('auth');
         Route::get('/user-login', [UserController::class, 'login']);
         Route::post('/user-login', [UserController::class, 'login']);
-        Route::get('/login', [UserController::class, 'login'])->name('login');;
-        Route::post('/login', [UserController::class, 'login'])->name('login');;
+        Route::get('/login', [UserController::class, 'login'])->name('login');
+        ;
+        Route::post('/login', [UserController::class, 'login'])->name('login');
+        ;
         Route::get('/user-logout', [UserController::class, 'logout']);
         Route::post('/user-logout', [UserController::class, 'logout']);
     }
@@ -238,6 +271,8 @@ class UserController extends Controller
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            $email = strtolower($fields['email']);
+            $fields['password'] = UserController::hash($email, $fields['password']);
             $validator = Validator::make($fields, $this->rules(true));
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();
@@ -262,6 +297,8 @@ class UserController extends Controller
             $rc = $rc = redirect('/user-editpassword/' . strval($user->id));
         } elseif ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            $email = strtolower($fields['email']);
+            $fields['password'] = UserController::hash($email, $fields['password']);
             $validator = Validator::make($fields, $this->rules(false, $user));
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();

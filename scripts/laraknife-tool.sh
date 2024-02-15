@@ -23,6 +23,8 @@ Usage: laraknife-tool.sh TASK
     Creates a homepage
   move-to-laraknife <module>
     Moves all files of the given module to the laraknife directory.
+  link-module <module>
+    include a module from laraknife into the project
 EOS
   echo "+++ $*"
 }
@@ -33,7 +35,10 @@ function AdaptModules(){
   if [ -n "$found" ]; then
     echo "= role_id already found"
   else
-    sed -i -e "s/'password'/'password',#N#    'role_id'/" -e 's/#N#/\n/g' $fn
+    sed -i -e "s/\(fillable = .\)/\1#N#        'role_id',#N#/" \
+      -e "s/.password' =>.*//" \
+      -e 's/#N#/\n/g' \
+      $fn
   fi
   grep -A5 fillable $fn
   fn=routes/web.php
@@ -41,8 +46,11 @@ function AdaptModules(){
   if [ -n "$found" ]; then
     echo "= RoleController::routes already found"
   else
-    sed -i -e 's/Route;/Route;#N#use App\\Http\\Controllers\\RoleController;#N#use App\\Http\\Controllers\\UserController;#N#use App\\Http\\Controllers\\SPropertyController;/' \
-      -e 's/Auth::routes..;/Auth::routes();#N#RoleController::routes();#N#SPropertyController::routes();#N#UserController::routes();/' \
+    sed -i -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;/' \
+      -e 's/Auth::routes..;/# Auth::routes();#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;/' \
+      -e 's/#A#/use App\\Http\\Controllers\\/g' \
+      -e 's/#C#/Controller::routes()/g' \
+      -e 's=\(Route::get(./home\)=# \1=' \
       -e 's/#N#/\n/g' \
       $fn
     echo "= routes adapted:"
@@ -75,7 +83,7 @@ function BuildLinks(){
     done
     # === Helpers
     mkdir -pv app/Helpers
-    for module in DbHelper OsHelper ViewHelper StringHelper Builder Pagination; do
+    for module in DbHelper OsHelper ViewHelper StringHelper Builder Pagination ContextLaraKnife; do
       test "$option" = "--force" && rm -fv app/Helpers/$module.php
       ln -sv ../../$dirResources/helpers/$module.php app/Helpers/$module.php
     done
@@ -226,7 +234,6 @@ function LinkModule(){
       ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations/$node
     done
     ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/${Module}Seeder.php database/seeders/${Module}Seeder.php
-    done
   fi
 }
 # ===
