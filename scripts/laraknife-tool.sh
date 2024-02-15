@@ -189,7 +189,10 @@ function CreateLayout(){
 # ===
 function FillDb(){
   php artisan migrate
-  php artisan db:seed
+  php artisan db:seed --class=RoleSeeder
+  php artisan db:seed --class=UserSeeder
+  php artisan db:seed --class=SPropertySeeder
+  php artisan db:seed --class=MenuitemSeeder
 }
 # ===
 function InitI18N(){
@@ -299,6 +302,7 @@ rest)
   AdaptModules
   CreateLayout
   CreateHome
+  ./Join
   ;;
 *)
   Usage "unknown TASK: $MODE"

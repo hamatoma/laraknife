@@ -272,13 +272,14 @@ class UserController extends Controller
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
             $email = strtolower($fields['email']);
-            $fields['password'] = UserController::hash($email, $fields['password']);
             $validator = Validator::make($fields, $this->rules(true));
             if ($validator->fails()) {
+                $errors = $validator->errors();
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 // Retrieve the validated input...
                 $validated = $validator->validated();
+                $validated['password'] = UserController::hash($email, $fields['password']);
                 User::create($validated);
             }
         }
@@ -298,7 +299,6 @@ class UserController extends Controller
         } elseif ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
             $email = strtolower($fields['email']);
-            $fields['password'] = UserController::hash($email, $fields['password']);
             $validator = Validator::make($fields, $this->rules(false, $user));
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();

@@ -1,5 +1,12 @@
 # Development phase
 
+## 0.4.5 2024.02.15 corrections
+- menuitem/index.blade.php: wrong column
+- user/create.blade.php: missing role_id
+- laraknife-tool.sh: call of seeders
+- layout.templ: menu_main instead of menu_start
+- UserController: errors in store() and update()
+
 ## 0.4.4 2024.02.15 other password encryption
 - new: StringHelper::createPassword()
 - laraknife-tool.sh:
@@ -8,7 +15,6 @@
   - layout.blade.php: correction: user-edit-current
   - UserSeeder: creation of a random password for the admin,  writing into .lrv.credentials
   - UserController: many corrections. Now using another password encryption
-     
 
 ## 0.4.3 2024.02.13 database seeders, refactoring
 - database is filled by seeders now

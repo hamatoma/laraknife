@@ -35,7 +35,6 @@
                             <td>{{ $menuitem->section }}</td>
                             <td>{{ $menuitem->link }}</td>
                             <td>{{ $menuitem->id }}</td>
-                            <td><a href="/menuitem-show/{{ $menuitem->id }}/delete">{{ __('Delete') }}</a></td>
                             <td><x-laraknife.icons.delete-record module="menuitem" no="{{ $menuitem->id }}" /></td>
                         </tr>
                     @endforeach
