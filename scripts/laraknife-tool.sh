@@ -46,8 +46,10 @@ function AdaptModules(){
   if [ -n "$found" ]; then
     echo "= RoleController::routes already found"
   else
-    sed -i -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;/' \
-      -e 's/Auth::routes..;/# Auth::routes();#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;/' \
+    sed -i \
+      -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \

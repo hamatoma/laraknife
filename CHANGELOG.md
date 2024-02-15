@@ -1,5 +1,8 @@
 # Development phase
 
+## 0.4.6 2024.02.15 corrections for web.php
+- laraknife-tool.sh: no more: Auth::routes()
+
 ## 0.4.5 2024.02.15 corrections
 - laraknife-tool.sh: creating resources/views/layouts
 - CreateLaraProj.sh: "php artisan ui bootstrap" without "-auth"
