@@ -1,5 +1,12 @@
 # Development phase
 
+## 0.5.0 2024.02.17 navigation tabs, login
+- new: x-laraknife.layout.cell,  x-laraknife.layout.nav-tabs
+- new: NavigationTabs
+- corrections: StringHelper::createPassword()
+- new: NoteController::editDocuments() note/edit_documents.php
+- login: no more default behaviour, we use our own encryption
+
 ## 0.4.6 2024.02.15 corrections for web.php
 - laraknife-tool.sh: no more: Auth::routes()
 

@@ -10,11 +10,11 @@
     <a href="{{ $link }}">
       @if($header !== '') 
       <h2>{{__($header)}}</h2>
-      @endif()
+      @endif
       <div><i class="{{$icon}}"></i></div>
       @if($footer !== '') 
       <h2>{{__($footer)}}</h2>
-      @endif()
+      @endif
     </a>
   </div>
 @if($position === 'alone' || $position === 'last')

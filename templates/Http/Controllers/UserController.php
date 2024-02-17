@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
 use App\Helpers\Pagination;
 use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\StringHelper;
 use Illuminate\Validation\Rule;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
@@ -93,7 +95,9 @@ class UserController extends Controller
                 }
             }
             if ($rc == null) {
-                $rc = view('user.changepw', ['user' => $user]);
+                $examples = StringHelper::createPassword() . "<br/>\n" . StringHelper::createPassword() 
+                 . "<br>\n" . StringHelper::createPassword();
+                $rc = view('user.changepw', ['user' => $user, 'examples' => $examples]);
             }
         }
         return $rc;
@@ -157,36 +161,42 @@ class UserController extends Controller
         if (count($fields) === 0) {
             $fields = ['email' => '', 'password' => ''];
         } else {
-            $refresh = 2 % 2 == 1;
+            $forceLogin = env('DEBUG_FORCE_LOGIN') === 'true';
             $email = strtolower($fields['email']);
             $pw = $fields['password'];
-            $hash = Hash::make("$email\t$pw");
             $records = DB::select('SELECT id,password FROM users WHERE email=?', [$email]);
             $ok = count($records) === 1;
             if ($ok) {
                 $pw2 = $records[0]->password;
                 $userId = $records[0]->id;
-                $ok = $pw2 === $hash;
+                $ok = Hash::check("$email\t$pw", $pw2);
             }
             $validator = Validator::make($fields, ['email' => ['required', 'email'], 'password' => ['required']]);
-            if (! $validator->failed() && !$ok) {
-                $validator->errors()->add(
-                    'password',
-                    'The provided credentials do not match our records.'
-                );
+            if (!$validator->failed() && !$ok) {
+                if (!$forceLogin) {
+                    $validator->errors()->add(
+                        'password',
+                        'The provided credentials do not match our records.'
+                    );
+                }
             }
-            if ($validator->failed()) {
+            if (! $forceLogin && ($validator->failed() || !$ok)) {
                 $rc = back()->withErrors([
                     'email' => __('The provided credentials do not match our records.'),
                 ])->onlyInput('email');
             } else {
-                if ($refresh) {
+                if ($forceLogin) {
                     $userId = 1;
                 }
                 $user = User::find($userId);
-                auth()->login($user);
-                $request->session()->regenerate();
-                $rc = redirect('/menuitem-menu_main');
+                if ($user != null){
+                    auth()->login($user);
+                    $role = Role::find($user->role_id);
+                    $request->session()->regenerate();
+                    session(['role' => $role->priority, 'userName' => $user->name]);
+                    // $data = $request->session()->all();
+                    $rc = redirect('/menuitem-menu_main');
+                }
             }
         }
         if ($rc == null) {
@@ -242,9 +252,7 @@ class UserController extends Controller
         Route::get('/user-login', [UserController::class, 'login']);
         Route::post('/user-login', [UserController::class, 'login']);
         Route::get('/login', [UserController::class, 'login'])->name('login');
-        ;
         Route::post('/login', [UserController::class, 'login'])->name('login');
-        ;
         Route::get('/user-logout', [UserController::class, 'logout']);
         Route::post('/user-logout', [UserController::class, 'logout']);
     }

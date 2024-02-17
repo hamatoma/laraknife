@@ -7,11 +7,11 @@ class StringHelper{
      * @param int $length the length of the result
      * @return string a random password, e.g. "A.LESY443re/mik"
      */
-    public static function createPassword(int $length=12): string{
+    public static function createPassword(int $length=16): string{
         $lengh = max(6, $length);
-        $vocals = 'aeiouy';
-        $consonants = 'bcfghjlmnpqrstvwxz';
-        $specials = './=+-;,';
+        $vocals = 'aeiouyaeiouyaeiouyaeiouy';
+        $consonants = 'bcfghjlmnpqrstvwxzbcfghjlmnpqrstvwxzbcfghjlmnpqrstvwxz';
+        $specials = './=+-;,./=+-;,./=+-;,';
         $sources = [$vocals, $consonants, $specials];
         $even = false;
         $rc = '';
@@ -19,7 +19,7 @@ class StringHelper{
         for ($ix = 0; $ix < $count; $ix++){
             $cc = StringHelper::randomChar($ix % 2 == 0 ? $vocals : $consonants);
             if ($ix < $count / 2){
-                $rc = strtoupper($cc);
+                $cc = strtoupper($cc);
             }
             $rc .= $cc;
         }

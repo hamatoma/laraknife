@@ -85,7 +85,8 @@ function BuildLinks(){
     done
     # === Helpers
     mkdir -pv app/Helpers
-    for module in DbHelper OsHelper ViewHelper StringHelper Builder Pagination ContextLaraKnife; do
+    for full in ../../$dirResources/helpers/*.php; do
+      local module=$(basename $full)
       test "$option" = "--force" && rm -fv app/Helpers/$module.php
       ln -sv ../../$dirResources/helpers/$module.php app/Helpers/$module.php
     done
@@ -306,6 +307,8 @@ rest)
   CreateLayout
   CreateHome
   ./Join
+  echo "= credentials for first login:"
+  cat .lrv.credentials
   ;;
 *)
   Usage "unknown TASK: $MODE"

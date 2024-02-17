@@ -29,20 +29,34 @@ button {
 .lkn-edit-panel,
 .lkn-create-panel,
 .lkn-show-panel,
-.lkn-panel {
+.lkn-panel,
+fieldset  .lkn-nav-tab-panel {
     background-color: aliceblue;
 }
 
 .lkn-panel,
 .lkn-edit-panel,
 .lkn-create-panel,
-.lkn-show-panel {
+.lkn-show-panel,
+fieldset  .lkn-nav-tab-panel {
     border: grey solid 0.07rem;
     padding: 2rem 3rem;
     border-radius: 0.5rem;
     box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
 }
-
+fieldset.lkn-nav-tab-panel{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+fieldset ul li.nav-item {
+    border: solid 1px black;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    border-bottom: none;
+}
+fieldset ul li.lkn-nav-item-active {
+    background-color: aliceblue;
+}
 .lkn-filter,
 .lkn-form-table {
     margin: 0;
@@ -160,4 +174,11 @@ a:visited.lkn-overview-cell,
 a:link.lkn-overview-cell,
 a:active.lkn-overview-cell {
     background-color: #EEE;
+}
+
+fieldset ul .nav-item {
+    background-color: #EEE;
+}
+.lkn-logout {
+    margin-left: auto;
 }

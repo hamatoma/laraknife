@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Note;
+use App\Helpers\Helper;
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\ViewHelperTaskX;
+use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Note;
-use App\Models\SProperty;
-use App\Helpers\ContextLaraKnife;
-use App\Helpers\ViewHelper;
-use App\Helpers\DbHelper;
-use App\Helpers\Helper;
-use App\Helpers\Pagination;
 
 class NoteController extends Controller
 {
@@ -37,13 +38,13 @@ class NoteController extends Controller
             $optionsCategory = SProperty::optionsByScope('category', $fields['category_scope'], '-');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $fields['notestatus_scope'], '-');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
-            $context = new ContextLaraKnife($request, $fields);     
+            $context = new ContextLaraKnife($request, $fields);
             $rc = view('note.create', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
                 'optionsUser' => $optionsUser,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -63,18 +64,43 @@ class NoteController extends Controller
                     'category_scope' => '1051',
                     'notestatus_scope' => '1011',
                     'user_id' => strval(auth()->id())
-                    ];
+                ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->user_id, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $note);
+            $navigationTabInfo = ViewHelperTaskX::getNavigationTabInfo($note->id, 'note-edit', 0);
             $rc = view('note.edit', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
                 'optionsUser' => $optionsUser,
-                ]);
+                'navTabsInfo' => $navigationTabInfo
+            ]);
+        }
+        return $rc;
+    }
+    public function editDocuments(Note $note, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/note-index');
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [];
+            }
+            $context = new ContextLaraKnife($request, null, $note);
+            $records = [
+                ['name' => 'demo.txt', 'size' => 2344, 'date' => '2024.02.15 08:44'],
+                ['name' => 'demo.doc', 'size' => 32020, 'date' => '2024.02.15 10:32']
+            ];
+            $navigationTabInfo = ViewHelperTaskX::getNavigationTabInfo($note->id, 'note-edit', 1);
+            $rc = view('note.edit_documents', [
+                'context' => $context,
+                'navTabsInfo' => $navigationTabInfo,
+                'records' => $records
+            ]);
         }
         return $rc;
     }
@@ -101,18 +127,18 @@ class NoteController extends Controller
                 . ' LEFT JOIN sproperties t1 ON t1.id=t0.category_scope'
                 . ' LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope'
                 . ' LEFT JOIN sproperties t3 ON t3.id=t0.user_id'
-                ;
+            ;
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
-                'category' => '1051',
-                'notestatus' => '1011',
-                'user' => strval(auth()->id()),
-                'title' => '',
-                'body' => '',
-                '_sortParams' => 'id:asc' 
-                                . ';title:desc'
+                    'category' => '1051',
+                    'notestatus' => '1011',
+                    'user' => strval(auth()->id()),
+                    'title' => '',
+                    'body' => '',
+                    '_sortParams' => 'id:asc'
+                        . ';title:desc'
                 ];
             } else {
                 $conditions = [];
@@ -145,7 +171,7 @@ class NoteController extends Controller
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreate=false): array
+    private function rules(bool $isCreate = false): array
     {
         $rc = [
             'title' => 'required',
@@ -164,6 +190,8 @@ class NoteController extends Controller
         Route::put('/note-store', [NoteController::class, 'store'])->middleware('auth');
         Route::post('/note-edit/{note}', [NoteController::class, 'edit'])->middleware('auth');
         Route::get('/note-edit/{note}', [NoteController::class, 'edit'])->middleware('auth');
+        Route::post('/note-edit_documents/{note}', [NoteController::class, 'editDocuments'])->middleware('auth');
+        Route::get('/note-edit_documents/{note}', [NoteController::class, 'editDocuments'])->middleware('auth');
         Route::post('/note-update/{note}', [NoteController::class, 'update'])->middleware('auth');
         Route::get('/note-show/{note}/delete', [NoteController::class, 'show'])->middleware('auth');
         Route::delete('/note-show/{note}/delete', [NoteController::class, 'destroy'])->middleware('auth');
@@ -186,7 +214,7 @@ class NoteController extends Controller
                 'optionsNotestatus' => $optionsNotestatus,
                 'optionsUser' => $optionsUser,
                 'mode' => 'delete'
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -205,11 +233,11 @@ class NoteController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-            $validated['body'] = strip_tags($validated['body']);
+                $validated['body'] = strip_tags($validated['body']);
                 Note::create($validated);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/note-index');
         }
         return $rc;
@@ -233,7 +261,7 @@ class NoteController extends Controller
                 $note->update($validated);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/note-index');
         }
         return $rc;

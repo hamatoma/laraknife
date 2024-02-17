@@ -24,4 +24,5 @@ else
   composer update
   vendor/hamatoma/laraknife/scripts/laraknife-tool.sh build-links
   echo "= run: cd $BASE"
+  echo "= run: larascripts/laraknife-tool.sh rest"
 fi
