@@ -137,7 +137,8 @@ class #Module#Controller extends Controller
 ##ON nameLike(_(scope|id)$)##
                 ViewHelper::addConditionComparism($conditions, $parameters, '#field#', '#base#');
 ##ON typeLike((tring|[tT]ext)$)##
-                ViewHelper::addConditionPattern($conditions, $parameters, '#field#);
+                ViewHelper::addConditionPattern($conditions, $parameters, '#field#');
+                // ViewHelper::addConditionPattern($conditions, $parameters, 'column1,col2,col3', 'filterfield');
 ##ELSE##
                 ViewHelper::addConditionComparism($conditions, $parameters, '#field#', null, '=');
 ##END.CASE##

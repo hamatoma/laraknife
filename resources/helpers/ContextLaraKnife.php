@@ -14,11 +14,24 @@ class ContextLaraKnife {
     public Request $request;
     public ?Model $model;
     public int $currentNo;
+    public ?array $callbacks;
     public function __construct(Request $request, ?array $fields, ?Model $model = null){
         $this->fields = $fields;
         $this->request = $request;
         $this->model = $model;
         $this->currentNo = 0;
+        $this->callbacks = null;
+        $this->callbackMethod = '';
+    }
+    public function callback(string $name, $data){
+        $rc = null;
+        if (array_key_exists($name, $this->callbacks)){
+            $item = $this->callbacks[$name];
+            $object = $item[0];
+            $method = $item[1];
+            $rc = $object->$method($data);
+        }
+        return $rc;
     }
     public function text(string $text): string{
         return $text;
@@ -36,5 +49,9 @@ class ContextLaraKnife {
     }
     public function currentNo(): int{
         return ++$this->currentNo;
+    }
+    public function setCallback(string $name, $object, string $method){
+        $this->callbacks ??= [];
+        $this->callbacks[$name] = [$object, $method];
     }
 }

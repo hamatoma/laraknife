@@ -1,5 +1,15 @@
 # Development phase
 
+## 0.5.1 2024.02.18 module "file"
+- new module file
+- new ContextLaraKnife::callback()
+- new FileHelper
+- menuitem/create+edit.blade.php: the link to the bootstrap icon page
+- note/edit: missing buttons added
+- controller.templ: index(): wrong parameters for addConditionPattern()
+- show.blade.templ: wrong "row" for string fields
+
+
 ## 0.5.0 2024.02.17 navigation tabs, login
 - new: x-laraknife.layout.cell,  x-laraknife.layout.nav-tabs
 - new: NavigationTabs

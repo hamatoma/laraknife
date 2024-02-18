@@ -1,0 +1,271 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\File;
+use App\Helpers\Helper;
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\FileHelper;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
+use Illuminate\Http\Request;
+use App\Helpers\ContextLaraKnife;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
+
+class FileController extends Controller
+{
+    /** Returns a HTML anchor for a given file
+     * @param File $file the file object
+     */
+    public function buildAnchor($file)
+    {
+        $name = $file->filename;
+        if (($ix = strpos($name, '_')) != false) {
+            $name = substr($name, $ix + 1);
+        }
+        $rc = '<a href="' . strip_tags(FileHelper::buildFileLink($file->filename, $file->created_at)) . '" target="_blank">'
+            . strip_tags($name) . '</a>';
+        return $rc;
+    }
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/file-index');
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'title' => '',
+                    'description' => '',
+                    'filename' => '',
+                    'filegroup_scope' => '1101',
+                    'user_id' => auth()->id()
+                ];
+            }
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('file.create', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsUser' => $optionsUser,
+            ]);
+        }
+        return $rc;
+    }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(File $file, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/file-index');
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'title' => '',
+                    'description' => '',
+                    'filename' => '',
+                    'filegroup_scope' => '',
+                    'user_id' => ''
+                ];
+            }
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $context = new ContextLaraKnife($request, null, $file);
+            $rc = view('file.edit', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsUser' => $optionsUser,
+            ]);
+        }
+        return $rc;
+    }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(File $file, Request $request)
+    {
+        if ($request->btnSubmit === 'btnDelete') {
+            $file->delete();
+            FileHelper::deleteUploadedFile($file->filename, $file->created_at);
+        }
+        return redirect('/file-index');
+    }
+    /**
+     * Display the database records of the resource.
+     */
+    public function index(Request $request)
+    {
+        if ($request->btnSubmit === 'btnNew') {
+            return redirect('/file-create');
+        } else {
+            $sql = 'SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id '
+                . ' FROM files t0'
+                . ' LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope'
+                . ' LEFT JOIN sproperties t2 ON t2.id=t0.user_id'
+            ;
+            $parameters = [];
+            $fields = $request->all();
+            if (count($fields) == 0) {
+                $fields = [
+                    'filegroup' => '',
+                    'user' => auth()->id(),
+                    'text' => '',
+                    'filegroup_scope' => '1101',
+                    '_sortParams' => 'id:desc'
+                ];
+            } else {
+                $conditions = [];
+                ViewHelper::addConditionComparism($conditions, $parameters, 'filegroup_scope', 'filegroup');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'user_id', 'user');
+                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
+                $sql = DbHelper::addConditions($sql, $conditions);
+            }
+            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+            $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup'], 'all');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user']);
+            $context = new ContextLaraKnife($request, $fields);
+            $context->setCallback('buildAnchor', $this, 'buildAnchor');
+            return view('file.index', [
+                'context' => $context,
+                'records' => $records,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsUser' => $optionsUser,
+                'pagination' => $pagination
+            ]);
+        }
+    }
+    /**
+     * Returns the validation rules.
+     * @return array<string, string> The validation rules.
+     */
+    private function rules(bool $isCreate = false): array
+    {
+        if ($isCreate) {
+            $rc = [
+                'title' => 'required',
+                'filegroup_scope' => 'required',
+                'file' => 'required',
+                'user_id' => 'required'
+            ];
+        } else {
+            $rc = [
+                'title' => 'required',
+                'filegroup_scope' => 'required',
+            ];
+        }
+        return $rc;
+    }
+    public static function routes()
+    {
+        Route::get('/file-index', [FileController::class, 'index'])->middleware('auth');
+        Route::post('/file-index', [FileController::class, 'index'])->middleware('auth');
+        Route::get('/file-create', [FileController::class, 'create'])->middleware('auth');
+        Route::put('/file-store', [FileController::class, 'store'])->middleware('auth');
+        Route::post('/file-edit/{file}', [FileController::class, 'edit'])->middleware('auth');
+        Route::get('/file-edit/{file}', [FileController::class, 'edit'])->middleware('auth');
+        Route::post('/file-update/{file}', [FileController::class, 'update'])->middleware('auth');
+        Route::get('/file-show/{file}/delete', [FileController::class, 'show'])->middleware('auth');
+        Route::delete('/file-show/{file}/delete', [FileController::class, 'destroy'])->middleware('auth');
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function show(File $file, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/file-index')->middleware('auth');
+        } else {
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $context = new ContextLaraKnife($request, null, $file);
+            $rc = view('file.show', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsUser' => $optionsUser,
+                'mode' => 'delete'
+            ]);
+        }
+        return $rc;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $rc = null;
+        if ($request->btnSubmit === 'btnStore') {
+            $fields = $request->all();
+            $validator = Validator::make($fields, $this->rules(true));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $fields['description'] = strip_tags($fields['description']);
+                $this->storeFile($request, $fields);
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect('/file-index');
+        }
+        return $rc;
+    }
+    function storeFile(Request $request, array $fields): bool
+    {
+        $rc = false;
+        $file = $request->file('file');
+        if ($file != null) {
+            $name = empty($fields['filename']) ? $file->getClientOriginalName() : $fields['filename'];
+            $filename = session('userName') . '_' . strval(time()) . '!' . $name;
+            $relativePath = FileHelper::buildFileStoragePath();
+            $file2 = new File([
+                'title' => $fields['title'],
+                'description' => $fields['description'],
+                'filename' => $filename,
+                'filegroup_scope' => $fields['filegroup_scope'],
+                'user_id' => $fields['user_id'],
+                'size' => $file->getSize() / 1E6
+            ]);
+            $filePath = $request->file('file')->storeAs("$relativePath", $filename, 'public');
+            $file2->save();
+            $id = $file2->id;
+            $filename2 = strval($id) . '_' . $name;
+            FileHelper::renameUploadedFile($filename, $filename2);
+            $file2->update(['filename' => $filename2]);
+            $rc = true;
+        }
+        return $rc;
+    }
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(File $file, Request $request)
+    {
+        $rc = null;
+        if ($request->btnSubmit === 'btnStore') {
+            $fields = $request->all();
+            $fields['description'] = strip_tags($fields['description']);
+            $validator = Validator::make($fields, $this->rules(false));
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $fields2 = $request->only(['title', 'description', 'filegroup_scope']);
+                $file->update($fields2);
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect('/file-index');
+        }
+        return $rc;
+    }
+}
