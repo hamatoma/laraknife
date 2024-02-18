@@ -48,7 +48,14 @@ class MenuitemSeeder extends Seeder
             'section' => 'main',
             'link' => '/note-index'
         ]);
-        for ($no = 1; $no <= 5; $no++){
+        DB::table('menuitems')->insert([
+            'name' => 'files',
+            'label' => 'Files',
+            'icon' => 'bi bi-file-pdf',
+            'section' => 'main',
+            'link' => '/file-index'
+        ]);
+        for ($no = 1; $no <= 6; $no++){
             DB::table('menuitems_roles')->insert([
                 'order' => '10',
                 'menuitem_id' => strval($no),

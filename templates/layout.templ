@@ -27,11 +27,6 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="/menuitem-menu_main">Start</a>
                     </li>
-@auth
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user-edit-current">{{ __('Settings') }}</a>
-                    </li>
-@endauth
                     <li>
                         <a class="nav-link" href="/public/doc/Impressum.pdf" target="_blank">{{ __('Imprint') }}</a>
                     </li>
@@ -39,7 +34,14 @@
                         <a class="nav-link" href="/public/doc/Datenschutz.pdf" target="_blank">{{ __('Privacy') }}</a>
                     </li>
                 </ul>
-                <a href="/user-logout" class="btn btn-success">{{ __('Logout') }}</a>
+                <ul class="navbar-nav mr-auto lkn-logout">
+                    @auth
+                    <li class="nav-item border rounded-3">
+                        <a class="nav-link" href="/user-edit-current">{{ session('userName') }}</a>
+                    </li>
+                    @endauth
+                    <li><a href="/user-logout" class="btn btn-success">{{ __('Logout') }}</a></li>
+                </ul>
            </div>                
         </nav>
     </header>

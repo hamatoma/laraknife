@@ -1,5 +1,13 @@
 # Development phase
 
+## 0.5.3 2024.02.18 laraknife-tool.sh, seeding, layout
+- laraknife-tool.sh:
+  - additional module: file
+  - link to public/upload
+  - fix in BuildLinks: helpers
+  - seeding FileSeeder
+- layout.templ: logout button rightside, "settings" -> userame
+
 ## 0.5.2 2024.02.18 handling of filename in FileController::create()
 - new: FileHelper::extensionOf()
 - FileController: addition of the source extension if needed

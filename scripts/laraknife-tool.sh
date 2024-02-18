@@ -28,6 +28,18 @@ Usage: laraknife-tool.sh TASK
 EOS
   echo "+++ $*"
 }
+function Test(){
+ local base=vendor/hamatoma/laraknife
+  local dirResources=$base/resources
+  local dirTemplates=$base/templates
+    for full in $dirResources/helpers/*.php; do
+      local module=$(basename $full)
+      echo "module: $module full: $full"
+    done
+ 
+}
+Test
+exit
 # ===
 function AdaptModules(){
   local fn=app/Models/User.php
@@ -71,7 +83,7 @@ function BuildLinks(){
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
     # === Modules
-    for module in SProperty Role User Note Menuitem; do
+    for module in SProperty Role User Menuitem Note File; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
@@ -79,13 +91,13 @@ function BuildLinks(){
       ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
     done
     # === Views
-    for module in laraknife sproperty role user menuitem note; do
+    for module in laraknife sproperty role user menuitem note file; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
     # === Helpers
     mkdir -pv app/Helpers
-    for full in ../../$dirResources/helpers/*.php; do
+    for full in $dirResources/helpers/*.php; do
       local module=$(basename $full)
       test "$option" = "--force" && rm -fv app/Helpers/$module.php
       ln -sv ../../$dirResources/helpers/$module.php app/Helpers/$module.php
@@ -96,6 +108,10 @@ function BuildLinks(){
       test "$option" = "--force" && rm -fv public/$resource/laraknife.$resource
       ln -s ../../$dirResources/$resource/laraknife.$resource public/$resource/laraknife.$resource public/$resource
     done
+    # storage:
+    cd public
+    ln -s ../storage/app/public uploads
+    cd ..
     local fn=public/css/$PROJ.css
     cat <<EOS >$fn
 .white { color: white; }
@@ -197,6 +213,7 @@ function FillDb(){
   php artisan db:seed --class=UserSeeder
   php artisan db:seed --class=SPropertySeeder
   php artisan db:seed --class=MenuitemSeeder
+  php artisan db:seed --class=FileSeeder
 }
 # ===
 function InitI18N(){
