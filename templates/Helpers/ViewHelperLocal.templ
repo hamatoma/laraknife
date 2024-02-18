@@ -1,0 +1,29 @@
+<?php
+namespace App\Helpers;
+
+use App\Helpers\NavigationTabs;
+
+
+/**
+ * Helpers for views
+ *
+ * This class contains only static methods.
+ */
+class ViewHelperTaskX
+{
+    public static function getNavigationTabInfo(int $noteId, string $name, int $indexActive = 0): ?NavigationTabs
+    {
+        $rc = null;
+        switch ($name) {
+            case 'note-edit':
+                $rc = new NavigationTabs([
+                    "Properties;/note-edit/$noteId",
+                    "Documents;/note-edit_documents/$noteId"
+                ], $indexActive);
+                break;
+            default:
+                break;
+        }
+        return $rc;
+    }
+}

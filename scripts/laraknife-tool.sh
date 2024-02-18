@@ -58,8 +58,8 @@ function AdaptModules(){
   else
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
-      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;/' \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#/;' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -187,11 +187,8 @@ EOS
   composer dump-autoload
 }
 # ===
-function CreateHome(){
- . project.env
-  local fn=resources/views/home.blade.php
-  sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/home.templ >$fn
-  echo "= home $fn has been created"
+function CopyFiles(){
+  cp -av vendor/hamatoma/laraknife/templates/Helpers/ViewHelperLocal.php app/Helpers/
 }
 # ===
 function CreateLayout(){
@@ -320,7 +317,7 @@ rest)
   FillDb
   AdaptModules
   CreateLayout
-  CreateHome
+  CopyFiles
   echo "= current dir: $(pwd)"
   ./Join
   echo "= credentials for first login: see .lrv.credentials"

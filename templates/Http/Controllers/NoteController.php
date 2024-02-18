@@ -9,7 +9,7 @@ use App\Models\SProperty;
 use App\Helpers\Pagination;
 use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
-use App\Helpers\ViewHelperTaskX;
+use App\Helpers\ViewHelperLocal;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -70,7 +70,7 @@ class NoteController extends Controller
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->user_id, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $note);
-            $navigationTabInfo = ViewHelperTaskX::getNavigationTabInfo($note->id, 'note-edit', 0);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo($note->id, 'note-edit', 0);
             $rc = view('note.edit', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
@@ -95,7 +95,7 @@ class NoteController extends Controller
                 ['name' => 'demo.txt', 'size' => 2344, 'date' => '2024.02.15 08:44'],
                 ['name' => 'demo.doc', 'size' => 32020, 'date' => '2024.02.15 10:32']
             ];
-            $navigationTabInfo = ViewHelperTaskX::getNavigationTabInfo($note->id, 'note-edit', 1);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo($note->id, 'note-edit', 1);
             $rc = view('note.edit_documents', [
                 'context' => $context,
                 'navTabsInfo' => $navigationTabInfo,
