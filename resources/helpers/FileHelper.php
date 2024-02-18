@@ -34,6 +34,15 @@ class FileHelper{
         \unlink($name);
     }
     /**
+     * Returns the file extension. This is the part behind the last '.'.
+     * @param string $filename the filename to inspect
+     * @return string '': no '.' found. Otherwise: the extension, e.g. '.txt'
+     */
+    public static function extensionOf(string $filename): string{
+        $rc = ($ixDot = strrpos($filename, '.')) === false ? '' : substr($filename, $ixDot);
+        return $rc;
+    }
+    /**
      * Renames the uploaded file.
      * That is needed because the filename contains the primary key. This is known after storing the record.
      * @param string $oldName the name to rename (without path)

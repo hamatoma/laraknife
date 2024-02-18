@@ -1,6 +1,10 @@
 # Development phase
 
-## 0.5.1 2024.02.18 module "file"
+## 0.5.2 2024.02.18 handling of filename in FileController::create()
+- new: FileHelper::extensionOf()
+- FileController: addition of the source extension if needed
+
+## 0.5.1 2024.02.18 module "file", controller.templ, show.blade.templ
 - new module file
 - new ContextLaraKnife::callback()
 - new FileHelper
@@ -8,7 +12,6 @@
 - note/edit: missing buttons added
 - controller.templ: index(): wrong parameters for addConditionPattern()
 - show.blade.templ: wrong "row" for string fields
-
 
 ## 0.5.0 2024.02.17 navigation tabs, login
 - new: x-laraknife.layout.cell,  x-laraknife.layout.nav-tabs

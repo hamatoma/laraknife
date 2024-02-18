@@ -155,7 +155,7 @@ class FileController extends Controller
             $rc = [
                 'title' => 'required',
                 'filegroup_scope' => 'required',
-                'file' => 'required',
+                //'file' => 'required',
                 'user_id' => 'required'
             ];
         } else {
@@ -209,6 +209,7 @@ class FileController extends Controller
             $fields = $request->all();
             $validator = Validator::make($fields, $this->rules(true));
             if ($validator->fails()) {
+                $errors = $validator->errors();
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $fields['description'] = strip_tags($fields['description']);
@@ -226,6 +227,10 @@ class FileController extends Controller
         $file = $request->file('file');
         if ($file != null) {
             $name = empty($fields['filename']) ? $file->getClientOriginalName() : $fields['filename'];
+            $ext = FileHelper::extensionOf($name);
+            if (empty($ext)){
+                $name .= FileHelper::extensionOf($file->getClientOriginalName());
+            }
             $filename = session('userName') . '_' . strval(time()) . '!' . $name;
             $relativePath = FileHelper::buildFileStoragePath();
             $file2 = new File([
