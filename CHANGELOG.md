@@ -1,5 +1,7 @@
 # Development phase
 
+## 0.5.4 2024.02.18 laraknife-tool.sh was blocked by Test
+
 ## 0.5.3 2024.02.18 laraknife-tool.sh, seeding, layout
 - laraknife-tool.sh:
   - additional module: file

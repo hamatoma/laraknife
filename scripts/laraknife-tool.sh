@@ -38,8 +38,6 @@ function Test(){
     done
  
 }
-Test
-exit
 # ===
 function AdaptModules(){
   local fn=app/Models/User.php
@@ -323,8 +321,9 @@ rest)
   AdaptModules
   CreateLayout
   CreateHome
+  echo "= current dir: $(pwd)"
   ./Join
-  echo "= credentials for first login:"
+  echo "= credentials for first login: see .lrv.credentials"
   cat .lrv.credentials
   ;;
 *)
