@@ -96,15 +96,15 @@ function BuildLinks(){
     # === Helpers
     mkdir -pv app/Helpers
     for full in $dirResources/helpers/*.php; do
-      local module=$(basename $full)
-      test "$option" = "--force" && rm -fv app/Helpers/$module.php
-      ln -sv ../../$dirResources/helpers/$module.php app/Helpers/$module.php
+      local node=$(basename $full)
+      test "$option" = "--force" && rm -fv app/Helpers/$node
+      ln -sv ../../$dirResources/helpers/$node app/Helpers/$node
     done
     # CSS+JS
     for resource in css js; do
       mkdir -p public/$resource
       test "$option" = "--force" && rm -fv public/$resource/laraknife.$resource
-      ln -s ../../$dirResources/$resource/laraknife.$resource public/$resource/laraknife.$resource public/$resource
+      ln -s ../../$dirResources/$resource/laraknife.$resource public/$resource/laraknife.$resource
     done
     # storage:
     cd public
