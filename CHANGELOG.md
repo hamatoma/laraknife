@@ -1,5 +1,12 @@
 # Development phase
 
+## 0.5.7 2024.02.19 laraknife-tool.sh, ViewHelperLocal
+- laraknife-tool.sh
+  - link uploads -> upload
+  - web.php: missing ";"
+  - wrong copying of ViewHelperLocal
+- ViewHelperLocal: wrong class name
+
 ## 0.5.6 2024.02.18 laraknife-tool.sh: ViewHelperLocal
 
 ## 0.5.5 2024.02.18 laraknife-tool.sh: links on Helpers, css, js

@@ -59,7 +59,7 @@ function AdaptModules(){
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
       -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#/;' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -108,7 +108,7 @@ function BuildLinks(){
     done
     # storage:
     cd public
-    ln -s ../storage/app/public uploads
+    ln -s ../storage/app/public upload
     cd ..
     local fn=public/css/$PROJ.css
     cat <<EOS >$fn
@@ -188,7 +188,7 @@ EOS
 }
 # ===
 function CopyFiles(){
-  cp -av vendor/hamatoma/laraknife/templates/Helpers/ViewHelperLocal.php app/Helpers/
+  cp -av vendor/hamatoma/laraknife/templates/Helpers/ViewHelperLocal.templ app/Helpers/ViewHelperLocal.php
 }
 # ===
 function CreateLayout(){
