@@ -10,9 +10,6 @@
             </x-laraknife.panels.filter>
 
             <x-laraknife.panels.index-button buttonType="new" />
-            <x-laraknife.forms.set-position position="first" />
-            <x-laraknife.forms.icon-action name="action" no="3" icon="bi bi-trash" />
-            <x-laraknife.forms.set-position position="last" />
             <x-laraknife.panels.sortable-table :context="$context" :pagination="$pagination">
                 <thead>
                     <tr>
