@@ -100,6 +100,20 @@ function BuildLinks(){
       test "$option" = "--force" && rm -fv app/Helpers/$node
       ln -sv ../../$dirResources/helpers/$node app/Helpers/$node
     done
+    # === EMail controller
+    mkdir -pv app/mail
+    for full in $dirResources/mail/*.php; do
+      local node=$(basename $full)
+      test "$option" = "--force" && rm -fv app/Mail/$node
+      ln -sv ../../$dirResources/mail/$node app/Mail/$node
+    done
+    # === EMail views
+    mkdir -pv resources/views/mails
+    for full in $dirResources/views/mails/*.blade.php; do
+      local node=$(basename $full)
+      test "$option" = "--force" && rm -fv resources/views/mails/$node
+      ln -sv ../../../$dirResources/views/mails/$node resources/views/mails/$node
+    done
     # CSS+JS
     for resource in css js; do
       mkdir -p public/$resource

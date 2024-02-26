@@ -15,6 +15,7 @@ class ContextLaraKnife {
     public ?Model $model;
     public int $currentNo;
     public ?array $callbacks;
+    public array $snippets;
     public function __construct(Request $request, ?array $fields, ?Model $model = null){
         $this->fields = $fields;
         $this->request = $request;
@@ -22,6 +23,7 @@ class ContextLaraKnife {
         $this->currentNo = 0;
         $this->callbacks = null;
         $this->callbackMethod = '';
+        $this->snippets = [];
     }
     public function callback(string $name, $data){
         $rc = null;
@@ -50,8 +52,15 @@ class ContextLaraKnife {
     public function currentNo(): int{
         return ++$this->currentNo;
     }
+    public function getSnippet(string $key): string{
+        $rc = array_key_exists($key, $this->snippets) ? $this->snippets[$key] : '';
+        return $rc;
+    }
     public function setCallback(string $name, $object, string $method){
         $this->callbacks ??= [];
         $this->callbacks[$name] = [$object, $method];
+    }
+    public function setSnippet(string $key, string $value){
+        $this->snippets[$key] = $value;
     }
 }

@@ -1,5 +1,15 @@
 # Development phase
 
+## 0.5.8 2024.02.25 password forgotten
+- UserController: new: answer(), forgotton()
+- login.blade.php: link to "password forgotten"
+- new: ForgottenPassword (mail), EmailHelper.php
+
+- ContextLaraKnife: new: getSnippet(), setSnippet()
+- note: edit.blade.php: x-laraknife.panels.standard instead of x-laraknife.panels.edit
+- new: forms/link.blade.php
+- new: panels/noform.blade.php+standard.blade.php
+
 ## 0.5.7 2024.02.19 laraknife-tool.sh, ViewHelperLocal
 - laraknife-tool.sh
   - link uploads -> upload

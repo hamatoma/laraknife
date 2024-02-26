@@ -3,7 +3,7 @@
 @section('content')
     <form id="note-edit-documents" action="/note-edit_documents/{{ $context->model->id }}" method="POST">
         @csrf
-        <x-laraknife.panels.standard title="{{ __('Change of a Note') }}">
+        <x-laraknife.panels.noform title="{{ __('Change of a Note') }}">
             <x-laraknife.layout.nav-tabs :info="$navTabsInfo">
                 <table class="table table-striped">
                     <tr>
@@ -20,6 +20,6 @@
                     @endforeach
                 </table>
             </x-laraknife.layout.nav-tabs>
-        </x-laraknife.panels.standard>
+        </x-laraknife.panels.noform>
     </form>
 @endsection

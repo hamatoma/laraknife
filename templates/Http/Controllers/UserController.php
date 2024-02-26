@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
 use App\Helpers\Pagination;
 use App\Helpers\ViewHelper;
+use App\Helpers\EmailHelper;
 use Illuminate\Http\Request;
 use App\Helpers\StringHelper;
 use Illuminate\Validation\Rule;
@@ -22,6 +24,53 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class UserController extends Controller
 {
+    /**
+     * Handles the link sent by email (forgotten password).
+     * @param Request $request the request data
+     */
+    public function answer(Request $request)
+    {
+        $rc = null;
+        $token = $request->get('token');
+        if ($token !== null) {
+            if (($user = User::where('remember_token', $token)->first()) != null) {
+                $updated = $user->updated_at;
+                $diff = (new Carbon())->diffInHours($updated);
+                if ($diff <= 6) {
+                    auth()->login($user);
+                    $role = Role::find($user->role_id);
+                    $request->session()->regenerate();
+                    session(['role' => $role->priority, 'userName' => $user->name]);
+                    $date = (new \DateTime())->format('y-m-d H:i');
+                    DB::update(
+                        "UPDATE users SET remember_token=NULL, updated_at='$date' WHERE id=?",
+                        [$user->id]
+                    );
+                    $rc = $rc = redirect('/user-edit-current');
+                }
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect('/user-login');
+        }
+        return $rc;
+    }
+
+    protected function buildForgottenLink(string $email): ?string
+    {
+        $rc = null;
+        if (($user = User::where('email', $email)->first()) != null) {
+            $hash = Hash::make($email . strval(time()) . strval(rand(0, 0x7fffffff)));
+            $user->update(['remember_token' => $hash]);
+            $date = (new \DateTime())->format('y-m-d H:i');
+            DB::update(
+                "UPDATE users SET remember_token=?, updated_at='$date' WHERE id=?",
+                [$hash, $user->id]
+            );
+            $rc = env('APP_URL', '') . "/user-answer?token=$hash";
+        }
+        return $rc;
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -40,6 +89,7 @@ class UserController extends Controller
         }
         return $rc;
     }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -95,10 +145,43 @@ class UserController extends Controller
                 }
             }
             if ($rc == null) {
-                $examples = StringHelper::createPassword() . "<br/>\n" . StringHelper::createPassword() 
-                 . "<br>\n" . StringHelper::createPassword();
+                $examples = StringHelper::createPassword() . "<br/>\n" . StringHelper::createPassword()
+                    . "<br>\n" . StringHelper::createPassword();
                 $rc = view('user.changepw', ['user' => $user, 'examples' => $examples]);
             }
+        }
+        return $rc;
+    }
+    public function forgotten(Request $request)
+    {
+        $rc = null;
+        $message = null;
+        $fields = $request->all();
+        if ($request->btnSubmit === 'btnSend') {
+            $validator = Validator::make($fields, [
+                'email' => 'required|email'
+            ]);
+            if ($validator->failed()) {
+                $errors = $validator->errors();
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $email = $fields['email'];
+                if (($link = $this->buildForgottenLink($email)) != null) {
+                    EmailHelper::sendMail('user.forgotten', $email, ['link' => $link]);
+                }
+                $message = __('Email has been sent if the email address is known.');
+            }
+        } elseif (count($fields)) {
+            $fields = [
+                'email' => ''
+            ];
+        }
+        if ($rc == null) {
+            $context = new ContextLaraKnife($request, $fields);
+            if ($message != null) {
+                $context->setSnippet('msg', $message);
+            }
+            $rc = view('user.forgotten', ['context' => $context]);
         }
         return $rc;
     }
@@ -180,7 +263,7 @@ class UserController extends Controller
                     );
                 }
             }
-            if (! $forceLogin && ($validator->failed() || !$ok)) {
+            if (!$forceLogin && ($validator->failed() || !$ok)) {
                 $rc = back()->withErrors([
                     'email' => __('The provided credentials do not match our records.'),
                 ])->onlyInput('email');
@@ -189,7 +272,7 @@ class UserController extends Controller
                     $userId = 1;
                 }
                 $user = User::find($userId);
-                if ($user != null){
+                if ($user != null) {
                     auth()->login($user);
                     $role = Role::find($user->role_id);
                     $request->session()->regenerate();
@@ -252,9 +335,12 @@ class UserController extends Controller
         Route::get('/user-login', [UserController::class, 'login']);
         Route::post('/user-login', [UserController::class, 'login']);
         Route::get('/login', [UserController::class, 'login'])->name('login');
-        Route::post('/login', [UserController::class, 'login'])->name('login');
+        Route::post('/login', [UserController::class, 'login']);
         Route::get('/user-logout', [UserController::class, 'logout']);
         Route::post('/user-logout', [UserController::class, 'logout']);
+        Route::get('/user-forgotten', [UserController::class, 'forgotten']);
+        Route::post('/user-forgotten', [UserController::class, 'forgotten']);
+        Route::get('/user-answer', [UserController::class, 'answer']);
     }
     /**
      * Display the specified resource.

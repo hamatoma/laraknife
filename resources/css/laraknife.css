@@ -26,6 +26,7 @@ button {
     vertical-align: bottom;
 }
 
+.lkn-standard-panel,
 .lkn-edit-panel,
 .lkn-create-panel,
 .lkn-show-panel,
@@ -34,6 +35,8 @@ fieldset  .lkn-nav-tab-panel {
     background-color: aliceblue;
 }
 
+.lkn-noform-panel,
+.lkn-standard-panel,
 .lkn-panel,
 .lkn-edit-panel,
 .lkn-create-panel,
