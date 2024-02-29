@@ -1,5 +1,13 @@
 # Development phase
 
+## 0.6.0 2024.02.29 notes with documents, visibility
+- improvements HTML components
+- FileHelper::buildFileLink(): fix in link
+- Notes: new field visibility_scope
+- Notes: embedded file upload facility
+- Files: new field visibility_scope
+- new module Module
+
 ## 0.5.8 2024.02.25 password forgotten
 - UserController: new: answer(), forgotton()
 - login.blade.php: link to "password forgotten"

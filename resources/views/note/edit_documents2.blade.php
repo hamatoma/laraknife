@@ -1,7 +1,7 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="note-edit-documents" action="/note-edit_documents/{{ $context->model->id }}" method="POST">
+    <form id="note-edit-documents" action="/note-index_documents/{{ $context->model->id }}" method="POST">
         @csrf
         <x-laraknife.panels.noform title="{{ __('Change of a Note') }}">
             <x-laraknife.layout.nav-tabs :info="$navTabsInfo">

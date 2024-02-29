@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('title');
-            $table->text('body');
+            $table->text('body')->nullable();
             // foreign key of sproperties.
             $table->integer('category_scope');
+            // foreign key of sproperties.
+            $table->integer('visibility_scope');
             // foreign key of sproperties.
             $table->integer('notestatus_scope');
             $table->foreignId('user_id')->references('id')->on('users')->nullable();

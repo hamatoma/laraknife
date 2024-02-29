@@ -14,12 +14,14 @@
                 width2="4" attribute="readonly" />
             <x-laraknife.forms.string position="first" name="id" label="Id" value="{{ $context->valueOf('id') }}"
                 width2="4" attribute="readonly" />
-            <x-laraknife.forms.combobox position="last" name="user_id" label="User" :options="$optionsUser"
+            <x-laraknife.forms.combobox position="last" name="user_id" label="User" :options="$optionsUser" width2="4"
+                attribute="readonly" />
+            <x-laraknife.forms.string position="first" name="title" label="Title"
+                value="{{ $context->valueOf('title') }}" width2="4" attribute="readonly" />
+            <x-laraknife.forms.combobox position="last" name="visibility_scope" label="Visibility" :options="$optionsVisibility"
                 width2="4" attribute="readonly" />
-            <x-laraknife.forms.string position="alone" name="title" label="Title" value="{{ $context->valueOf('title') }}"
-                width2="10" attribute="readonly" />
-            <x-laraknife.forms.text position="alone" name="body" label="Body"
-                value="{{ $context->valueOf('body') }}" width2="10" attribute="readonly" rows="2" />
+            <x-laraknife.forms.text position="alone" name="body" label="Body" value="{{ $context->valueOf('body') }}"
+                width2="10" attribute="readonly" rows="2" />
         </x-laraknife.panels.show>
     </form>
 @endsection

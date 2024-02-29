@@ -31,7 +31,7 @@ button {
 .lkn-create-panel,
 .lkn-show-panel,
 .lkn-panel,
-fieldset  .lkn-nav-tab-panel {
+.lkn-nav-tab-panel {
     background-color: aliceblue;
 }
 
@@ -41,34 +41,41 @@ fieldset  .lkn-nav-tab-panel {
 .lkn-edit-panel,
 .lkn-create-panel,
 .lkn-show-panel,
-fieldset  .lkn-nav-tab-panel {
+div.row  .lkn-nav-tab-panel {
     border: grey solid 0.07rem;
     padding: 2rem 3rem;
     border-radius: 0.5rem;
     box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
 }
-fieldset.lkn-nav-tab-panel{
+#main-content li.lkn-nav-tab-panel{
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
-fieldset ul li.nav-item {
+#main-content li.nav-item {
     border: solid 1px black;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
     border-bottom: none;
 }
-fieldset ul li.lkn-nav-item-active {
+#main-content li.lkn-nav-item-active {
     background-color: aliceblue;
 }
+div.lkn-nav-tab-panel,
+ul.nav-tab-panel,
 .lkn-filter,
+.lkn-fieldset,
 .lkn-form-table {
     margin: 0;
     padding: 1rem 1rem 0 1rem;
     border: 0.075rem black solid;
     border-radius: 0.25rem;
 }
-
+ul.nav-tab-panel + .lkn-fieldset {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
 .lkn-filter,
+.lkn-fieldset,
 .lkn-form-table {
     background-color: aliceblue;
 }
@@ -178,8 +185,7 @@ a:link.lkn-overview-cell,
 a:active.lkn-overview-cell {
     background-color: #EEE;
 }
-
-fieldset ul .nav-item {
+#main-content .nav-item {
     background-color: #EEE;
 }
 .lkn-logout {

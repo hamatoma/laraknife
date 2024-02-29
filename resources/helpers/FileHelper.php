@@ -9,7 +9,7 @@ class FileHelper{
      * @return string the relative link, e.g. "/upload/2024/02/113_london.jpg'
      */
     public static function buildFileLink(string $filename, string $date): string{
-        $rc = 'upload/' . FileHelper::buildFileStoragePath($date) . '/' . $filename;
+        $rc = '/upload/' . FileHelper::buildFileStoragePath($date) . '/' . $filename;
         return $rc;
     }
    /**
@@ -29,8 +29,8 @@ class FileHelper{
      * Deletes the uploaded file.
      * @param string $filename the name to rename (without path)
      */
-    public static function deleteUploadedFile(string $filename){
-        $name = storage_path() . '/app/public/' . FileHelper::buildFileStoragePath() . '/' . $filename;
+    public static function deleteUploadedFile(string $filename, \DateTime $date){
+        $name = storage_path() . '/app/public/' . FileHelper::buildFileStoragePath($date) . '/' . $filename;
         \unlink($name);
     }
     /**

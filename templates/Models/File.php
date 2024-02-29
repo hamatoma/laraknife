@@ -17,7 +17,10 @@ class File extends Model
         'description',
         'filename',
         'filegroup_scope',
+        'visibility_scope',
         'user_id',
-        'size'
+        'size',
+        'module_id',
+        'reference_id'
     ];
 }

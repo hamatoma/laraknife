@@ -17,6 +17,7 @@ class Note extends Model
         'body',
         'category_scope',
         'notestatus_scope',
+        'visibility_scope',
         'user_id'
     ];
 }

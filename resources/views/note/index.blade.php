@@ -7,6 +7,7 @@
       <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
       <x-laraknife.forms.combobox position="first" name="category" label="Category" :options="$optionsCategory" class="lkn-autoupdate" width2="4" />
       <x-laraknife.forms.combobox position="last" name="notestatus" label="Status" :options="$optionsNotestatus" class="lkn-autoupdate" width2="4" />
+      <x-laraknife.forms.combobox position="alone" name="visibility" label="Visibility" :options="$optionsVisibility" width2="4" />
       <x-laraknife.forms.string position="first" name="title" label="Title" value="{{ $context->valueOf('title') }}" width2="4" />
       <x-laraknife.forms.string position="last" name="body" label="Body" value="{{ $context->valueOf('body') }}" width2="4" />
       <x-laraknife.forms.string position="first" name="text" label="Text" value="{{ $context->valueOf('text') }}" width2="4" />

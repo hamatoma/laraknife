@@ -1,4 +1,4 @@
-@props(['info' => ''])
+@props(['info' => '', 'fieldset' => 'true'])
 <ul class="nav nav-tabs lkn-nav-tab">
     @foreach ($info->items as $item)
         <li class="nav-item{!! $info->activeClass($item) !!}">
@@ -12,6 +12,12 @@
     </li>
     @endforeach
 </ul>
-<fieldset class="lkn-nav-tab-panel">
+@if ($fieldset === 'true')
+<fieldset class="lkn-fieldset lkn-nav-tab-panel">
     {{ $slot }}
 </fieldset>
+@else
+<div class="lkn-nav-tab-panel">
+    {{ $slot }}
+</div>
+@endif

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\File;
 use App\Models\Note;
+use App\Models\Module;
 use App\Helpers\Helper;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
+use App\Helpers\FileHelper;
 use App\Helpers\Pagination;
 use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
@@ -32,22 +35,56 @@ class NoteController extends Controller
                     'body' => '',
                     'category_scope' => '1051',
                     'notestatus_scope' => '1011',
+                    'visibility_scope' => '1091',
                     'user_id' => strval(auth()->id())
                 ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $fields['category_scope'], '-');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $fields['notestatus_scope'], '-');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('note.create', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
+                'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
             ]);
         }
         return $rc;
     }
+    public function createDocument(Note $note, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect("/note-index_documents/$note->id");
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'title' => '',
+                    'description' => '',
+                    'filename' => '',
+                    'filegroup_scope' => '1101',
+                    'visibility_scope' => '1091',
+                    'user_id' => auth()->id()
+                ];
+            }
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view('note.create_document', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
+                'optionsUser' => $optionsUser,
+                'note' => $note
+            ]);
+        }
+        return $rc;
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -63,47 +100,57 @@ class NoteController extends Controller
                     'body' => '',
                     'category_scope' => '1051',
                     'notestatus_scope' => '1011',
+                    'visibility_scope' => '1091',
                     'user_id' => strval(auth()->id())
                 ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->user_id, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $note);
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo($note->id, 'note-edit', 0);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 0, $note->id);
             $rc = view('note.edit', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
+                'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
                 'navTabsInfo' => $navigationTabInfo
             ]);
         }
         return $rc;
     }
-    public function editDocuments(Note $note, Request $request)
+    public function editDocument(File $file, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/note-index');
+            $rc = redirect("/note-index_documents/$file->reference_id");
         } else {
             $fields = $request->all();
             if (count($fields) === 0) {
-                $fields = [];
+                $fields = [
+                    'title' => '',
+                    'description' => '',
+                    'filename' => '',
+                    'filegroup_scope' => '',
+                    'visibility_scope' => '',
+                    'user_id' => ''
+                ];
             }
-            $context = new ContextLaraKnife($request, null, $note);
-            $records = [
-                ['name' => 'demo.txt', 'size' => 2344, 'date' => '2024.02.15 08:44'],
-                ['name' => 'demo.doc', 'size' => 32020, 'date' => '2024.02.15 10:32']
-            ];
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo($note->id, 'note-edit', 1);
-            $rc = view('note.edit_documents', [
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $context = new ContextLaraKnife($request, null, $file);
+            $rc = view('note.edit_document', [
                 'context' => $context,
-                'navTabsInfo' => $navigationTabInfo,
-                'records' => $records
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
+                'optionsUser' => $optionsUser,
             ]);
         }
         return $rc;
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -113,6 +160,14 @@ class NoteController extends Controller
             $note->delete();
         }
         return redirect('/note-index');
+    }
+    public function destroyDocument(File $file, Request $request)
+    {
+        if ($request->btnSubmit === 'btnDelete') {
+            $file->delete();
+            FileHelper::deleteUploadedFile($file->filename, $file->created_at);
+        }
+        return redirect("/note-index_documents/$file->reference_id");
     }
     /**
      * Display the database records of the resource.
@@ -127,6 +182,7 @@ class NoteController extends Controller
                 . ' LEFT JOIN sproperties t1 ON t1.id=t0.category_scope'
                 . ' LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope'
                 . ' LEFT JOIN sproperties t3 ON t3.id=t0.user_id'
+                . ' LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope'
             ;
             $parameters = [];
             $fields = $request->all();
@@ -134,6 +190,7 @@ class NoteController extends Controller
                 $fields = [
                     'category' => '1051',
                     'notestatus' => '1011',
+                    'visibility' => '1091',
                     'user' => strval(auth()->id()),
                     'title' => '',
                     'body' => '',
@@ -144,6 +201,7 @@ class NoteController extends Controller
                 $conditions = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'category_scope', 'category');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'notestatus_scope', 'notestatus');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'visibility_scope', 'visibility');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'user_id', 'user');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title,body', 'text');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title');
@@ -155,6 +213,7 @@ class NoteController extends Controller
             $records = $pagination->records;
             $optionsCategory = SProperty::optionsByScope('category', $fields['category'], 'all');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $fields['notestatus'], 'all');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility'], 'all');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user']);
             $context = new ContextLaraKnife($request, $fields);
             return view('note.index', [
@@ -162,8 +221,55 @@ class NoteController extends Controller
                 'records' => $records,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
+                'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
                 'pagination' => $pagination
+            ]);
+        }
+    }
+    public function indexDocuments(Note $note, Request $request)
+    {
+        $moduleId = Module::idOfModule('Note');
+        if ($request->btnSubmit === 'btnNew') {
+            return redirect("/note-create_document/$note->id");
+        } else {
+            $sql = 'SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id '
+                . ' FROM files t0'
+                . ' LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope'
+                . ' LEFT JOIN sproperties t2 ON t2.id=t0.user_id'
+            ;
+            $parameters = [];
+            $fields = $request->all();
+            if (count($fields) == 0) {
+                $fields = [
+                    'filegroup' => '',
+                    'user' => auth()->id(),
+                    'text' => '',
+                    'filegroup_scope' => '1101',
+                    '_sortParams' => 'id:desc',
+                ];
+            } else {
+                $conditions = [];
+                ViewHelper::addConditionComparism($conditions, $parameters, 'module_id', $moduleId);
+                ViewHelper::addConditionComparism($conditions, $parameters, 'reference_id', $note->id);
+                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
+                $sql = DbHelper::addConditions($sql, $conditions);
+            }
+            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+            $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup'], 'all');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user']);
+            $context = new ContextLaraKnife($request, $fields);
+            $fileController = new FileController();
+            $context->setCallback('buildAnchor', $fileController, 'buildAnchor');
+            $navTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 1, $note->id);
+            return view('note.index_documents', [
+                'context' => $context,
+                'records' => $records,
+                'pagination' => $pagination,
+                'navigationTabs' => $navTabInfo,
+                'note' => $note,
             ]);
         }
     }
@@ -175,9 +281,9 @@ class NoteController extends Controller
     {
         $rc = [
             'title' => 'required',
-            'body' => 'required',
             'category_scope' => 'required',
             'notestatus_scope' => 'required',
+            'visibility_scope' => 'required',
             'user_id' => 'required'
         ];
         return $rc;
@@ -190,11 +296,18 @@ class NoteController extends Controller
         Route::put('/note-store', [NoteController::class, 'store'])->middleware('auth');
         Route::post('/note-edit/{note}', [NoteController::class, 'edit'])->middleware('auth');
         Route::get('/note-edit/{note}', [NoteController::class, 'edit'])->middleware('auth');
-        Route::post('/note-edit_documents/{note}', [NoteController::class, 'editDocuments'])->middleware('auth');
-        Route::get('/note-edit_documents/{note}', [NoteController::class, 'editDocuments'])->middleware('auth');
+        Route::post('/note-index_documents/{note}', [NoteController::class, 'indexDocuments'])->middleware('auth');
+        Route::get('/note-index_documents/{note}', [NoteController::class, 'indexDocuments'])->middleware('auth');
         Route::post('/note-update/{note}', [NoteController::class, 'update'])->middleware('auth');
         Route::get('/note-show/{note}/delete', [NoteController::class, 'show'])->middleware('auth');
         Route::delete('/note-show/{note}/delete', [NoteController::class, 'destroy'])->middleware('auth');
+        Route::get('/note-create_document/{note}', [NoteController::class, 'createDocument'])->middleware('auth');
+        Route::put('/note-store_document/{note}', [NoteController::class, 'storeDocument'])->middleware('auth');
+        Route::get('/note-edit_document/{file}', [NoteController::class, 'editDocument'])->middleware('auth');
+        Route::post('/note-edit_document/{file}', [NoteController::class, 'editDocument'])->middleware('auth');
+        Route::post('/note-update_document/{file}', [NoteController::class, 'updateDocument'])->middleware('auth');
+        Route::get('/note-show_document/{file}/delete', [NoteController::class, 'showDocument'])->middleware('auth');
+        Route::delete('/note-show_document/{file}/delete', [NoteController::class, 'destroyDocument'])->middleware('auth');
     }
     /**
      * Display the specified resource.
@@ -202,16 +315,37 @@ class NoteController extends Controller
     public function show(Note $note, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/note-index')->middleware('auth');
+            $rc = redirect('/note-index');
         } else {
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $note->visibility_scope, '');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->user_id);
             $context = new ContextLaraKnife($request, null, $note);
             $rc = view('note.show', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
+                'optionsVisibility' => $optionsVisibility,
+                'optionsUser' => $optionsUser,
+                'mode' => 'delete'
+            ]);
+        }
+        return $rc;
+    }
+    public function showDocument(File $file, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect("/note-index_documents/$file->reference_id");
+        } else {
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $context = new ContextLaraKnife($request, null, $file);
+            $rc = view('note.show_document', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
                 'mode' => 'delete'
             ]);
@@ -233,12 +367,37 @@ class NoteController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-                $validated['body'] = strip_tags($validated['body']);
+                array_push($validated, strip_tags($fields['body'] ?? ''));
                 Note::create($validated);
             }
         }
         if ($rc == null) {
             $rc = redirect('/note-index');
+        }
+        return $rc;
+    }
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function storeDocument(Note $note, Request $request)
+    {
+        $rc = null;
+        if ($request->btnSubmit === 'btnStore') {
+            $fields = $request->all();
+            $validator = Validator::make($fields, ['title' => 'required', 'filegroup_scope' => 'required', 'visibility_scope' => 'required']);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $controller = new FileController();
+                $fields['module_id'] = Module::idOfModule('Note');
+                $fields['reference_id'] = $note->id;
+                $fields['description'] = strip_tags($fields['description']);
+                $controller->storeFile($request, $fields);
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect("/note-index_documents/$note->id");
         }
         return $rc;
     }
@@ -257,12 +416,31 @@ class NoteController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-                $validated['body'] = strip_tags($validated['body']);
+                $validated['body'] = strip_tags($fields['body']);
                 $note->update($validated);
             }
         }
         if ($rc == null) {
             $rc = redirect('/note-index');
+        }
+        return $rc;
+    }
+    public function updateDocument(File $file, Request $request)
+    {
+        $rc = null;
+        if ($request->btnSubmit === 'btnStore') {
+            $fields = $request->all();
+            $fields['description'] = strip_tags($fields['description']);
+            $validator = Validator::make($fields, ['title' => 'required']);
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $fields2 = $request->only(['title', 'description', 'filegroup_scope']);
+                $file->update($fields2);
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect("/note-index_documents/$file->reference_id");
         }
         return $rc;
     }

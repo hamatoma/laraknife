@@ -201,8 +201,16 @@ EOS
   composer dump-autoload
 }
 # ===
-function CopyFiles(){
+function CopyAndLinkFiles(){
   cp -av vendor/hamatoma/laraknife/templates/Helpers/ViewHelperLocal.templ app/Helpers/ViewHelperLocal.php
+  cat <<EOS >missing.seeders
+# Enter the module names separated by " ".
+# Example: MISSING="User Role Menuitem"
+MISSING=""
+EOS
+  for script in Own.sh RunSeeder.sh SwitchRepo.sh; do
+    ln -s larascripts/$script .
+  done
 }
 # ===
 function CreateLayout(){
@@ -332,6 +340,7 @@ rest)
   AdaptModules
   CreateLayout
   CopyFiles
+  LinkFiles
   echo "= current dir: $(pwd)"
   ./Join
   echo "= credentials for first login: see .lrv.credentials"

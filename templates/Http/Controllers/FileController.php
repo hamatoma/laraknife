@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
+use App\Models\Module;
 use App\Helpers\Helper;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
@@ -45,15 +46,18 @@ class FileController extends Controller
                     'description' => '',
                     'filename' => '',
                     'filegroup_scope' => '1101',
+                    'visibility_scope' => '1091',
                     'user_id' => auth()->id()
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('file.create', [
                 'context' => $context,
                 'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
             ]);
         }
@@ -107,16 +111,18 @@ class FileController extends Controller
         if ($request->btnSubmit === 'btnNew') {
             return redirect('/file-create');
         } else {
-            $sql = 'SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id '
+            $sql = 'SELECT t0.*, t1.name as filegroup_scope, t2.name as user, t3.name as visibility '
                 . ' FROM files t0'
                 . ' LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope'
                 . ' LEFT JOIN sproperties t2 ON t2.id=t0.user_id'
+                . ' LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope'
             ;
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
                     'filegroup' => '',
+                    'visibility' => '1091',
                     'user' => auth()->id(),
                     'text' => '',
                     'filegroup_scope' => '1101',
@@ -125,6 +131,7 @@ class FileController extends Controller
             } else {
                 $conditions = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'filegroup_scope', 'filegroup');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'visibility_scope', 'visibility');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'user_id', 'user');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
@@ -133,6 +140,7 @@ class FileController extends Controller
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup'], 'all');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility'], 'all');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user']);
             $context = new ContextLaraKnife($request, $fields);
             $context->setCallback('buildAnchor', $this, 'buildAnchor');
@@ -140,6 +148,7 @@ class FileController extends Controller
                 'context' => $context,
                 'records' => $records,
                 'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
                 'pagination' => $pagination
             ]);
@@ -184,7 +193,7 @@ class FileController extends Controller
     public function show(File $file, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/file-index')->middleware('auth');
+            $rc = redirect('/file-index');
         } else {
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
@@ -213,6 +222,7 @@ class FileController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $fields['description'] = strip_tags($fields['description']);
+                $fields['module_id'] = Module::idOfModule('File');
                 $this->storeFile($request, $fields);
             }
         }
@@ -221,7 +231,7 @@ class FileController extends Controller
         }
         return $rc;
     }
-    function storeFile(Request $request, array $fields): bool
+    public function storeFile(Request $request, array $fields): bool
     {
         $rc = false;
         $file = $request->file('file');
@@ -233,13 +243,18 @@ class FileController extends Controller
             }
             $filename = session('userName') . '_' . strval(time()) . '!' . $name;
             $relativePath = FileHelper::buildFileStoragePath();
+            ViewHelper::addFieldIfMissing($fields, 'module_id', null);
+            ViewHelper::addFieldIfMissing($fields, 'reference_id', null);
             $file2 = new File([
                 'title' => $fields['title'],
                 'description' => $fields['description'],
                 'filename' => $filename,
                 'filegroup_scope' => $fields['filegroup_scope'],
-                'user_id' => $fields['user_id'],
-                'size' => $file->getSize() / 1E6
+                'visibility_scope' => $fields['visibility_scope'],
+                'user_id' => auth()->id(),
+                'size' => $file->getSize() / 1E6,
+                'module_id' => $fields['module_id'],
+                'reference_id' => $fields['reference_id'],
             ]);
             $filePath = $request->file('file')->storeAs("$relativePath", $filename, 'public');
             $file2->save();
