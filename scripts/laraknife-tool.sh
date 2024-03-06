@@ -17,6 +17,8 @@ Usage: laraknife-tool.sh TASK
     Puts records into tables
   adapt-modules
     Integrates the laraknife modules into the project
+  copy-and-link-files
+    Places the needed laraknife files into the procject
   create-layout
     Creates a layout blade file
   create-home
@@ -24,7 +26,11 @@ Usage: laraknife-tool.sh TASK
   move-to-laraknife <module>
     Moves all files of the given module to the laraknife directory.
   link-module <module>
-    include a module from laraknife into the project
+    Include a module from laraknife into the project
+  setup-nginx TARGET DOMAIN DOCUMENT_ROOT PHP_VERSION
+    Creates  a nginx configuration:
+    TARGET: local or server
+    Example: setup-nginx local taskx.test /home/ws/php/taskx 8.3
 EOS
   echo "+++ $*"
 }
@@ -81,12 +87,14 @@ function BuildLinks(){
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
     # === Modules
-    for module in SProperty Role User Menuitem Note File; do
+    for module in SProperty Role User Menuitem Module Note File; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
       fi
-      ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
+      if [ "$module != Module ]; then
+        ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
+      fi
     done
     # === Views
     for module in laraknife sproperty role user menuitem note file; do
@@ -101,7 +109,7 @@ function BuildLinks(){
       ln -sv ../../$dirResources/helpers/$node app/Helpers/$node
     done
     # === EMail controller
-    mkdir -pv app/mail
+    mkdir -pv app/Mail
     for full in $dirResources/mail/*.php; do
       local node=$(basename $full)
       test "$option" = "--force" && rm -fv app/Mail/$node
@@ -226,11 +234,13 @@ function CreateLayout(){
 # ===
 function FillDb(){
   php artisan migrate
+  php artisan db:seed --class=ModuleSeeder
   php artisan db:seed --class=RoleSeeder
   php artisan db:seed --class=UserSeeder
   php artisan db:seed --class=SPropertySeeder
   php artisan db:seed --class=MenuitemSeeder
   php artisan db:seed --class=FileSeeder
+  php artisan db:seed --class=NoteSeeder
 }
 # ===
 function InitI18N(){
@@ -309,6 +319,39 @@ function MoveToLaraknife(){
     fi
   fi
 }
+# ===
+function SetupNginx(){
+  local target=$1
+  local domain="$2"
+  local documentRoot="$3"
+  local phpVersion="$4"
+  local trg=/etc/nginx/sites-available/$domain
+  test -z "$phpVersion" && phpVersion=8.2
+  if [ ! -d /etc/nginx ]; then
+    Usage "missing /etc/nginx"
+  elif [ "$target" != local -a "$target" != server ]; then
+    Usage "unknown TARGET: $target. Use local or server"
+  elif [ -z "$documentRoot" ]; then
+    Usage "missing arguments: TARGET DOMAIN DOCUMENT_ROOT"
+  elif [ ! -d $documentRoot ]; then
+    Usage "not a document root directory: $documentRoot"
+  elif [ -f $trg ]; then
+      echo "+++ $trg already exists"
+  else
+    sudo sh -c "sed \
+      -e s/#DOMAIN#/$domain/ \
+      -e s=#ROOT#=$documentRoot= \
+      -e s/#PHP_VERS#/$phpVersion/ \
+      vendor/hamatoma/laraknife/templates/configuration/nginx.$target \
+      >$trg"
+    echo "= created: $fn"
+    sudo ln -s ../sites-available/$domain /etc/nginx/sites-enabled/$domain
+    if [ "$target" = server ]; then
+      sudo MkCert.sh $DOMAIN
+    fi
+    sudo systemctl reload nginx
+  fi
+}
 case $MODE in
 adapt-modules)
   AdaptModules
@@ -334,18 +377,21 @@ link-module)
 move-to-laraknife)
   MoveToLaraknife "$2"
   ;;
+setup-nginx)
+  SetupNginx $2 $3 $4 $5
+  ;;
 rest)
   InitI18N
   FillDb
   AdaptModules
   CreateLayout
-  CopyFiles
-  LinkFiles
+  CopyAndLinkFiles
   echo "= current dir: $(pwd)"
   ./Join
   echo "= credentials for first login: see .lrv.credentials"
   cat .lrv.credentials
   ;;
+
 *)
   Usage "unknown TASK: $MODE"
   ;;

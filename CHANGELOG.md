@@ -1,5 +1,14 @@
 # Development phase
 
+## 0.6.1 2024.03.06 installation process
+- laraknife-tool.sh:
+  - handling of ModuleController
+  - creating app/Mail
+  - calling ModuleSeeder, NoteSeeder
+  - new: SetupNginx
+- layout.templ: logo
+- ViewHelperLocal: using module and reference
+
 ## 0.6.0 2024.02.29 notes with documents, visibility
 - improvements HTML components
 - FileHelper::buildFileLink(): fix in link
