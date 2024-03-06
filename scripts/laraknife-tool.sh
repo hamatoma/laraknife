@@ -92,7 +92,7 @@ function BuildLinks(){
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
       fi
-      if [ "$module != Module ]; then
+      if [ "$module" != Module ]; then
         ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
       fi
     done
@@ -270,7 +270,7 @@ function LinkModule(){
   if [ -z "$module" ]; then
     Usage "missing <module>"
   elif [ ! -d vendor/hamatoma/laraknife/resources/views/$module ]; then
-    Usage "unknown module: $module (missing vendor/hamatoma/laraknife/resources/views/$module)"
+    Usage "unknown module: $module missing vendor/hamatoma/laraknife/resources/views/$module"
   elif [ -d resources/views/$module ]; then
     Usage "$module already exists: resources/views/$module"
   else

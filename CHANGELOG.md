@@ -1,5 +1,8 @@
 # Development phase
 
+## 0.6.2 2024.03.06 installation process
+- laraknife-tool.sh: syntax error
+
 ## 0.6.1 2024.03.06 installation process
 - laraknife-tool.sh:
   - handling of ModuleController
