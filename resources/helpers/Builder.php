@@ -34,6 +34,24 @@ class Builder
     /// field objects:
     protected ?string $comment = null;
     public bool $force = false;
+    public function adaptRouting()
+    {
+        $controller = $this->moduleCapital . 'Controller';
+        $fn = 'routes/web.php';
+        $content = file_get_contents($fn);
+        if (strpos($content, $controller) === false) {
+            $ix = strrpos($content, 'use App\\Http\\Controllers');
+            $content = substr($content, 0, $ix) . "use App\\Http\\Controllers\\$controller;\n"
+                . substr($content, $ix);
+            if (str_ends_with($content, '\n\n')) {
+                $content = substr($content, 0, strlen($content) - 2) . "$controller::routes();\n";
+            } else {
+                $content = "$content\n$controller::routes();\n";
+            }
+            file_put_contents($fn, $content);
+            $this->log("written: $fn");
+        }
+    }
     public function createModule(string $templates, string $views, string $controllers, string $models)
     {
         $module = $this->module;
@@ -56,6 +74,11 @@ class Builder
     {
         echo "+++ $message\n";
     }
+    public function log(string $message)
+    {
+        echo "= $message\n";
+    }
+
     protected function nextLine(bool $skipComment = false): ?string
     {
         $this->comment = null;
@@ -91,7 +114,7 @@ class Builder
             }
             $this->tableCapital = StringHelper::toCapital($this->tablename);
             $this->moduleCapital = StringHelper::toCapital($this->module);
-            echo "Table: $this->tablename\n";
+            $this->log("Table: $this->tablename");
             while (($line = $this->nextLine(true)) != null) {
                 // $table->timestamp('term');
                 if (preg_match("/table->(\\w+)\\([\"'](\\w+)(.*)/", $line, $match)) {
@@ -129,7 +152,7 @@ class Builder
         if ($module != null && $this->module == null) {
             $this->module = strtolower($module);
             $this->moduleCapital = StringHelper::toCapital($this->module);
-            echo "module: $this->module\n";
+            $this->log("module: $this->module");
         }
     }
     protected function skipTo(string $marker, bool $skipMarker = true): bool
@@ -165,7 +188,7 @@ class Builder
                     }
                     $full = OsHelper::joinPath($dirSources, $file);
                     $contents = file_get_contents($full);
-                    echo "read: $full\n";
+                    $this->log("read: $full");
                     $tree = json_decode($contents);
                     foreach ($tree as $key => $value) {
                         if (!array_key_exists($key, $summary)) {
@@ -187,7 +210,7 @@ class Builder
                 }
                 $contents = json_encode($sorted, JSON_PRETTY_PRINT);
                 file_put_contents($fileTarget, $contents);
-                echo "written: $fileTarget\n";
+                $this->log("written: $fileTarget");
             }
         }
     }
@@ -238,7 +261,7 @@ class Builder
             } while (true);
             $contents = implode("\n", $output);
             file_put_contents($target, $contents);
-            echo "= written $target\n";
+            $this->log("written $target");
         }
     }
 }
@@ -390,6 +413,9 @@ class FieldInfo
                     $this->type = 'number';
                 }
                 break;
+            case 'boolean':
+                $this->type = 'bool';
+                break;
             case 'foreignId':
                 $this->type = 'reference';
                 // $table->foreignId('verifiedby')->references('id')->on('users')->nullable();
@@ -411,6 +437,9 @@ class FieldInfo
     public function inputType()
     {
         switch ($this->type) {
+            case 'bool':
+                $rc = 'checkbox';
+                break;
             case 'reference':
                 $rc = 'combobox';
             case 'datetime':
@@ -435,8 +464,10 @@ class FieldInfo
         $line = str_replace('#position#', 'alone', $line);
         $line = str_replace('#base#', $this->baseName, $line);
         $line = str_replace('#Base#', $this->baseNameCapital, $line);
-        $line = str_replace('#ref.table#', $this->refTable, $line);
-        $line = str_replace('#ref.id#', $this->refId, $line);
+        if ($this->refTable != null){
+            $line = str_replace('#ref.table#', $this->refTable, $line);
+            $line = str_replace('#ref.id#', $this->refId, $line);
+        }
         return $line;
     }
 }
@@ -546,6 +577,7 @@ function main()
                             $controllers = $options['controllers'];
                             $models = $options['models'];
                             $builder->createModule($options['templates'], $views, $controllers, $models);
+                            $builder->adaptRouting();
                         }
                         break;
                     case 'test:mini':

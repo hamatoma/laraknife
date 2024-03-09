@@ -39,7 +39,7 @@ class #Module#Controller extends Controller
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $fields['#field#'], '-');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#s', 'name', '#ref.id#', $fields['#field#'], __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#field#'], __('<Please select>'));
 ##END.CASE##
             $context = new ContextLaraKnife($request, $fields);     
             $rc = view('#module#.create', [
@@ -73,7 +73,7 @@ class #Module#Controller extends Controller
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#field#'], __('<Please select>'));
 ##END.CASE##        
             $context = new ContextLaraKnife($request, null, $#module#);
             $rc = view('#module#.edit', [
@@ -153,7 +153,7 @@ class #Module#Controller extends Controller
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], 'all');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#base#']);
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#base#'], __('<Please select>'));
 ##END.CASE##
             $context = new ContextLaraKnife($request, $fields);
             return view('#module#.index', [
@@ -205,7 +205,7 @@ class #Module#Controller extends Controller
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $#module#->#field#, __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#field#'], __('<Please select>'));
 ##END.CASE##
             $context = new ContextLaraKnife($request, null, $#module#);
             $rc = view('#module#.show', [

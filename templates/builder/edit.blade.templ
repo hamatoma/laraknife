@@ -12,6 +12,8 @@
         <x-laraknife.forms.text position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##ON typeLike([sS]tring$)##
         <x-laraknife.forms.string position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(bool$)##
+        <x-laraknife.forms.checkbox position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##ELSE##
         <x-laraknife.#type# position="alone" name="#field#" label="#Field#" value="{{ $#module#->#field# }}" width2="4" #attribute#/>
 ##END.CASE##

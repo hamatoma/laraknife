@@ -19,8 +19,11 @@ return new class extends Migration
             // foreign key of sproperties: but sproperties.id is integer, not biginteger
             $table->integer('category_scope');
             $table->integer('status_scope');
+            $table->boolean('active');
+            $table->timestamp('timestamp');
+            $table->date('date');
             // foreign key of users
-            $table->foreignId('user_id')->nullable()->default(null)->references('id')->on('users');
+            $table->foreignId('owner_id')->nullable()->default(null)->references('id')->on('users');
         });
     }
 

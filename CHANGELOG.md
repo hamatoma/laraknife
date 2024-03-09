@@ -1,5 +1,16 @@
 # Development phase
 
+## 0.6.5 2024.03.09 Builder, checkbox, bool columns
+
+- checkbox.blade.templ: fix: alignment
+- Builder.php:
+  - new adaptRouting()
+  - recognition of column type "boolean"
+- controller.templ: fix: parameters of comboboxDataOfTable() on foreign keys
+- create.blade.index ... show.blade.index: handling of bool types
+- TermController: fix: filter field "text"
+
+
 ## 0.6.4 2024.03.09 module term, Builder
 - new: checkbox.blade.php
 - string.blade.php: attribute "type"
