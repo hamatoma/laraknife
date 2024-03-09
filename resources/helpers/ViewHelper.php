@@ -17,9 +17,14 @@ class ViewHelper
      * @param string $operator the comparison operator: "=", ">", ">=", "<", "<=", "!="
      * @param string $ignoreValue if the filter value has that value no condition is created
      */
-    public static function addConditionComparism(array &$conditions, array &$parameters, string $column,
-        ?string $filterField = null, string $operator = "=", $ignoreValue = '-')
-    {
+    public static function addConditionComparism(
+        array &$conditions,
+        array &$parameters,
+        string $column,
+        ?string $filterField = null,
+        string $operator = "=",
+        $ignoreValue = '-'
+    ) {
         $filterField ??= $column;
         $value = array_key_exists($filterField, $_POST) ? $_POST[$filterField] : '';
         if ($value !== '' && $value !== $ignoreValue) {
@@ -33,14 +38,34 @@ class ViewHelper
         }
     }
     /**
-     * Appends a field to a field list if that field is not in the list.
-     * @param array $fields IN/OUT: the field list
-     * @param string $name the field name
-     * @param string $value the field value
+     * Adds a SQL condition "from until to" for filtering records.
+     * @param array $conditions IN/OUT: the new condition is put to that list
+     * @param array $parameters IN/OUT: the named sql parameters (":value")
+     * @param string $fromField the field name of the dattime lower bound.
+     * @param string $toField the field name of the dattime upper bound.
+     * @param string $column the name of the column to compare 
      */
-    public static function addFieldIfMissing(array &$fields, string $name, ?string $value){
-        if (! array_key_exists($name, $fields)){
-            $fields[$name] = $value;
+    public static function addConditionDateTimeRange(array &$conditions, array &$parameters, string $fromField, string $toField, string $column)
+    {
+        $from = array_key_exists($fromField, $_POST) ? $_POST[$fromField] : '';
+        $to = array_key_exists($toField, $_POST) ? $_POST[$toField] : '';
+        if ($to !== '' && strpos($to, ':') === false){
+            $to .= ' 23:59:59';
+        }
+        $isValidFrom = $from !== '';
+        $isValidTo = $to !== '';
+        if ($isValidFrom or $isValidTo) {
+            if ($isValidFrom && !$isValidTo) {
+                array_push($conditions, "`$column`>=?");
+                array_push($parameters, $from);
+            } elseif (! $isValidFrom && $isValidTo) {
+                array_push($conditions, "`$column`<=?");
+                array_push($parameters, $to);
+            } else {
+                array_push($conditions, "(`$column`>=? AND `$column`<=?)");
+                array_push($parameters, $from);
+                array_push($parameters, $to);
+            }
         }
     }
     /**
@@ -80,6 +105,18 @@ class ViewHelper
             }
         }
     }
+    /**
+     * Appends a field to a field list if that field is not in the list.
+     * @param array $fields IN/OUT: the field list
+     * @param string $name the field name
+     * @param string $value the field value
+     */
+    public static function addFieldIfMissing(array &$fields, string $name, ?string $value)
+    {
+        if (!array_key_exists($name, $fields)) {
+            $fields[$name] = $value;
+        }
+    }
 
     /**
      * Builds the HTML text of the entries ("options") of a combobox ("selection").
@@ -91,9 +128,13 @@ class ViewHelper
      *   Otherwise: an entry is added as first entry with that text and the value ''
      * @return array a list of combobox entries, e.g. [['text' => 'x', 'value' => 'y', 'active' => false], ...]
      */
-    public static function buildEntriesOfCombobox(array $texts, ?array $values, string $selected = '',
-        ?string $textUndefined = null, bool $translate = false): array
-    {
+    public static function buildEntriesOfCombobox(
+        array $texts,
+        ?array $values,
+        string $selected = '',
+        ?string $textUndefined = null,
+        bool $translate = false
+    ): array {
         if ($values == null) {
             $values = $texts;
         }
@@ -122,17 +163,39 @@ class ViewHelper
         return $rc;
     }
     /**
+     * Converts fields with special data types into a usable form.
+     * 
+     * Example: datetime is delivered as "2024-03-02T00:40". The converted form is "2024-03-02 00:40"
+     * 
+     * @param array $list the list with the field data
+     * @param array $dataFields a associative field with fieldname => datatype entries. Datatype: "datetime"
+     */
+    public static function adaptFieldValues(array &$list, array $dateFields){
+        foreach($dateFields as $name => $type){
+            if (array_key_exists($name, $list)){
+            switch($type){
+                case 'datetime':
+                    $list[$name] = str_replace('T', ' ', $list[$name]);
+                    break;
+                default:
+                break;
+            }
+        }
+    }
+    }
+    /**
      * Extracts the number of a numbered button.
      * @param array $fields the form fields
      * @param string $name the name of the numbered button
      * @return int|NULL NULL: no button found. Otherwise: the number of the button
      */
-    public static function numberOfButton(array $fields, string $name): ?int{
+    public static function numberOfButton(array $fields, string $name): ?int
+    {
         $rc = null;
         $fieldname = '_lknAction';
-        if (array_key_exists($fieldname, $fields)){
-            $value =  $fields[$fieldname];
-            if (str_starts_with($value, $name)){
+        if (array_key_exists($fieldname, $fields)) {
+            $value = $fields[$fieldname];
+            if (str_starts_with($value, $name)) {
                 $rc = intval(substr($value, strlen($name) + 1));
             }
         }

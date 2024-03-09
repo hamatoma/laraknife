@@ -136,7 +136,7 @@ function BuildLinks(){
     cat <<EOS >$fn
 .white { color: white; }
 .expand100 { width: 100%;}
-.nav-link, .nav-item { color: white; font-weight: bolder;}
+header .nav-link, header .nav-item { color: white; font-weight: bolder;}
 table, tr, th, td {
     border: solid black 1px;
     border-collapse: collapse;

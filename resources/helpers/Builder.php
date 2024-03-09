@@ -93,6 +93,7 @@ class Builder
             $this->moduleCapital = StringHelper::toCapital($this->module);
             echo "Table: $this->tablename\n";
             while (($line = $this->nextLine(true)) != null) {
+                // $table->timestamp('term');
                 if (preg_match("/table->(\\w+)\\([\"'](\\w+)(.*)/", $line, $match)) {
                     $fieldname = $match[2];
                     $field = new FieldInfo(
@@ -101,7 +102,7 @@ class Builder
                         $match[3],
                         $this->comment != null && strpos($this->comment, 'spropert') !== false
                     );
-                    if ($fieldname !== 'id' && $this->secondary == null){
+                    if ($fieldname !== 'id' && $this->secondary == null) {
                         $this->secondary = $field;
                     }
                     array_push($this->fields, $field);
@@ -230,7 +231,7 @@ class Builder
                         }
                     } while (true);
                     $comma = count($output) > $sizeOutput ? ',' : '';
-                    if ($sizeOutput > 0){
+                    if ($sizeOutput > 0) {
                         $output[$sizeOutput - 1] = str_replace('#Comma#', $comma, $output[$sizeOutput - 1]);
                     }
                 }
@@ -264,7 +265,7 @@ class CaseInfo
     }
     public function handleBlock(array &$output)
     {
-        if (count($this->block) > 0){
+        if (count($this->block) > 0) {
             foreach ($this->currentConditionFields as $field) {
                 $this->index++;
                 foreach ($this->block as $line) {
@@ -314,7 +315,7 @@ class CaseInfo
             $ix = array_search($field, $this->fields);
             array_splice($this->fields, $ix, 1);
         }
-        $this->lastField = $count == 0 ? null :  $this->currentConditionFields[$count - 1];
+        $this->lastField = $count == 0 ? null : $this->currentConditionFields[$count - 1];
     }
     public static function startCase(string $line, Builder $builder): ?CaseInfo
     {
@@ -335,12 +336,14 @@ class FieldInfo
     public string $type;
     public bool $multiline;
     /// syntax: <table>.<column>
-    public ?string $reference;
+    public ?string $refTable;
+    public ?string $refId;
     public function __construct(string $fieldname, string $type, string $parameters, bool $isSProperty = false)
     {
         $match = null;
         $this->multiline = false;
-        $this->reference = null;
+        $this->refTable = null;
+        $this->refId = null;
         $this->name = $fieldname;
         $this->nameCapital = StringHelper::toCapital($fieldname);
         $endLength = 0;
@@ -381,7 +384,8 @@ class FieldInfo
             case 'integer':
                 if ($isSProperty) {
                     $this->type = 'ref';
-                    $this->reference = 'sproperties.id';
+                    $this->refTable = 'sproperties';
+                    $this->refId = 'id';
                 } else {
                     $this->type = 'number';
                 }
@@ -389,8 +393,10 @@ class FieldInfo
             case 'foreignId':
                 $this->type = 'reference';
                 // $table->foreignId('verifiedby')->references('id')->on('users')->nullable();
+                // .....................................................1.......1............2.......2
                 if ($parameters != null && preg_match("/references.[\"']([^\"']+).*->on.[\"']([^\"']+)/", $parameters, $match)) {
-                    $this->reference = $match[2] . '.' . $match[1];
+                    $this->refTable = $match[2];
+                    $this->refId = $match[1];
                 }
                 break;
             default:
@@ -399,7 +405,7 @@ class FieldInfo
     }
     public function dump()
     {
-        $rest = $this->reference ?? null;
+        $rest = $this->refTable == null ? '' : "$this->refTable.$this->refId";
         echo $this->name . ": " . $this->type, " $rest\n";
     }
     public function inputType()
@@ -407,8 +413,15 @@ class FieldInfo
         switch ($this->type) {
             case 'reference':
                 $rc = 'combobox';
+            case 'datetime':
+            case 'timestamp':
+                $rc = 'string type="datetime-local"';
+                break;
+            case 'date':
+                $rc = 'string type="date"';
+                break;
             default:
-                $rc = $this->multiline ? 'bigtext' : 'text';
+                $rc = $this->multiline ? 'text' : 'string';
                 break;
         }
         return $rc;
@@ -422,6 +435,8 @@ class FieldInfo
         $line = str_replace('#position#', 'alone', $line);
         $line = str_replace('#base#', $this->baseName, $line);
         $line = str_replace('#Base#', $this->baseNameCapital, $line);
+        $line = str_replace('#ref.table#', $this->refTable, $line);
+        $line = str_replace('#ref.id#', $this->refId, $line);
         return $line;
     }
 }

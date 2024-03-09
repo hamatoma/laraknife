@@ -1,5 +1,23 @@
 # Development phase
 
+## 0.6.4 2024.03.09 module term, Builder
+- new: checkbox.blade.php
+- string.blade.php: attribute "type"
+- Builder.php:
+  - reference changed to refId and refTable
+  - bigtext/text changed to text/string
+  - handling of date / datetime / timestamp fields
+- ContextLaraKnife.php
+  - new: asDateTimeString()
+- ViewHelper.php:
+  - new: addConditionDateTimeRange()
+  - new: adaptFieldValues()
+- new module Term
+- laraknife-tool.sh: content of $PROJ.css
+- controller.templ: 
+  - fix: parameters of comboboxDataOfTable()
+  - default value of user_ix field: auth()->id()
+
 ## 0.6.3 2024.03.06 installation process
 - <app>.css: color tab header
 

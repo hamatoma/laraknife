@@ -28,6 +28,8 @@ class #Module#Controller extends Controller
             if (count($fields) === 0) {
                 $fields = [
 ##CASE(fields)##
+##ON nameLike(user_id)##
+                    '#field' => auth()->id()#comma#
 ##ON nameLike(.)##
                     '#field#' => ''#comma#
 ##END.CASE##
@@ -37,7 +39,7 @@ class #Module#Controller extends Controller
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $fields['#field#'], '-');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#base#s', 'name', 'id', $fields['#field#'], __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#s', 'name', '#ref.id#', $fields['#field#'], __('<Please select>'));
 ##END.CASE##
             $context = new ContextLaraKnife($request, $fields);     
             $rc = view('#module#.create', [
