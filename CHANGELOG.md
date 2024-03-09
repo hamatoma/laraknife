@@ -1,5 +1,11 @@
 # Development phase
 
+## 0.6.6 2024.03.09 correction for module term
+
+- laraknife.sh:
+  - web.php: insertion of module Term
+  - BuildLink: insertion of module Term
+
 ## 0.6.5 2024.03.09 Builder, checkbox, bool columns
 
 - checkbox.blade.templ: fix: alignment

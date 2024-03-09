@@ -64,8 +64,8 @@ function AdaptModules(){
   else
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
-      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;/' \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -87,7 +87,7 @@ function BuildLinks(){
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
     # === Modules
-    for module in SProperty Role User Menuitem Module Note File; do
+    for module in SProperty Role User Menuitem Module Note File Term; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
@@ -97,7 +97,7 @@ function BuildLinks(){
       fi
     done
     # === Views
-    for module in laraknife sproperty role user menuitem note file; do
+    for module in laraknife sproperty role user menuitem note file term; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
