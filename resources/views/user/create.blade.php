@@ -10,6 +10,7 @@
         <x-laraknife.forms.combobox position="alone" name="role_id" label="Role" :options="$roleOptions" width2="4" />
         <x-laraknife.forms.password position="first" name="password" label="Password" width2="4" />
         <x-laraknife.forms.password position="last" name="password_confirmation" label="Confirmation" width2="4" />
+        <x-laraknife.forms.combobox position="alone" name="localization" label="Localication" :options="$localizationOptions" width2="4" />
     </x-laraknife.panels.create>
 </form>
 @endsection

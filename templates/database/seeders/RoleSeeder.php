@@ -26,7 +26,7 @@ class RoleSeeder extends Seeder
         DB::table('roles')->insert([
             'id' => 3,
             'name' => 'User',
-            'priority' => '20'
+            'priority' => '50'
         ]);
         DB::table('roles')->insert([
             'id' => 4,

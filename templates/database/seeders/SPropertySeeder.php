@@ -27,5 +27,33 @@ class SPropertySeeder extends Seeder
             'order' => '20',
             'shortname' => 'I'
         ]);
+        DB::table('sproperties')->insert([
+            'id' => 1201,
+            'scope' => 'localization',
+            'name' => 'English (Britisch)',
+            'order' => '10',
+            'shortname' => 'en_GR'
+        ]);
+        DB::table('sproperties')->insert([
+            'id' => 1202,
+            'scope' => 'localization',
+            'name' => 'German (Germany)',
+            'order' => '20',
+            'shortname' => 'de_DE'
+        ]);
+        DB::table('sproperties')->insert([
+            'id' => 1203,
+            'scope' => 'localization',
+            'name' => 'French (France)',
+            'order' => '30',
+            'shortname' => 'fr_FR'
+        ]);
+        DB::table('sproperties')->insert([
+            'id' => 1204,
+            'scope' => 'localization',
+            'name' => 'Italian (Italy)',
+            'order' => '40',
+            'shortname' => 'it_IT'
+        ]);
  }
 }

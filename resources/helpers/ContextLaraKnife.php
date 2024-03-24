@@ -14,6 +14,8 @@ class ContextLaraKnife
     public ?array $fields;
     public Request $request;
     public ?Model $model;
+   public ?Model $model2;
+   public ?Model $model3;
     public int $currentNo;
     public ?array $callbacks;
     public array $snippets;
@@ -26,6 +28,7 @@ class ContextLaraKnife
         $this->callbacks = null;
         $this->callbackMethod = '';
         $this->snippets = [];
+        $this->model2 = $this->model3 = null;
     }
     public function asDateTimeString(string $dbDateTime, bool $withSeconds = false): string{
         $parts = explode(' ', $dbDateTime);

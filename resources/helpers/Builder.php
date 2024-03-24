@@ -180,6 +180,7 @@ class Builder
             $this->error("not a directory: $dirSources");
         } else {
             $summary = [];
+            $tree = null;
             $parent = dirname($fileTarget);
             if (OsHelper::ensureDirectory($parent)) {
                 foreach (scandir($dirSources) as $file) {
@@ -210,7 +211,6 @@ class Builder
                 }
                 $contents = json_encode($sorted, JSON_PRETTY_PRINT);
                 file_put_contents($fileTarget, $contents);
-                $this->log("written: $fileTarget");
             }
         }
     }

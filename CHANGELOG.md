@@ -1,5 +1,26 @@
 # Development phase
 
+## 0.6.7 2024.03.24 logo, localization
+
+- ContextLaraKnife: new: model2 and model3
+- StringHelper: new singularOf()
+- new: laraknife_logo_64.ico and *.png
+- new: resources/lang/de_DE/*.php
+- User: new attribute localization
+- laraknife-tool.sh:
+  - new: LANG_DEFAULT. 
+  - new directory layout of lang instead of resources/lang (Laravel 11)
+  - copy of favicon and logo image
+  - fix: RunSeeders.sh instead of RunSeeder.sh
+- Own.sh: better description
+- CreateLaraProj.sh: .env corrections
+- IncludeLara.sh: swap of MODE and BASE
+- layout.templ: correction of logo
+- RoleSeeder: fix of prio for User
+- SPropertySeeder: scope "localization"
+- MenuItemController:
+  - create(): completion of empty fields: label and link
+
 ## 0.6.6 2024.03.09 correction for module term
 
 - laraknife.sh:

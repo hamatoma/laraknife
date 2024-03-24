@@ -42,6 +42,16 @@ class StringHelper{
         $rc = $charSet[rand(0, strlen($charSet) - 1)];
         return $rc;
     }
+    public static function singularOf(string $word){
+        if (str_ends_with($word, 'ies')){
+            $rc = substr($word, 0, strlen($word) - 3);
+        } elseif (str_ends_with($word, 's')){
+            $rc = substr($word, 0, strlen($word) - 1);
+        } else {
+            $rc = $word;
+        }
+        return $rc;
+    }
     /**
      * Converts the $string into a capital string: the first character will be uppercase.
      */

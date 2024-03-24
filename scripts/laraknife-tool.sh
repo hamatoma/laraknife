@@ -2,6 +2,7 @@
 
 MODE=$1
 PROJ=$(basename $(pwd))
+LANG_DEFAULT=de_DE
 # ===
 function Usage(){
   cat <<EOS
@@ -128,6 +129,16 @@ function BuildLinks(){
       test "$option" = "--force" && rm -fv public/$resource/laraknife.$resource
       ln -s ../../$dirResources/$resource/laraknife.$resource public/$resource/laraknife.$resource
     done
+    # images
+    local trg=public/favicon.ico
+    if [ "$option" = "--force" -o ! -f $trg ]; then
+      cp -av $dirResources/img/laraknife_logo_64.ico $trg
+    fi
+    trg=public/img/logo_64.png
+    mkdir -p $(dirname $trg)
+    if [ "$option" = "--force" -o ! -f $trg ]; then
+      cp -av $dirResources/img/laraknife_logo_64.png $trg
+    fi
     # storage:
     cd public
     ln -s ../storage/app/public upload
@@ -173,16 +184,19 @@ EOS
     # ==== Translations
     mkdir -p resources/lang/sources
     test "$option" = "--force" && rm -fv resources/lang/sources/laraknife.de.json
-    ln -s ../../../$dirResources/lang/de_DE.json resources/lang/sources/laraknife.de.json
-    mkdir -p resources/lang/de_DE
-    local fn=resources/lang/de_DE/validation.php
-    test "$option" = "--force" && rm -fv $fn
-    ln -s ../../../$dirResources/lang/de_DE/validation.php $fn
+    ln -s ../../../$dirResources/lang/$LANG_DEFAULT.json resources/lang/sources/laraknife.de.json
+    mkdir -p lang/$LANG_DEFAULT
+    for fullFile in $dirResources/lang/$LANG_DEFAULT/*; do
+      local file=$(basename $fullFile)
+      local fn=lang/$LANG_DEFAULT/$file
+      test "$option" = "--force" && rm -fv $fn
+      ln -s ../../$dirResources/lang/$LANG_DEFAULT/$file $fn
+    done
     # Scripts:
     local script=Join
     cat <<EOS >$script
 #! /bin/bash
-php app/Helpers/Builder.php update:languages resources/lang/sources resources/lang/de_DE.json
+php app/Helpers/Builder.php update:languages resources/lang/sources lang/$LANG_DEFAULT.json
 EOS
     chmod +x $script
   fi
@@ -204,6 +218,7 @@ EOS
 php app/Helpers/Builder.php $*
 EOS
   chmod +x $script
+  ./$script
   test "$option" = "--force" && rm larascripts
   ln -s $base/scripts larascripts
   composer dump-autoload
@@ -216,7 +231,7 @@ function CopyAndLinkFiles(){
 # Example: MISSING="User Role Menuitem"
 MISSING=""
 EOS
-  for script in Own.sh RunSeeder.sh SwitchRepo.sh; do
+  for script in Own.sh RunSeeders.sh SwitchRepo.sh; do
     ln -s larascripts/$script .
   done
 }
@@ -248,9 +263,9 @@ function InitI18N(){
   if [ ! -f $fn ]; then
     echo "++ missing $fn"
   else
-    sed -i -e "s/'locale' => 'en'/'locale' => 'de_DE',#N#'available_locales' => [#N#  'English' => 'en',#N#  'German' => 'de_DE'#N#]/" \
+    sed -i -e "s/'locale' => 'en'/'locale' => '$LANG_DEFAULT',#N#'available_locales' => [#N#  'English' => 'en',#N#  'German' => '$LANG_DEFAULT'#N#]/" \
     -e 's/#N#/\n/g' $fn
-    grep -A4 "locale.*de_DE" $fn
+    grep -A4 "locale.*$LANG_DEFAULT" $fn
     local fn=resources/lang/sources/$PROJ.de.json
     if [ ! -f $fn ]; then
       cat <<EOS >$fn
@@ -263,6 +278,7 @@ EOS
       ls -l $fn
     fi
   fi
+  ln -sv ../../lang/$LANG_DEFAULT.json resources/lang/
 }
 # ===
 function LinkModule(){

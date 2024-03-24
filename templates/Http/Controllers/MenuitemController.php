@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menuitem;
 use App\Models\User;
 use App\Helpers\Helper;
+use App\Models\Menuitem;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
 use App\Helpers\Pagination;
 use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\StringHelper;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -281,6 +282,14 @@ class MenuitemController extends Controller
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            $name = $fields['name'];
+            if (empty($fields['label'])){
+                $fields['label'] = StringHelper::toCapital($name);
+            }
+            if (empty($fields['link'])){
+                $word = StringHelper::singularOf($name);
+                $fields['link'] = "/$word-index";
+            }
             $validator = Validator::make($fields, $this->rules(true));
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();

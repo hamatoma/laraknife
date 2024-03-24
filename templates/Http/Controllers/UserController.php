@@ -15,6 +15,7 @@ use App\Helpers\StringHelper;
 use Illuminate\Validation\Rule;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -81,11 +82,18 @@ class UserController extends Controller
         } else {
             $fields = $request->all();
             if (count($fields) == 0) {
-                $fields = ['name' => '', 'email' => '', 'password' => '', 'password_confirmation' => '', 'role_id' => ''];
+                $fields = ['name' => '', 'email' => '', 'password' => '', 'password_confirmation' => '', 'role_id' => '',
+            'localization' => 'en_GB'];
             }
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
+            $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
+            $localizationOptions = SProperty::optionsByScope('localization', $fields['localization'], '', 'name', 'shortname');
+
             $context = new ContextLaraKnife($request, $fields);
-            $rc = view('user.create', ['context' => $context, 'roleOptions' => $options]);
+            $rc = view('user.create', [
+                'context' => $context,
+                'roleOptions' => $roleOptions,
+                'localizationOptions' => $localizationOptions
+            ]);
         }
         return $rc;
     }
@@ -100,9 +108,11 @@ class UserController extends Controller
         } elseif ($request->btnSubmit === 'btnSetPassword') {
             $rc = redirect('/user-editpassword/' . strval($user->id));
         } else {
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
+            $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
+            $localizationOptions = SProperty::optionsByScope('localization', $user->localization, '', 'name', 'shortname');
             $context = new ContextLaraKnife($request, null, $user);
-            $rc = view('user.edit', ['context' => $context, 'roleOptions' => $options]);
+            $rc = view('user.edit', ['context' => $context, 'roleOptions' => $roleOptions,
+            'localizationOptions' => $localizationOptions]);
         }
         return $rc;
     }
@@ -276,7 +286,8 @@ class UserController extends Controller
                     auth()->login($user);
                     $role = Role::find($user->role_id);
                     $request->session()->regenerate();
-                    session(['role' => $role->priority, 'userName' => $user->name]);
+                    session(['userName' => $user->name]);
+                    App::setLocale($user->localization);
                     // $data = $request->session()->all();
                     $rc = redirect('/menuitem-menu_main');
                 }
@@ -304,6 +315,7 @@ class UserController extends Controller
                 'name' => 'required|unique:users',
                 'email' => 'required|email|unique:users',
                 'role_id' => 'required',
+                'localization' => 'required',
                 'password' => 'required|confirmed',
                 'password_confirmation' => 'required'
             ];
@@ -311,7 +323,8 @@ class UserController extends Controller
             $rc = [
                 'name' => ['required', Rule::unique('users')->ignore($user)],
                 'email' => 'required|unique:users,id,' . strval($user->id),
-                'role_id' => 'required'
+                'role_id' => 'required',
+                'localization' => 'required'
             ];
         }
         return $rc;
@@ -373,6 +386,9 @@ class UserController extends Controller
             } else {
                 // Retrieve the validated input...
                 $validated = $validator->validated();
+                if ($fields['localization'] !== App::getLocale()){
+                    App::setLocale($fields['localization']);
+                }
                 $validated['password'] = UserController::hash($email, $fields['password']);
                 User::create($validated);
             }

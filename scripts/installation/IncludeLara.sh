@@ -1,10 +1,10 @@
 #! /bin/bash
-MODE=$1
-BASE=$2
+BASE=$1
+MODE=$2
 function Usage(){
-echo "Usage: IncludeLara.sh MODE BASE"
-  echo "Example: IncludeLara.sh git /home/ws/php/taskx"
-  echo "Example: IncludeLara.sh local /home/ws/php/taskx"
+echo "Usage: IncludeLara.sh BASE MODE"
+  echo "Example: IncludeLara.sh /home/ws/php/taskx" git 
+  echo "Example: IncludeLara.sh /home/ws/php/taskx" local
   echo "+++ $*"
 }
 if [ "$MODE" != git -a "$MODE" != "local" ]; then
