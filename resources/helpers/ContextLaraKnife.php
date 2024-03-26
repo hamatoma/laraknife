@@ -60,7 +60,7 @@ class ContextLaraKnife
     }
     public function valueOf(string $name)
     {
-        if ($this->model != null) {
+        if ($this->model != null && $this->model->$name !== null) {
             $rc = old($name, $this->model[$name]);
         } else {
             if ($this->fields == null) {

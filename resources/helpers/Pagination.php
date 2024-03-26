@@ -28,7 +28,7 @@ class Pagination
     public function __construct(string $sql, array $parameters, array $fields, ?string $sqlTotalCount = null,
         int $visiblePages = 9, int $defaultPageSize = 20)
     {
-         $this->defaultPageSize = $defaultPageSize;
+        $this->defaultPageSize = $defaultPageSize;
         $this->visiblePages = intval(max(5, $visiblePages) / 2) * 2 + 1;
         if ($sqlTotalCount == null) {
             $match = null;

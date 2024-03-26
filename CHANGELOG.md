@@ -1,5 +1,14 @@
 # Development phase
 
+## 0.6.8 2024.03.26 ContextLaraKnife, DbHelper, ViewHelper
+
+- ContextLaraKnife:
+  - valueOf(): using of $this->fields if $this->model has no matching attribute
+- DbHelper:
+  - addOrderBy(): handling of x.y items: changed to x.`y`
+- ViewHelper:
+  - new: adaptCheckbox()
+
 ## 0.6.7 2024.03.24 logo, localization
 
 - ContextLaraKnife: new: model2 and model3

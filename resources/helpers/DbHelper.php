@@ -50,7 +50,14 @@ class DbHelper
                 if (!empty($order)) {
                     $order .= ',';
                 }
-                $order .= "`$parts[0]`";
+                if (strpos($first = $parts[0], '`') !== false){
+                    $order .= $first;
+                } elseif (strpos($first, '.') === false){
+                    $order .= "`$first`";
+                } else {
+                    $parts2 = explode('.', $first);
+                    $order .= $parts2[0] . ".`$parts2[1]`";
+                }
                 if (count($parts) > 0 && $parts[1] === 'desc') {
                     $order .= ' desc';
                 }

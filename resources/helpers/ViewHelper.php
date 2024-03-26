@@ -9,6 +9,20 @@ namespace App\Helpers;
 class ViewHelper
 {
     /**
+     * Adapts the data of a $_POST array for a checkbox.
+     * Note: If a checkbox is not checked the field is missing in $_POST.
+     * And the field value is changed into 1 (true) or 0 (false): BOOL in MySql dbs are tiny int.
+     * @param array $fields the array with the $_POST / $_GET variables
+     * @param string $name the fieldname of the checkbox
+     */
+    public static function adaptCheckbox(array &$fields, string $name){
+        if (! array_key_exists($name, $fields)){
+            $fields[$name] = 0;
+        } else {
+            $fields[$name] = 1;
+        }
+    }
+    /**
      * Adds a SQL condition "compared to FIELD" for filtering records.
      * @param array $conditions IN/OUT: the new condition is put to that list
      * @param array $parameters IN/OUT: the named sql parameters (":value")
