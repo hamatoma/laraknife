@@ -52,12 +52,11 @@ if [ ! -d ../laraknife ]; then
   echo "+++ missing ../laraknife"
   echo "cd .. ; git clone git@github.com:hamatoma/laraknife.git"
 elif [ ! -e .dev.user ]; then
-  echo "+++ call './Own all' before!"
+  echo "+++ call './Own all' before! You can ignore errors of Own.sh"
 elif [ ! -f .env ]; then
   echo "+++ missing .env"
   echo "cp -a env.example .env"
   echo "adapt: APP_URL DB_USERNAME..."
-  echo "run later: php artisan key:generate"
 elif [ ! -d /var/lib/mysql/lrv#PROJECT~ ]; then
   echo "+++ missing db lrv#PROJECT~"
   echo "sudo mysqladmin create lrv#PROJECT~"

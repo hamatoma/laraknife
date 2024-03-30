@@ -1,5 +1,13 @@
 # Development phase
 
+## 0.6.10 2024.03.30 InitApp.sh Own.sh
+
+- README.md: installation tips
+- *modify_user_role.php: endautologin->nullable()
+- InitApp.templ improvments
+- Own.sh: no sqlite database
+
+
 ## 0.6.9 2024.03.30 Autologin
 
 - checkbox.blade: corrections for mode "belowLabel"

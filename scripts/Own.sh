@@ -13,5 +13,5 @@ else
      sudo chmod g+w -R .
      sudo find -type d -exec chmod ug+wx "{}" \;
    fi
-   sudo chown -R www-data:www-data bootstrap/cache storage/logs database/database.sqlite
+   sudo chown -R www-data:www-data bootstrap/cache storage/logs
 fi

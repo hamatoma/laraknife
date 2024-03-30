@@ -7,4 +7,12 @@ That files must have the namespace of the laravel project, not of laraknife's na
 
 This directory is not included into the automatic class loader.
 
+# Installation
+
+```
+git clone ssh://git@git.hamatoma.de:/home/git/repo/worxer.git
+cd worxer
+scripts/InitApp.sh
+```
+
 
