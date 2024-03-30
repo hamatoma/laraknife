@@ -12,6 +12,7 @@ use App\Helpers\ViewHelper;
 use App\Helpers\EmailHelper;
 use Illuminate\Http\Request;
 use App\Helpers\StringHelper;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
@@ -82,8 +83,14 @@ class UserController extends Controller
         } else {
             $fields = $request->all();
             if (count($fields) == 0) {
-                $fields = ['name' => '', 'email' => '', 'password' => '', 'password_confirmation' => '', 'role_id' => '',
-            'localization' => 'en_GB'];
+                $fields = [
+                    'name' => '',
+                    'email' => '',
+                    'password' => '',
+                    'password_confirmation' => '',
+                    'role_id' => '',
+                    'localization' => 'en_GB'
+                ];
             }
             $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
             $localizationOptions = SProperty::optionsByScope('localization', $fields['localization'], '', 'name', 'shortname');
@@ -111,8 +118,11 @@ class UserController extends Controller
             $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
             $localizationOptions = SProperty::optionsByScope('localization', $user->localization, '', 'name', 'shortname');
             $context = new ContextLaraKnife($request, null, $user);
-            $rc = view('user.edit', ['context' => $context, 'roleOptions' => $roleOptions,
-            'localizationOptions' => $localizationOptions]);
+            $rc = view('user.edit', [
+                'context' => $context,
+                'roleOptions' => $roleOptions,
+                'localizationOptions' => $localizationOptions
+            ]);
         }
         return $rc;
     }
@@ -248,48 +258,49 @@ class UserController extends Controller
     }
     public function login(Request $request)
     {
-        $rc = null;
-        $userId = null;
-        $fields = $request->all();
-        if (count($fields) === 0) {
-            $fields = ['email' => '', 'password' => ''];
-        } else {
-            $forceLogin = env('DEBUG_FORCE_LOGIN') === 'true';
-            $email = strtolower($fields['email']);
-            $pw = $fields['password'];
-            $records = DB::select('SELECT id,password FROM users WHERE email=?', [$email]);
-            $ok = count($records) === 1;
-            if ($ok) {
-                $pw2 = $records[0]->password;
-                $userId = $records[0]->id;
-                $ok = Hash::check("$email\t$pw", $pw2);
-            }
-            $validator = Validator::make($fields, ['email' => ['required', 'email'], 'password' => ['required']]);
-            if (!$validator->failed() && !$ok) {
-                if (!$forceLogin) {
-                    $validator->errors()->add(
-                        'password',
-                        'The provided credentials do not match our records.'
-                    );
-                }
-            }
-            if (!$forceLogin && ($validator->failed() || !$ok)) {
-                $rc = back()->withErrors([
-                    'email' => __('The provided credentials do not match our records.'),
-                ])->onlyInput('email');
+        if (($rc = $this->loginAutomatic($request)) == null) {
+            $rc = null;
+            $userId = null;
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = ['email' => '', 'password' => ''];
             } else {
-                if ($forceLogin) {
-                    $userId = 1;
+                $forceLogin = env('DEBUG_FORCE_LOGIN') === 'true';
+                $email = strtolower($fields['email']);
+                $pw = $fields['password'];
+                $records = DB::select('SELECT id,password FROM users WHERE email=?', [$email]);
+                $ok = count($records) === 1;
+                if ($ok) {
+                    $pw2 = $records[0]->password;
+                    $userId = $records[0]->id;
+                    $ok = Hash::check("$email\t$pw", $pw2);
                 }
-                $user = User::find($userId);
-                if ($user != null) {
-                    auth()->login($user);
-                    $role = Role::find($user->role_id);
-                    $request->session()->regenerate();
-                    session(['userName' => $user->name]);
-                    App::setLocale($user->localization);
-                    // $data = $request->session()->all();
-                    $rc = redirect('/menuitem-menu_main');
+                $validator = Validator::make($fields, ['email' => ['required', 'email'], 'password' => ['required']]);
+                if (!$validator->failed() && !$ok) {
+                    if (!$forceLogin) {
+                        $validator->errors()->add(
+                            'password',
+                            'The provided credentials do not match our records.'
+                        );
+                    }
+                }
+                if (!$forceLogin && ($validator->failed() || !$ok)) {
+                    $rc = back()->withErrors([
+                        'email' => __('The provided credentials do not match our records.'),
+                    ])->onlyInput('email');
+                } else {
+                    if ($forceLogin) {
+                        $userId = 1;
+                    }
+                    $rc = $this->loginUser($request, $userId);
+                    if ($rc != null && $request->has('autologin')){
+                        $key = StringHelper::createPassword();
+                        $minutes = 60*24*30;
+                        $endTime = \time() + 60*$minutes;
+                        $end = new \DateTime("@$endTime");
+                        $rc->withCookie(cookie('autologin', $key, $minutes));
+                        $this->loginStoreInDb($userId, $key, $end);
+                    }
                 }
             }
         }
@@ -299,8 +310,49 @@ class UserController extends Controller
         }
         return $rc;
     }
+    private function loginAutomatic(Request $request)
+    {
+        $rc = null;
+        if (($key = $request->cookie('autologin')) != null && $key !== '') {
+            $hash = Hash::make($key);
+            $now = (new \DateTime())->format('Y-m-d H:i');
+            $records = DB::select("SELECT id FROM users WHERE autologin='$hash' and endautologin > '$now'");
+            if ($records != null && count($records[0]) == 1) {
+                $id = $records[0]['email'];
+                $rc = $this->loginUser($request, $id);
+            }
+        }
+        return $rc;
+    }
+    private function loginUser(Request $request, int $userId)
+    {
+        $rc = null;
+        $user = User::find($userId);
+        if ($user != null) {
+            auth()->login($user);
+            $role = Role::find($user->role_id);
+            $request->session()->regenerate();
+            session(['userName' => $user->name]);
+            App::setLocale($user->localization);
+            // $data = $request->session()->all();
+            $rc = redirect('/menuitem-menu_main');
+        }
+        return $rc;
+    }
+    public function loginStoreInDb(int $userId, ?string $key, ?\DateTime $end){
+        $user = User::find($userId);
+        if ($key == null){
+            $user->update(['autologin' => null, 'endautologin' => (new \DateTime())->format('Y-m-d')]);
+        } else {
+            $user->update(['autologin' => Hash::make($key), 'endautologin' => $end]);
+        }
+
+    }
     public function logout(Request $request)
     {
+        if ( ($id = Auth::id()) != null){
+            $this->loginStoreInDb($id ?? 0, null, null);
+        }
         Auth::logout();
         return redirect('/user-login');
     }
@@ -386,7 +438,7 @@ class UserController extends Controller
             } else {
                 // Retrieve the validated input...
                 $validated = $validator->validated();
-                if ($fields['localization'] !== App::getLocale()){
+                if ($fields['localization'] !== App::getLocale()) {
                     App::setLocale($fields['localization']);
                 }
                 $validated['password'] = UserController::hash($email, $fields['password']);

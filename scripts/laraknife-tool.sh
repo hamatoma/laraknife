@@ -52,8 +52,9 @@ function AdaptModules(){
   if [ -n "$found" ]; then
     echo "= role_id already found"
   else
-    sed -i -e "s/\(fillable = .\)/\1#N#        'role_id',#N#/" \
+    sed -i -e "s/\(fillable = .\)/\1#N#        'role_id',/" \
       -e "s/.password' =>.*//" \
+      -e "s/\(hidden = .\)/\1#N#        'autologin',#N#        'endautologin',/" \
       -e 's/#N#/\n/g' \
       $fn
   fi

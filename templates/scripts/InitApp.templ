@@ -1,0 +1,69 @@
+#! /bin/bash
+
+function Wait(){
+    echo "OK? Break with Ctrl-C"
+    read answer
+}
+function SeedIt(){
+  for class in DatabaseSeeder ModuleSeeder SPropertySeeder RoleSeeder UserSeeder \
+      MenuitemSeeder FileSeeder NoteSeeder; do
+    sudo -u $DEV_USER ./artisan db:seed --class=$class
+  done
+}
+function CreateStorage(){
+  mkdir -p storage/logs
+  if [ ! -d storage/framework/cache ]; then
+    mkdir -p storage/framework/cache storage/framework/views storage/framework/sessions
+  fi
+}
+function LinkLaraknife(){
+  mkdir -p vendor/hamatoma
+  ln -sv ../../../laraknife vendor/hamatoma
+}
+function DoIt(){
+  # get DEV_USER
+  . .dev.user
+  apt update && apt install composer npm
+  CreateStorage
+  Wait
+  chown -R $DEV_USER:www-data bootstrap/cache
+  sudo -u $DEV_USER composer update
+  Wait
+  sudo -u $DEV_USER ./artisan migrate
+  Wait
+  SeedIt
+  Wait
+  egrep '"vite":' package.json && sudo -u $DEV_USER npm install vite
+  Wait
+  sudo -u $DEV_USER npm run build
+  cat <<'EOS' >ToDo
+= see .lrv.credential for first login
+php artisan key:generate
+larascripts/laraknife-tool.sh setup-nginx local #PROJECT~.test $(pwd) 8.2
+EOS
+  echo "=== contents of ToDo:"
+  cat ToDo
+}
+if [ ! -L vendor/hamatoma/laraknife ]; then
+  LinkLaraknife
+fi
+
+if [ ! -d ../laraknife ]; then
+  echo "+++ missing ../laraknife"
+  echo "cd .. ; git clone git@github.com:hamatoma/laraknife.git"
+elif [ ! -e .dev.user ]; then
+  echo "+++ call './Own all' before!"
+elif [ ! -f .env ]; then
+  echo "+++ missing .env"
+  echo "cp -a env.example .env"
+  echo "adapt: APP_URL DB_USERNAME..."
+  echo "run later: php artisan key:generate"
+elif [ ! -d /var/lib/mysql/lrv#PROJECT~ ]; then
+  echo "+++ missing db lrv#PROJECT~"
+  echo "sudo mysqladmin create lrv#PROJECT~"
+  echo "echo \"grant all on lrv#PROJECT~.* to '#PROJECT~'@'localhost' identified by 'topsecret';\" | sudo mysql mysql"
+elif [ "$(id -u)" != 0 ]; then
+  echo "+++ Be root"
+else
+  DoIt
+fi

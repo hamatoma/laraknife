@@ -1,5 +1,15 @@
 # Development phase
 
+## 0.6.9 2024.03.30 Autologin
+
+- checkbox.blade: corrections for mode "belowLabel"
+- new:const-text.blade
+- login.blade: new checkbox "Remain signed in"
+- User:
+  - new attributes: autologin, endautologin, rights, options
+  - storing a "auto login password" in a cookie
+- new: InitApp.templ: a script for cloning of the project
+
 ## 0.6.8 2024.03.26 ContextLaraKnife, DbHelper, ViewHelper
 
 - ContextLaraKnife:

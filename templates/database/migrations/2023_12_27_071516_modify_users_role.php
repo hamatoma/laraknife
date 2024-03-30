@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::table('users', function(Blueprint $table) {
             $table->foreignId('role_id')->nullable()->constrained("roles")->cascadeOnUpdate()->nullOnDelete();
             $table->string('localization', 8)->default('en_GB');
+            $table->string('autologin', 129)->nullable();
+            $table->timestamp('endautologin');
+            $table->string('options')->nullable();
+            $table->string('rights')->nullable();
        });
     }
 
