@@ -1,7 +1,9 @@
 <?php
 namespace App\Helpers;
 
+use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -19,6 +21,7 @@ class ContextLaraKnife
     public int $currentNo;
     public ?array $callbacks;
     public array $snippets;
+    public ?Role $role;
     public function __construct(Request $request, ?array $fields, ?Model $model = null)
     {
         $this->fields = $fields;
@@ -29,6 +32,7 @@ class ContextLaraKnife
         $this->callbackMethod = '';
         $this->snippets = [];
         $this->model2 = $this->model3 = null;
+        $this->role = null;
     }
     public function asDateTimeString(string $dbDateTime, bool $withSeconds = false): string{
         $parts = explode(' ', $dbDateTime);
@@ -53,7 +57,22 @@ class ContextLaraKnife
         }
         return $rc;
     }
-    
+    protected function findRole(){
+        if ($this->role == null){
+            $user = Auth::user();
+            $this->role = Role::find($user->role_id);
+        }
+    }
+    public function hasRole(int $priority): bool{
+        $this->findRole();
+        $rc = $this->role->priority <= $priority;
+        return $rc;
+    }
+    public function isAdmin(): bool{
+        $this->findRole();
+        $rc = $this->role->priority <= 19;
+        return $rc;
+    }
     public function text(string $text): string
     {
         return $text;

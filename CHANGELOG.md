@@ -1,5 +1,16 @@
 # Development phase
 
+## 0.6.11 2024.04.10 Builder import, autologin
+
+- Builder
+  - improved import
+- ContextLaraKnife:
+  - new: $role, hasRole(), isAdmin()
+- UserController
+  - correction of "autologin"
+- SProperty
+  - new idOfLocalization()
+
 ## 0.6.10 2024.03.30 InitApp.sh Own.sh
 
 - README.md: installation tips

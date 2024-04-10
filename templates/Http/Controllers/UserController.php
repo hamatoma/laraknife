@@ -316,7 +316,8 @@ class UserController extends Controller
         if (($key = $request->cookie('autologin')) != null && $key !== '') {
             $hash = Hash::make($key);
             $now = (new \DateTime())->format('Y-m-d H:i');
-            $records = DB::select("SELECT id FROM users WHERE autologin='$hash' and endautologin > '$now'");
+            $sql = "SELECT id FROM users WHERE autologin='$hash' and endautologin > '$now'";
+            $records = DB::select($sql);
             if ($records != null && count($records[0]) == 1) {
                 $id = $records[0]['email'];
                 $rc = $this->loginUser($request, $id);
@@ -340,13 +341,15 @@ class UserController extends Controller
         return $rc;
     }
     public function loginStoreInDb(int $userId, ?string $key, ?\DateTime $end){
-        $user = User::find($userId);
         if ($key == null){
-            $user->update(['autologin' => null, 'endautologin' => (new \DateTime())->format('Y-m-d')]);
+            $hash = '';
+            $end = new \DateTime();
         } else {
-            $user->update(['autologin' => Hash::make($key), 'endautologin' => $end]);
+            $hash = Hash::make($key);
         }
-
+        $end2 = $end->format('Y-m-d h:i');
+        $sql = "UPDATE users SET autologin='$hash', endautologin='$end2' WHERE id=$userId;";
+        DB::update($sql);
     }
     public function logout(Request $request)
     {

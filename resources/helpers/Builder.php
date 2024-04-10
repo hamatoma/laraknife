@@ -1,18 +1,18 @@
 <?php
 namespace App\Helpers;
 
-if (is_dir(__DIR__ . '/../vendor')) {
-    require __DIR__ . '/../vendor/autoload.php';
-} elseif (file_exists(__DIR__ . '/../../../../autoload.php')) {
-    require __DIR__ . '/../../../../autoload.php';
-    require_once 'StringHelper.php';
-    require_once 'OsHelper.php';
-} elseif (is_dir(__DIR__ . '/../../vendor')) {
-    require __DIR__ . '/../../vendor/autoload.php';
-    require_once 'StringHelper.php';
-    require_once 'OsHelper.php';
-} else {
-    require __DIR__ . '/../autoload.php';
+$dir = __DIR__;
+if ( ($ix = strpos($dir, 'vendor/')) !== false){
+    $dir = substr($dir, 0, $ix + 7);
+}
+while( ($ix = strrpos($dir, '/')) !== false){
+    $dir = substr($dir, 0, $ix);
+    if (is_dir("$dir/vendor")){
+        require "$dir/vendor/autoload.php";
+        require_once "StringHelper.php";
+        require_once "OsHelper.php";
+        break;
+    }
 }
 
 use App\Helpers\OsHelper;

@@ -33,18 +33,17 @@ class SProperty extends Model
         $rc = $record == null ? null : $record->id;
         return $rc;
     }
-      /**
-     * Returns a list of all scopes: values of the column "scope" in the table sproproperties.
+    /**
+     * Returns the id of a record with scope 'localization' and a given name.
+     * @param $localization the name of the record. If null the user's localization is taken
+     * @return NULL|int the id or NULL if not found
      */
-    public static function scopes(): array
-    {
-        $rc = [];
-        $records = DB::select('select distinct scope from sproperties order by scope');
-        if (count($records) > 0) {
-            foreach ($records as $record) {
-                array_push($rc, $record->scope);
-            }
+    public static function idOfLocalization(?string $localization = null): ?int{
+        if ($localization == null){
+            $localization = auth()->user()->localization;
         }
+        $sproperty = SProperty::where(['scope' => 'localization', 'shortname' => $localization])->first();
+        $rc = $sproperty == null ? null : $sproperty['id'];
         return $rc;
     }
     /**
@@ -83,6 +82,20 @@ class SProperty extends Model
                 }
                 array_push($rc, ['text' => $title, 'value' => $value, 
                     'active' => $value === $selected]);
+            }
+        }
+        return $rc;
+    }
+      /**
+     * Returns a list of all scopes: values of the column "scope" in the table sproproperties.
+     */
+    public static function scopes(): array
+    {
+        $rc = [];
+        $records = DB::select('select distinct scope from sproperties order by scope');
+        if (count($records) > 0) {
+            foreach ($records as $record) {
+                array_push($rc, $record->scope);
             }
         }
         return $rc;
