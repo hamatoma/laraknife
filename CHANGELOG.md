@@ -1,5 +1,10 @@
 # Development phase
 
+## 0.6.12 2024.04.10 autologin
+
+- UserController:
+  - autologin without hashing
+
 ## 0.6.11 2024.04.10 Builder import, autologin
 
 - Builder

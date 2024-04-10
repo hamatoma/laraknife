@@ -314,7 +314,7 @@ class UserController extends Controller
     {
         $rc = null;
         if (($key = $request->cookie('autologin')) != null && $key !== '') {
-            $hash = Hash::make($key);
+            $hash = $key;
             $now = (new \DateTime())->format('Y-m-d H:i');
             $sql = "SELECT id FROM users WHERE autologin='$hash' and endautologin > '$now'";
             $records = DB::select($sql);
@@ -345,7 +345,7 @@ class UserController extends Controller
             $hash = '';
             $end = new \DateTime();
         } else {
-            $hash = Hash::make($key);
+            $hash = $key;
         }
         $end2 = $end->format('Y-m-d h:i');
         $sql = "UPDATE users SET autologin='$hash', endautologin='$end2' WHERE id=$userId;";
