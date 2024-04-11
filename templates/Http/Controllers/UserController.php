@@ -318,8 +318,8 @@ class UserController extends Controller
             $now = (new \DateTime())->format('Y-m-d H:i');
             $sql = "SELECT id FROM users WHERE autologin='$hash' and endautologin > '$now'";
             $records = DB::select($sql);
-            if ($records != null && count($records[0]) == 1) {
-                $id = $records[0]['email'];
+            if ($records != null && count($records) == 1) {
+                $id = $records[0]->id;
                 $rc = $this->loginUser($request, $id);
             }
         }

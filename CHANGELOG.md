@@ -1,5 +1,10 @@
 # Development phase
 
+## 0.6.13 2024.04.11 autologin
+
+- UserController:
+  - autologin works now
+
 ## 0.6.12 2024.04.10 autologin
 
 - UserController:
