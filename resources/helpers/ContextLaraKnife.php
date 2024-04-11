@@ -22,6 +22,8 @@ class ContextLaraKnife
     public ?array $callbacks;
     public array $snippets;
     public ?Role $role;
+
+    public ?array $combobox;
     public function __construct(Request $request, ?array $fields, ?Model $model = null)
     {
         $this->fields = $fields;
@@ -33,6 +35,7 @@ class ContextLaraKnife
         $this->snippets = [];
         $this->model2 = $this->model3 = null;
         $this->role = null;
+        $this->combobox = null;
     }
     public function asDateTimeString(string $dbDateTime, bool $withSeconds = false): string{
         $parts = explode(' ', $dbDateTime);
@@ -56,6 +59,9 @@ class ContextLaraKnife
             $rc = $object->$method($data);
         }
         return $rc;
+    }
+    public function combobox(): ?array{
+        return $this->combobox;
     }
     protected function findRole(){
         if ($this->role == null){
@@ -102,6 +108,9 @@ class ContextLaraKnife
     {
         $this->callbacks ??= [];
         $this->callbacks[$name] = [$object, $method];
+    }
+    public function setCombobox(string $name, string $label, array &$options, string $attribute = '', string $class=''){
+        $this->combobox = ['name' => $name, 'label' => $label, 'opt' => $options, 'attr' => $attribute, 'class' => $class];
     }
     public function setSnippet(string $key, string $value)
     {

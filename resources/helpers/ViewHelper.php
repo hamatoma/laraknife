@@ -52,6 +52,35 @@ class ViewHelper
         }
     }
     /**
+     * Adds a SQL condition "a field compared to a const" for filtering records.
+     * @param array $conditions IN/OUT: the new condition is put to that list
+     * @param array $parameters IN/OUT: the named sql parameters (":value")
+     * @param string $column the column name
+     * @param mixed $value the value to compare
+     * @param string $operator the comparison operator: "=", ">", ">=", "<", "<=", "!="
+     */
+    public static function addConditionConstComparison(
+        array &$conditions,
+        array &$parameters,
+        string $column,
+        $value,
+        string $operator = "=",
+    ) {
+        if (strpos($column, '.') === false){
+            $column = "`$column`";
+        }
+        if ($value === null){
+            if ($operator === '='){
+                array_push($conditions, "$column IS NULL");
+            } else {
+                array_push($conditions, "$column IS NOT NULL");
+            }
+        } else {
+            $condition = gettype($value) === 'string' ? "$column$operator'$value'" : "$column$operator$value";
+            array_push($conditions, $condition);
+        }
+    }
+    /**
      * Adds a SQL condition "from until to" for filtering records.
      * @param array $conditions IN/OUT: the new condition is put to that list
      * @param array $parameters IN/OUT: the named sql parameters (":value")

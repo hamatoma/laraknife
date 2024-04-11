@@ -1,5 +1,16 @@
 # Development phase
 
+## 0.6.14 2024.04.11 sortable-table, ContextLaraKnife
+
+- sortable-table.blade:
+  - integrated combobox (depends on not null result of $context->combobox())
+- laraknife.css:
+  - new: .left
+- ContextLaraKnife:
+  - new: combobox(), setCombobox()
+- ViewHelper:
+  - new: addConditionConstComparison()
+
 ## 0.6.13 2024.04.11 autologin
 
 - UserController:

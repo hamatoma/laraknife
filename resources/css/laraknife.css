@@ -194,3 +194,6 @@ a:active.lkn-overview-cell {
 #img-logo {
     height: 32px;
 }
+.left {
+    margin-right: auto;
+}

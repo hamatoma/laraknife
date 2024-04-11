@@ -16,6 +16,24 @@
                 @endif
             @endforeach
         </ul>
+        @if($context->combobox() != null)
+        @php 
+        $name = $context->combobox()['name'];
+        $attribute = $context->combobox()['attr'];
+        $class = $context->combobox()['class'];
+        $options = $context->combobox()['opt'];
+        @endphp
+        <select class="lkn-input left {{$class}}" id="fld_{{$name}}" name="{{$name}}" @if ($attribute === 'readonly') disabled @ else {{$attribute}} @endif>
+            @foreach($options as $option)
+            @php 
+            $v = $option['value'];
+            $a = $option['active'] ? ' selected' : '';
+            $t = $option['text'];
+            @endphp
+            <option value="{{$v}}"{{$a}}>{{$t}}</option>
+            @endforeach
+        </select>
+        @endif
         <div class="lkn-left-pagination-block">
             {{ __('Filtered') }}: {{ $pagination->filteredCount }} {{ __('from') }} {{ $pagination->totalCount }}
             &nbsp; &nbsp;
