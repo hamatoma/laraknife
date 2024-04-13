@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.6.15 2024.04.13 Builder
+
+- Builder: new import variant
+
 ## 0.6.14 2024.04.11 sortable-table, ContextLaraKnife
 
 - sortable-table.blade:

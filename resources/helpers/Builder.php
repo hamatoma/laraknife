@@ -1,24 +1,36 @@
 <?php
 namespace App\Helpers;
-
+function logToFile(string $message){
+    file_put_contents('/tmp/builder.log', $message . "\n", FILE_APPEND);
+}
 $dir = __DIR__;
+logToFile("= Builder.import: $dir");
 if ( ($ix = strpos($dir, 'vendor/')) !== false){
     $dir = substr($dir, 0, $ix + 7);
+    logToFile("changed: $dir");
 }
 while( ($ix = strrpos($dir, '/')) !== false){
     $dir = substr($dir, 0, $ix);
     if (is_dir("$dir/vendor")){
+        logToFile("found-1: $dir/vendor");
         require "$dir/vendor/autoload.php";
         require_once "StringHelper.php";
         require_once "OsHelper.php";
+        $dir = null;
         break;
     }
 }
-
+if ($dir != null && is_dir('/home/ws/php/gadeku/vendor')){
+    $dir = '/home/ws/php/gadeku';
+    logToFile("found-2: $dir/vendor");
+    require "$dir/vendor/autoload.php";
+    require_once "StringHelper.php";
+    require_once "OsHelper.php";
+}
 use App\Helpers\OsHelper;
 use App\Helpers\StringHelper;
 
-$VERSION = '2024.01.27';
+$VERSION = '2024.04.12';
 class Builder
 {
     protected array $lines = [];
