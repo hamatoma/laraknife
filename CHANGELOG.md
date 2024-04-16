@@ -1,5 +1,16 @@
 # Development phase
 
+## 0.6.16 2024.04.16 Builder, file-exchange
+- Builder
+  - new import variang
+- components:
+  - new exchange-record.blade, exchange.blade
+- FileHelper:
+  - buildFileStoragePath(): $date has no default
+  - new: replaceUploadedFile() storeFile()
+- FileController: replacement of the file
+  - new: exchange(), updateFile()
+
 ## 0.6.15 2024.04.13 Builder
 
 - Builder: new import variant

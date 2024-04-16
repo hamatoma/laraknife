@@ -93,6 +93,28 @@ class FileController extends Controller
         return $rc;
     }
     /**
+     * Show the form for exchanging a file.
+     */
+    public function exchange(File $file, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/file-index');
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'title' => $file->title,
+                    'description' => $file->description,
+                ];
+            }
+            $context = new ContextLaraKnife($request, null, $file);
+            $rc = view('file.exchange', [
+                'context' => $context,
+            ]);
+        }
+        return $rc;
+    }
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(File $file, Request $request)
@@ -111,12 +133,13 @@ class FileController extends Controller
         if ($request->btnSubmit === 'btnNew') {
             return redirect('/file-create');
         } else {
-            $sql = 'SELECT t0.*, t1.name as filegroup_scope, t2.name as user, t3.name as visibility '
-                . ' FROM files t0'
-                . ' LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope'
-                . ' LEFT JOIN sproperties t2 ON t2.id=t0.user_id'
-                . ' LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope'
-            ;
+            $sql = "
+SELECT t0.*, t1.name as filegroup_scope, t2.name as user, t3.name as visibility 
+FROM files t0
+LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope
+LEFT JOIN users t2 ON t2.id=t0.user_id
+LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
+";
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
@@ -183,6 +206,9 @@ class FileController extends Controller
         Route::put('/file-store', [FileController::class, 'store'])->middleware('auth');
         Route::post('/file-edit/{file}', [FileController::class, 'edit'])->middleware('auth');
         Route::get('/file-edit/{file}', [FileController::class, 'edit'])->middleware('auth');
+        Route::get('/file-exchange/{file}', [FileController::class, 'exchange'])->middleware('auth');
+        Route::post('/file-exchange/{file}', [FileController::class, 'exchange'])->middleware('auth');
+        Route::put('/file-updatefile/{file}', [FileController::class, 'updateFile'])->middleware('auth');
         Route::post('/file-update/{file}', [FileController::class, 'update'])->middleware('auth');
         Route::get('/file-show/{file}/delete', [FileController::class, 'show'])->middleware('auth');
         Route::delete('/file-show/{file}/delete', [FileController::class, 'destroy'])->middleware('auth');
@@ -242,7 +268,6 @@ class FileController extends Controller
                 $name .= FileHelper::extensionOf($file->getClientOriginalName());
             }
             $filename = session('userName') . '_' . strval(time()) . '!' . $name;
-            $relativePath = FileHelper::buildFileStoragePath();
             ViewHelper::addFieldIfMissing($fields, 'module_id', null);
             ViewHelper::addFieldIfMissing($fields, 'reference_id', null);
             $file2 = new File([
@@ -256,11 +281,11 @@ class FileController extends Controller
                 'module_id' => $fields['module_id'],
                 'reference_id' => $fields['reference_id'],
             ]);
-            $filePath = $request->file('file')->storeAs("$relativePath", $filename, 'public');
+            $filePath = FileHelper::storeFile($request, 'file', $filename);
             $file2->save();
             $id = $file2->id;
             $filename2 = strval($id) . '_' . $name;
-            FileHelper::renameUploadedFile($filename, $filename2);
+            FileHelper::renameUploadedFile($filename, $filename2, $file2->created_at);
             $file2->update(['filename' => $filename2]);
             $rc = true;
         }
@@ -286,6 +311,19 @@ class FileController extends Controller
         if ($rc == null) {
             $rc = redirect('/file-index');
         }
+        return $rc;
+    }
+    public function updateFile(int $fileid, Request $request)
+    {
+        $rc = null;
+        $file = File::find($fileid);
+        $fieldname = 'file';
+        $upload = $request->file($fieldname);
+        if ($upload != null) {
+            FileHelper::replaceUploadedFile($request, $fieldname, $file->filename, $file->created_at);
+            $file->update(['size' => $upload->getSize() / 1E6]);
+        }
+        $rc = redirect('/file-index');
         return $rc;
     }
 }
