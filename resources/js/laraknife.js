@@ -165,6 +165,8 @@ var ready = (callback) => {
         document.addEventListener("DOMContentLoaded", callback);
     }
 }
+var tooltipTriggerList;
+var tooltipList;
 ready(() => {
     /* Do things after DOM has fully loaded */
     window.globalSorter = new TableSorter();
@@ -172,4 +174,6 @@ ready(() => {
     setAutoUpdate();
     setPaginationClick();
     setNumberedButtonClick();
-}); 
+    tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    }); 

@@ -1,5 +1,19 @@
 # Development phase
 
+## 0.6.17 2024.04.20 Audio control, FileHelper, File, tooltips
+
+- components:
+  - new: audio.blade: audio file control
+  - new: file-protected.blade a field to upload a file that cannot be changed
+  - new noform-text: for articles (alice blue border)
+- FileHelper:
+  - new: textToFilename()
+- laraknife.js:
+  - initializing tooltips
+- File:
+  - new: storeFile()
+  - new: relativeFileLink()
+
 ## 0.6.16 2024.04.16 Builder, file-exchange
 - Builder
   - new import variang

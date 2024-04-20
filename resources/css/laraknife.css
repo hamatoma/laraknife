@@ -26,6 +26,7 @@ button {
     vertical-align: bottom;
 }
 
+.lkn-noform-frame,
 .lkn-standard-panel,
 .lkn-edit-panel,
 .lkn-create-panel,
@@ -34,7 +35,11 @@ button {
 .lkn-nav-tab-panel {
     background-color: aliceblue;
 }
-
+.lkn-noform-text p {
+    margin-bottom: 0.25em;
+}
+.lkn-noform-frame,
+.lkn-noform-text,
 .lkn-noform-panel,
 .lkn-standard-panel,
 .lkn-panel,
@@ -46,6 +51,9 @@ div.row  .lkn-nav-tab-panel {
     padding: 2rem 3rem;
     border-radius: 0.5rem;
     box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
+}
+fieldset.lkn-noform-text {
+    background-color: white;
 }
 #main-content li.lkn-nav-tab-panel{
     border-top-left-radius: 0;
@@ -195,5 +203,9 @@ a:active.lkn-overview-cell {
     height: 32px;
 }
 .left {
+    margin-right: auto;
+}
+.lkn-center {
+    margin-left: auto;
     margin-right: auto;
 }

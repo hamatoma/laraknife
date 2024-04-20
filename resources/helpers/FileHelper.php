@@ -1,25 +1,29 @@
 <?php
 namespace App\Helpers;
+
 use Illuminate\Http\Request;
 
-class FileHelper{
+class FileHelper
+{
     /**
      * Builds the download link of an uploaded file.
      * @param string $filename the filename without path
      * @param string $date the date/time of the upload
      * @return string the relative link, e.g. "/upload/2024/02/113_london.jpg'
      */
-    public static function buildFileLink(string $filename, string $date): string{
+    public static function buildFileLink(string $filename, string $date): string
+    {
         $rc = '/upload/' . FileHelper::buildFileStoragePath($date) . '/' . $filename;
         return $rc;
     }
-   /**
+    /**
      * Builds the relative path for the upload file storage.
      * @param string|\DateTime $date the creation date of the file: defines the path name
      */
-    public static function buildFileStoragePath($date): string{
+    public static function buildFileStoragePath($date): string
+    {
         $date ??= new \DateTime();
-        if ($date instanceof \DateTime){
+        if ($date instanceof \DateTime) {
             $rc = $date->format('Y') . '/' . $date->format('m');
         } else {
             $parts = explode('-', $date, 3);
@@ -32,7 +36,8 @@ class FileHelper{
      * @param string $filename the name to rename (without path)
      * @param string|\DateTime $date the creation date of the file: defines the path name
      */
-    public static function deleteUploadedFile(string $filename, $date){
+    public static function deleteUploadedFile(string $filename, $date)
+    {
         $name = storage_path() . '/app/public/' . FileHelper::buildFileStoragePath($date) . '/' . $filename;
         \unlink($name);
     }
@@ -41,7 +46,8 @@ class FileHelper{
      * @param string $filename the filename to inspect
      * @return string '': no '.' found. Otherwise: the extension, e.g. '.txt'
      */
-    public static function extensionOf(string $filename): string{
+    public static function extensionOf(string $filename): string
+    {
         $rc = ($ixDot = strrpos($filename, '.')) === false ? '' : substr($filename, $ixDot);
         return $rc;
     }
@@ -52,9 +58,10 @@ class FileHelper{
      * @param string $newName the target name
      * @param string|\DateTime $date the creation date of the file: defines the path name
      */
-    public static function renameUploadedFile(string $oldName, string $newName, $date){
+    public static function renameUploadedFile(string $oldName, string $newName, $date)
+    {
         $storage = storage_path() . '/app/public/' . FileHelper::buildFileStoragePath($date) . '/';
-        $old = $storage  . $oldName;
+        $old = $storage . $oldName;
         $new = $storage . $newName;
         \rename($old, $new);
     }
@@ -65,14 +72,33 @@ class FileHelper{
      * @param string $filename the name of the file to replace
      * @param string|\DateTime $date the creation date of the file: defines the path name
      */
-    public static function replaceUploadedFile(Request $request, string $fieldname, string $filename, $date){
+    public static function replaceUploadedFile(Request $request, string $fieldname, string $filename, $date)
+    {
         $relativePath = FileHelper::buildFileStoragePath($date);
         $request->file($fieldname)->storeAs($relativePath, $filename, 'public');
     }
 
-    public static function storeFile(Request $request, string $fieldname, string $filename): string{
+    public static function storeFile(Request $request, string $fieldname, string $filename): string
+    {
         $relativePath = FileHelper::buildFileStoragePath(null);
         $filePath = $request->file($fieldname)->storeAs($relativePath, $filename, 'public');
         return $filePath;
+    }
+    /**
+     * Converts any text to a filename: remove/convert wrong characters.
+     * @param string $text the text to inspect
+     * @param int $maxLength the maximum lenght of the result
+     * @return string a valid filename
+     */
+    public static function textToFilename(string $text, int $maxLength = 32)
+    {
+        $rc = preg_replace(['/\s+/', '/[\W=+-]+/', '/__+/'], ['_', '', '_'], $text);
+        if (strlen($rc) > $maxLength) {
+            $rc = substr($rc, 0, $maxLength);
+        }
+        if (empty($rc)) {
+            $rc = '_';
+        }
+        return $rc;
     }
 }
