@@ -1,5 +1,10 @@
 # Development phase
 
+## 0.6.18 2024.04.20 Fix note documents
+
+- NoteController:
+  - indexDocuments(): fix: displays only files assigned to the note
+
 ## 0.6.17 2024.04.20 Audio control, FileHelper, File, tooltips
 
 - components:

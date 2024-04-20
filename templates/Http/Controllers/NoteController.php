@@ -177,13 +177,14 @@ class NoteController extends Controller
         if ($request->btnSubmit === 'btnNew') {
             return redirect('/note-create');
         } else {
-            $sql = 'SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category_scope, t2.name as notestatus_scope, t3.name as user_id '
-                . ' FROM notes t0'
-                . ' LEFT JOIN sproperties t1 ON t1.id=t0.category_scope'
-                . ' LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope'
-                . ' LEFT JOIN sproperties t3 ON t3.id=t0.user_id'
-                . ' LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope'
-            ;
+            $sql = "
+SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category_scope, t2.name as notestatus_scope, t3.name as user_id 
+FROM notes t0
+LEFT JOIN sproperties t1 ON t1.id=t0.category_scope
+LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope
+LEFT JOIN sproperties t3 ON t3.id=t0.user_id
+LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
+";
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
@@ -233,12 +234,14 @@ class NoteController extends Controller
         if ($request->btnSubmit === 'btnNew') {
             return redirect("/note-create_document/$note->id");
         } else {
-            $sql = 'SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id '
-                . ' FROM files t0'
-                . ' LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope'
-                . ' LEFT JOIN sproperties t2 ON t2.id=t0.user_id'
-            ;
+            $sql = "
+SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id 
+FROM files t0
+LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope
+LEFT JOIN sproperties t2 ON t2.id=t0.user_id
+";
             $parameters = [];
+            $conditions = [];
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
@@ -249,12 +252,11 @@ class NoteController extends Controller
                     '_sortParams' => 'id:desc',
                 ];
             } else {
-                $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'module_id', $moduleId);
-                ViewHelper::addConditionComparism($conditions, $parameters, 'reference_id', $note->id);
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            ViewHelper::addConditionConstComparison($conditions, $parameters, 'module_id', $moduleId);
+            ViewHelper::addConditionConstComparison($conditions, $parameters, 'reference_id', $note->id);
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
