@@ -47,6 +47,22 @@ class SProperty extends Model
         return $rc;
     }
     /**
+     * Inserts a sproperties record if there is no record with the given id.
+     * @param int $id
+     * @param string $scope
+     * @param string $name
+     * @param int $order
+     * @param string $shortname
+     */
+     public static function insertIfNotExists(int $id, string $scope, string $name, int $order, string $shortname){
+      if (SProperty::find($id) == null){
+          DB::table('sproperties')->insert([
+              'id' => $id, 'scope' => $scope, 'name' => $name, 'order' => $order, 'shortname' => $shortname
+          ]);
+      }
+     }
+  
+    /**
      * Builds the HTML selection options as string from all entries by a given scope.
      * @param string $scope defines the database records to use
      * @param string $selected the current field value (defines the selected entry)

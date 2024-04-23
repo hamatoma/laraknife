@@ -10,8 +10,16 @@
         <x-laraknife.forms.combobox position="alone" name="#field#" label="#Base#" :options="$options#Base#" width2="4"/>
 ##ON typeLike([Tt]ext$)##
         <x-laraknife.forms.text position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON nameLike(email)##
+        <x-laraknife.forms.string type="email" position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##ON typeLike([sS]tring$)##
         <x-laraknife.forms.string position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(number$)##
+        <x-laraknife.forms.string type="number" position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(datetime|timestamp)##
+        <x-laraknife.forms.string type="datetime-local" position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(date$)##
+        <x-laraknife.forms.string type="date" position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##ON typeLike(bool$)##
         <x-laraknife.forms.checkbox position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##ELSE##

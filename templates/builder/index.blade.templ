@@ -10,6 +10,12 @@
       <x-laraknife.forms.combobox position="alone" name="#base#" label="#Base#" :options="$options#Base#" class="lkn-autoupdate" width2="4" />
 ##ON typeLike(bool$)##
       <x-laraknife.forms.checkbox position="alone" name="#base#" label="#Base#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(number$)##
+        <x-laraknife.forms.string type="number" position="alone" name="#base#" label="#Base#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(datetime|timestamp)##
+        <x-laraknife.forms.string type="datetime-local" position="alone" name="#base#" label="#Base#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
+##ON typeLike(date$)##
+        <x-laraknife.forms.string type="date" position="alone" name="#base#" label="#Base#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##ELSE##
       <x-laraknife.forms.#type# position="alone" name="#field#" label="#Field#" value="{{ $context->valueOf('#field#') }}" width2="4" #attribute#/>
 ##END.CASE##

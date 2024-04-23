@@ -12,7 +12,7 @@
                 width2="4" />
             <x-laraknife.forms.string position="alone" name="title" label="Title" value="{{ $context->valueOf('title') }}"
                 width2="10" />
-            <x-laraknife.forms.file position="first" name="file" label="File" width2="4" rows="4" />
+            <x-laraknife.forms.file position="first" name="file" label="File" width2="4" />
             <x-laraknife.forms.string position="last" name="filename" label="Filename"
                 value="{{ $context->valueOf('filename') }}" width2="4"
                 placeholder="{{ __('Overwrites the upload name (if not empty)') }}" />

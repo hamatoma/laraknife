@@ -1,5 +1,19 @@
 # Development phase
 
+## 0.7.0 2024.04.23 MediaWiki
+
+- new: MediaWiki
+- components:
+  - combobox.blade: fix: wrong blade @else
+  - file.blade: fix: wrong value attribute 
+  - textarea.blade: fix: {!! !!} instead of {{ }}
+- Builder:
+  - Controller.templ: fix: $field settings in edit()
+  - Controller.templ: $sql statement as one string
+  - xxx.blade.templ: better proposals for integer/datetime... fields
+- Menuitem.php, Module.php, SProperty.php:
+  - new: insertIfNotExists()
+
 ## 0.6.18 2024.04.20 Fix note documents
 
 - NoteController:

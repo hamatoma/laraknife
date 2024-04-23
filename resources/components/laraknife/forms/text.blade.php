@@ -8,7 +8,7 @@
 </div>
 @endif
 <div class="col-md-{{ $width2 }}">
-     <textarea class="lkn-expand100" id="fld_{{$name}}" name="{{$name}}" rows="{{$rows}}" @if($placeholder !== '') placeholder="{{$placeholder}}" @endif {{ $attribute }}>{{$value}}</textarea>
+     <textarea class="lkn-expand100" id="fld_{{$name}}" name="{{$name}}" rows="{{$rows}}" @if($placeholder !== '') placeholder="{{$placeholder}}" @endif {{ $attribute }}>{!!$value!!}</textarea>
      <x-laraknife.forms.field-error name="{{$name}}" />
 </div>
 @if($position === 'alone' || $position === 'last')

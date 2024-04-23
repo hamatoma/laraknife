@@ -65,7 +65,7 @@ class #Module#Controller extends Controller
                 $fields = [
 ##CASE(fields)##
 ##ON nameLike(.)##
-                    '#field#' => ''#comma#
+                    '#field#' => $#module#->#field##comma#
 ##END.CASE##
                     ];
             }
@@ -104,17 +104,18 @@ class #Module#Controller extends Controller
         if ($request->btnSubmit === 'btnNew') {
             return redirect('/#module#-create');
         } else {
-            $sql = 'SELECT t0.*#Comma#'
+            $sql = "
+SELECT t0.*#Comma#
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-                . 't#no#.name as #field##comma# '
+  t#no#.name as #field##comma#
 ##END.CASE##
-                . ' FROM #table# t0'
+FROM #table# t0
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-                . ' LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#'
+LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#
 ##END.CASE##
-                ;
+";
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {

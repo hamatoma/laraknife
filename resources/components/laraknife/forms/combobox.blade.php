@@ -7,7 +7,7 @@
 </div>
 @endif
 <div class="col-md-{{ $width2 }}">
-    <select class="lkn-input expand100 {{$class}}" id="fld_{{$name}}" name="{{$name}}" @if ($attribute === 'readonly') disabled @ else {{$attribute}} @endif>
+    <select class="lkn-input expand100 {{$class}}" id="fld_{{$name}}" name="{{$name}}" @if ($attribute === 'readonly') disabled @else {{$attribute}} @endif>
         @foreach($options as $option)
         @php 
         $v = $option['value'];

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\StringHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Hamatoma\Laraknife\ViewHelpers;
@@ -29,6 +30,24 @@ class Module extends Model
             $rc = $item->id;
         }
         return $rc;
+    }
+    /**
+     * Inserts a record of modules if it does not already exist.
+     * @param string $name
+     * @param string $tablename
+     */
+    public static function insertIfNotExists(string $name, string $tablename=null)
+    {
+        $name = StringHelper::toCapital($name);
+        if (self::where(['name' => $name])->first() == null) {
+            if ($tablename == null) {
+                $tablename = strtolower($name) . 's';
+            }
+            DB::table('modules')->insert([
+                'name' => $name,
+                'tablename' => $tablename,
+            ]);
+        }
     }
     public static function moduleOfTable(string $table): ?string {
         $rc = null;
