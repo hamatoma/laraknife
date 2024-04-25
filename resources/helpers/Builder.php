@@ -508,8 +508,8 @@ function usage(string $message)
     echo "php builder.php update:languages DIR_SOURCE FILE_TARGET\n";
     echo "php builder.php version\n";
     echo "Examples:\n";
-    echo "php builder.php create:module database/migrations/*articles*.php \\\n";
-    echo "  --module=article --templates=builder/templates \\\n";
+    echo "php builder.php create:module database/migrations/*pages*.php \\\n";
+    echo "  --module=page --templates=builder/templates \\\n";
     echo "  --views=resources/views --controllers=app/Http/Controllers\n";
     echo "php builder.php version\n";
     echo "+++ $message\n";

@@ -38,6 +38,19 @@ class StringHelper{
         }
         return $rc;
     }
+    /**
+     * Converts a string into a word usable as part of an URL.
+     * @param string $text the text to convert
+     * @param NULL|int $maxLength the result is never longer than that
+     * @return a word usable as part of the string
+     */
+    public static function textToUrl(string $text, ?int $maxLength = null): string{
+        $rc = preg_replace(['/[^\w.+-]+/', '/__+/'], ['_', '_'], $text);
+        if ($maxLength != null && strlen($rc) > $maxLength){
+            $rc = substr($rc, $maxLength);
+        }
+        return strtolower($rc);
+    }
     public static function randomChar(string $charSet){
         $rc = $charSet[rand(0, strlen($charSet) - 1)];
         return $rc;

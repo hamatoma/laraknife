@@ -1,5 +1,11 @@
 # Development phase
 
+## 0.7.1 Module Page
+
+- MediaWiki: new engine. Supports more wiki elements.
+- StringHelper: new textToUrl():
+- new: module Page
+
 ## 0.7.0 2024.04.23 MediaWiki
 
 - new: MediaWiki

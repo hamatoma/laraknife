@@ -26,10 +26,14 @@ class SProperty extends Model
     }
     /**
      * Returns the id of the record with a given $scope and $name.
+     * @param $scope the scope to search for
+     * @param $name the field value (of the column $column) to search for
+     * @param $column the column name of the field value to search for
+     * @return NULL|id the primary key
      */
-    public static function byScopeAndName(string $scope, string $name): ?int
+    public static function byScopeAndName(string $scope, string $name, string $column='name'): ?int
     {
-        $record = SProperty::where('scope', $scope)->where('name', $name)->first();
+        $record = SProperty::where('scope', $scope)->where($column, $name)->first();
         $rc = $record == null ? null : $record->id;
         return $rc;
     }
