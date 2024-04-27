@@ -26,6 +26,8 @@ Usage: laraknife-tool.sh TASK
     Creates a homepage
   move-to-laraknife <module>
     Moves all files of the given module to the laraknife directory.
+  copy-from-laraknife <module>
+    Removes the symlinks and copy the files of the given module to the project.
   link-module <module>
     Include a module from laraknife into the project
   setup-nginx TARGET DOMAIN DOCUMENT_ROOT PHP_VERSION
@@ -44,6 +46,44 @@ function Test(){
       echo "module: $module full: $full"
     done
  
+}
+# === private
+# Removes a symbolic link and copy the referenced files at that place.
+# @param $file: a symbolic link
+function ReplaceLink(){
+  local file=$1
+  local dir=$(dirname $file)
+  local node=$(basename $file)
+  pushd $dir >/dev/null 2>&1
+  if [ ! -L $node ]; then
+    echo "+++ dir: $(pwd)"
+    echo "+++ not a smybolic link: $node"
+    ls -ld $node
+  else
+    local link=$(readlink $node)
+    rm -f $node
+    cp -av $link $node
+  fi
+  popd >/dev/null 2>&1
+}
+# === private
+# Removes a symbolic link and copy the referenced files at that place.
+# @param $file: a symbolic link
+function ReplaceLinkDir(){
+  local file=$1
+  local dir=$(dirname $file)
+  local node=$(basename $file)
+  pushd $dir >/dev/null 2>&1
+  if [ ! -L $node ]; then
+    echo "+++ dir: $(pwd)"
+    echo "+++ not a symbolic link: $node"
+    ls -ld $node
+  else
+    local link=$(readlink $node)
+    rm -f $node
+    cp -av $link $node
+  fi
+  popd >/dev/null 2>&1
 }
 # ===
 function AdaptModules(){
@@ -237,6 +277,28 @@ EOS
   done
 }
 # ===
+function CopyFromLaraknife(){
+  . project.env
+  local module="$1"
+  if [ -z "$module" ]; then
+    Usage "missing <module>"
+  elif [ ! -d resources/views/$module ]; then
+    Usage "unknown module: $module (missing resources/views/$module)"
+  elif [ ! -d vendor/hamatoma/laraknife/resources/views/$module ]; then
+    Usage "$module not in Laraknife"
+  else
+    local Module="$(echo ${module:0:1} | tr '[:lower:]' '[:upper:]')${module:1}"
+    ReplaceLinkDir resources/views/$module
+    ReplaceLink app/Http/Controllers/${Module}Controller.php
+    ReplaceLink app/Models/${Module}.php
+    for file in vendor/hamatoma/laraknife/templates/database/migrations/*$module*.php; do
+      test -e $file && ReplaceLink $file
+    done
+    file=database/seeders/${Module}Seeder.php
+    test -e $file && ReplaceLink $file
+  fi
+}
+# ===
 function CreateLayout(){
   . project.env
   mkdir -p resources/views/layouts
@@ -390,6 +452,9 @@ init-i18n)
   ;;
 link-module)
   LinkModule "$2"
+  ;;
+copy-from-laraknife)
+  CopyFromLaraknife "$2"
   ;;
 move-to-laraknife)
   MoveToLaraknife "$2"

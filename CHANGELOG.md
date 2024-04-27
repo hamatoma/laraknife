@@ -1,5 +1,11 @@
 # Development phase
 
+## 0.7.2
+
+- MediaWiki: extracting sub class MediaWikiBase for simple class deriving
+- Page edit: fix: no loose of attributes, improvement on preview
+- laraknife-tool.sh: new: sub mode "copy-from-laraknife"
+
 ## 0.7.1 Module Page
 
 - MediaWiki: new engine. Supports more wiki elements.

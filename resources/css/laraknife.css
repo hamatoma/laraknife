@@ -215,3 +215,16 @@ a:active.lkn-overview-cell {
     border-radius: 0.25rem;
     padding: 1rem;
 }
+.lkn-text-info {
+    color: blue;
+}
+.lkn-text-error {
+    color: red;
+    background-color: yellow;
+}
+.lkn-text-warning {
+    color: green;
+}
+.lkn-text-important {
+    background-color: yellow;
+}

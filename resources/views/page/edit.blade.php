@@ -12,8 +12,8 @@
                 value="{{ $context->valueOf('columns') }}" width2="4" />
             <x-laraknife.forms.string type="number" position="last" name="order" label="Order"
                 value="{{ $context->valueOf('order') }}" width2="4" />
-            <x-laraknife.forms.combobox position="alone" name="language_scope" label="Language" :options="$optionsLanguage" width2="4"
-                attribute="readonly" />
+            <x-laraknife.forms.combobox position="alone" name="language_scope" label="Language" :options="$optionsLanguage"
+                width2="4" attribute="readonly" />
             <x-laraknife.forms.string position="first" name="title" label="Title"
                 value="{{ $context->valueOf('title') }}" width2="4" />
             <x-laraknife.forms.string position="last" name="name" label="Name (URL)"
@@ -25,10 +25,12 @@
             <x-laraknife.forms.file-protected position="first" name="file" fieldId="{{ $context->model->audio_id }}"
                 label="Audio" width2="4" />
             <x-laraknife.buttons.button position="last" name="btnPreview" label="Preview" />
-            @if (!empty($context->valueOf('preview')))
+        </x-laraknife.panels.edit>
+        @if (!empty($context->valueOf('preview')))
+            <x-laraknife.panels.noform title="{{ __('Preview') }}">
                 <div class="lkn-text">{!! $context->valueOf('preview') !!}
                 </div>
-            @endif
-        </x-laraknife.panels.edit>
+            </x-laraknife.panels.noform>
+        @endif
     </form>
 @endsection

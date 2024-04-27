@@ -29,7 +29,7 @@ class PageController extends Controller
         switch ($type) {
             case 1122: // mediawiki
                 $wiki = new MediaWiki();
-                $text = $wiki->ToHtml($contents);
+                $text = $wiki->toHtml($contents);
                 break;
             case 1223: // html
                 $text = $contents;
@@ -84,8 +84,6 @@ class PageController extends Controller
     {
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/page-index');
-        } elseif ($request->btnSubmit === 'btnStore') {
-            $rc = $this->update($page, $request);
         } else {
             $fields = $request->all();
             if (count($fields) === 0) {
@@ -106,10 +104,15 @@ class PageController extends Controller
                 $fields['markup_scope'] = $page->markup_scope;
                 $fields['language_scope'] = $page->language_scope;
             }
+            $fields['contents'] = MediaWiki::expandStarItems($fields['contents']);
+            if ($request->btnSubmit === 'btnStore') {
+                $this->update($page, $request, $fields);
+            }
             $optionsPagetype = SProperty::optionsByScope('pagetype', $page->pagetype_scope, '');
             $optionsMarkup = SProperty::optionsByScope('markup', $page->markup_scope, '');
             $optionsLanguage = SProperty::optionsByScope('localization', $page->language_scope, '');
-            $fields = $request->btnSubmit !== 'btnPreview' ? null : ['preview' => $this->asPreview($page)];
+            $preview = $this->asPreview($page);
+            $fields = $request->btnSubmit !== 'btnPreview' ? null : ['preview' => $preview];
             $context = new ContextLaraKnife($request, $fields, $page);
             $rc = view('page.edit', [
                 'context' => $context,
@@ -219,7 +222,6 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
         Route::put('/page-store', [PageController::class, 'store'])->middleware('auth');
         Route::post('/page-edit/{page}', [PageController::class, 'edit'])->middleware('auth');
         Route::get('/page-edit/{page}', [PageController::class, 'edit'])->middleware('auth');
-        Route::post('/page-update/{page}', [PageController::class, 'update'])->middleware('auth');
         Route::get('/page-show/{page}/delete', [PageController::class, 'show'])->middleware('auth');
         Route::delete('/page-show/{page}/delete', [PageController::class, 'destroy'])->middleware('auth');
         Route::get('/page-showpretty/{page}', [PageController::class, 'showPretty'])->middleware('auth');
@@ -308,6 +310,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            ViewHelper::addFieldIfMissing($fields, 'order', '0');
             ViewHelper::addFieldIfMissing($fields, 'owner_id', auth()->id());
             $fields['name'] = StringHelper::textToUrl(empty($fields['name']) ? $fields['title'] : $fields['name']);
             $lang = auth()->user()->localization;
@@ -321,7 +324,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['owner_id'] = $fields['owner_id'];
-                $validated['contents'] = TextProcessor::expandStarItems(strip_tags($validated['contents']));
+                $validated['contents'] = MediaWiki::expandStarItems($validated['contents']);
                 Page::create($validated);
             }
         }
@@ -333,29 +336,21 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
     /**
      * Update the specified resource in storage.
      */
-    public function update(Page $page, Request $request)
+    public function update(Page $page, Request $request, array &$fields)
     {
-        $rc = null;
-        if ($request->btnSubmit === 'btnStore') {
-            $fields = $request->all();
-            $validator = Validator::make($fields, $this->rules(false));
-            if ($validator->fails()) {
-                $rc = back()->withErrors($validator)->withInput();
-            } else {
-                $validated = $validator->validated();
-                $validated['info'] = strip_tags($validated['info']);
-                if (empty($page->audio_id) && $request->file('file') != null) {
-                    $filename = FileHelper::textToFilename($page->title);
-                    $moduleId = Module::idOfModule('Page');
-                    $fileId = File::storeFile($request, $page->title, 1103, 1091, 'audio file of page', $filename, $moduleId, $page->id);
-                    $validated['audio_id'] = $fileId;
-                }
-                $page->update($validated);
+        $validator = Validator::make($fields, $this->rules(false));
+        if ($validator->fails()) {
+            $rc = back()->withErrors($validator)->withInput();
+        } else {
+            $validated = $validator->validated();
+            $validated['info'] = strip_tags($validated['info']);
+            if (empty($page->audio_id) && $request->file('file') != null) {
+                $filename = FileHelper::textToFilename($page->title);
+                $moduleId = Module::idOfModule('Page');
+                $fileId = File::storeFile($request, $page->title, 1103, 1091, 'audio file of page', $filename, $moduleId, $page->id);
+                $validated['audio_id'] = $fileId;
             }
+            $page->update($validated);
         }
-        if ($rc == null) {
-            $rc = redirect("/page-edit/$page->id");
-        }
-        return $rc;
     }
 }
