@@ -1,6 +1,12 @@
 # Development phase
 
-## 0.7.2
+## 0.7.3 laraknife.css WikiMediaBase
+
+- laraknife.css: new: lrk-indent
+- WikimediaBase: CSS class indent renamed to lrk-indent
+
+
+## 0.7.2 WikiMedia Page laraknife-tool
 
 - MediaWiki: extracting sub class MediaWikiBase for simple class deriving
 - Page edit: fix: no loose of attributes, improvement on preview

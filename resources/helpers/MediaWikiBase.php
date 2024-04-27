@@ -401,7 +401,7 @@ class LayoutStatus
             $this->htmlBody .= "\n";
         } else {
             while ($this->indentLevel < $currentLevel) {
-                $this->htmlBody .= '<div class="indent">';
+                $this->htmlBody .= '<div class="lrk-indent">';
                 ++$this->indentLevel;
             }
             while ($this->indentLevel > $currentLevel) {

@@ -226,5 +226,11 @@ a:active.lkn-overview-cell {
     color: green;
 }
 .lkn-text-important {
+    color: red;
+}
+.lkn-text-tagged {
     background-color: yellow;
+}
+.lrk-indent {
+    margin-left: 2rem;
 }
