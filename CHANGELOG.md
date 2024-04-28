@@ -1,5 +1,12 @@
 # Development phase
 
+## 0.7.4 layout, WikiMediaBase
+- panels/noform-text: no fieldset, noframe
+- new: panels/text-area.blade
+- MediaWiki:
+  -  fix: reset of htmlBody on start
+  -  fix: name of the CSS class for indents
+
 ## 0.7.3 laraknife.css WikiMediaBase
 
 - laraknife.css: new: lrk-indent

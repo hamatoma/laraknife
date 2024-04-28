@@ -87,6 +87,17 @@ ul.nav-tab-panel + .lkn-fieldset {
 .lkn-form-table {
     background-color: aliceblue;
 }
+.lkn-text-frame {
+    margin: 0;
+    padding: 0;
+    background-color: aliceblue;
+    border-radius: 0.25rem;
+}
+.lkn-header-frame {
+    margin: 1em;
+    padding: 0;
+    background-color: aliceblue;
+}
 
 .lkn-behind-filter {
     margin-top: 0.5rem;
@@ -214,6 +225,7 @@ a:active.lkn-overview-cell {
     border: 0.075rem darkgray solid;
     border-radius: 0.25rem;
     padding: 1rem;
+    margin: 0.5rem 0.5rem;
 }
 .lkn-text-info {
     color: blue;
@@ -231,6 +243,15 @@ a:active.lkn-overview-cell {
 .lkn-text-tagged {
     background-color: yellow;
 }
-.lrk-indent {
+.lkn-indent {
     margin-left: 2rem;
+}
+.lkn-text-frame-background {
+    background-color: aliceblue;
+}
+.lkn-header-frame h1, .text-header-frame h2, .text-header-frame h3 {
+    color: blue;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }

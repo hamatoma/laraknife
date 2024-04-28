@@ -108,6 +108,7 @@ class MediaWikiBase extends LayoutStatus
     }
     function toHtml(string $wiki_text): string
     {
+        $this->htmlBody = '';
         $lines = explode("\n", $wiki_text);
         foreach ($lines as $ii => $line) {
             $linePrefix = '';
@@ -401,7 +402,7 @@ class LayoutStatus
             $this->htmlBody .= "\n";
         } else {
             while ($this->indentLevel < $currentLevel) {
-                $this->htmlBody .= '<div class="lrk-indent">';
+                $this->htmlBody .= '<div class="lkn-indent">';
                 ++$this->indentLevel;
             }
             while ($this->indentLevel > $currentLevel) {
