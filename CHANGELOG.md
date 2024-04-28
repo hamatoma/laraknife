@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.7.5 layout
+- new: forms/audio-norow
+- File: fix: storeFile(): module_id and reference_id are mandantory.
+
 ## 0.7.4 layout, WikiMediaBase
 - panels/noform-text: no fieldset, noframe
 - new: panels/text-area.blade

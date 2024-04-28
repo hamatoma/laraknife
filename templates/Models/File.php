@@ -44,8 +44,8 @@ class File extends Model
         int $visibility = 1091 /* public */ ,
         ?string $description = null,
         ?string $filename = null,
-        ?int $moduleId = null,
-        ?int $referenceId = null,
+        ?int $moduleId,
+        ?int $referenceId,
         string $fieldFile = 'file'
     ): ?int {
         $id = null;
