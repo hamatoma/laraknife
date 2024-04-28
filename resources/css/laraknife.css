@@ -244,7 +244,10 @@ a:active.lkn-overview-cell {
     background-color: yellow;
 }
 .lkn-indent {
-    margin-left: 2rem;
+    margin-left: 0;
+}
+.lkn-indent .lkn-indent {
+    margin-left: 1rem;
 }
 .lkn-text-frame-background {
     background-color: aliceblue;

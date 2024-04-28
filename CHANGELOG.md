@@ -1,5 +1,8 @@
 # Development phase
 
+## 0.7.5 indented blocks
+- MediaWiki: indent block works now
+
 ## 0.7.5 layout
 - new: forms/audio-norow
 - File: fix: storeFile(): module_id and reference_id are mandantory.
