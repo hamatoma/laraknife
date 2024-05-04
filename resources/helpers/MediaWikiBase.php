@@ -209,7 +209,7 @@ class MediaWikiBase extends LayoutStatus
     }
     function writeInternalLink(string $link, string $text)
     {
-        if (strncmp($link, 'uploads/media/', 14) == 0 && preg_match('/[.](jpg|png|gif|svg])$/i', $link)) {
+        if (str_starts_with($link, 'upload') && preg_match('/[.](jpg|png|gif|svg])$/i', $link)) {
             $link = preg_replace('&[\\/]\.\.[\/]&', '', $link);
             if (!$text) {
                 preg_match('%([^/]+)\.[^.]+$%', $link, $matcher);
@@ -261,8 +261,9 @@ class MediaWikiBase extends LayoutStatus
             $count = count($match);
             if ($count > 3 && $match[3] !== '') {
                 $this->writeExternLink($match[3], substr($match[5], 1));
-            } elseif ($count > 6 && $match[6] !== '') {
-                $this->writeInternalLink($match[6], substr($match[7], 1));
+            } elseif ($count > 7 && $match[6] !== '') {
+                $text = $count >= 8 ? substr($match[7], 1) : basename($match[6]);
+                $this->writeInternalLink($match[6], $text);
             } elseif ($count > 8 && $match[8] !== '') {
                 $this->writeExternLink($match[2], '');
             } else {

@@ -280,3 +280,10 @@ a:active.lkn-overview-cell {
 .lkn-ins, .lkn-del {
     background-color: yellow;
 }
+.lkn-icon-1 {
+    font-size: 1rem;
+}.lkn-icon-2 {
+    font-size: 2rem;
+}.lkn-icon-4 {
+    font-size: 4rem;
+}

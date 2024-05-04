@@ -1,5 +1,7 @@
 # Development phase
 
+## 0.7.7 images in MediaWiki
+
 ## 0.7.6 local CSS+JS+icons
 
 - new bootstrap-icons.css, bootstrap.min.css, bootstrap.min.js
