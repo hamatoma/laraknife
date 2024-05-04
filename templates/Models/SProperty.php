@@ -79,7 +79,7 @@ class SProperty extends Model
      */
     public static function optionsByScope(string $scope, ?string $selected, 
         ?string $titleUndefined = null, string $titleField = 'name', 
-        string $valueField = 'id', bool $translate=true): array
+        string $valueField = 'id', bool $translate=true, ?array $excludedIds=null): array
     {
         $selected ??= '';
         if ($titleUndefined === '' or $titleUndefined == null){
@@ -95,6 +95,9 @@ class SProperty extends Model
         if (in_array($titleField, self::$fields) && in_array($valueField, self::$fields)) {
             $recs = SProperty::byScope($scope);
             foreach ($recs as &$rec) {
+                if ($excludedIds != null && in_array($rec->id, $excludedIds)){
+                    continue;
+                }
                 $value = strval($rec[$valueField]);
                 $title = $rec[$titleField];
                 if ($translate){

@@ -13,9 +13,9 @@
     @endforeach
 </ul>
 @if ($fieldset === 'true')
-<fieldset class="lkn-fieldset lkn-nav-tab-panel">
+<div class="lkn-fieldset lkn-nav-tab-panel">
     {{ $slot }}
-</fieldset>
+</div>
 @else
 <div class="lkn-nav-tab-panel">
     {{ $slot }}

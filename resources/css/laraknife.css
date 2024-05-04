@@ -230,12 +230,22 @@ a:active.lkn-overview-cell {
 .lkn-text-info {
     color: blue;
 }
+.lkn-text-info2 {
+    color: green;
+}
+.lkn-text-info3 {
+    color: red;
+}
+.lkn-text-info4 {
+    color: cyan;
+}
 .lkn-text-error {
     color: red;
     background-color: yellow;
 }
 .lkn-text-warning {
     color: green;
+    background-color: yellow;
 }
 .lkn-text-important {
     color: red;
@@ -266,4 +276,7 @@ a:active.lkn-overview-cell {
 .lkn-audio-control {
     margin-left: 33%;
     max-width: fit-content;
+}
+.lkn-ins, .lkn-del {
+    background-color: yellow;
 }

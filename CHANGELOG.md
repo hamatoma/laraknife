@@ -1,5 +1,18 @@
 # Development phase
 
+## 0.7.6 local CSS+JS+icons
+
+- new bootstrap-icons.css, bootstrap.min.css, bootstrap.min.js
+- nav-tabs.blade: fieldset changed to div (no nesting fieldsets)
+- new: KeyValueStorage
+- MediaWiki.php changed to MediaWiki.templ
+- laraknife-tool.sh:
+  - local CSS/JS data
+  - copy of MediaWiki
+- layout.templ: local CSS/JS data
+- sproperties: optionsByScope(): new parameter $excludedIds
+
+
 ## 0.7.5 indented blocks
 - MediaWiki: indent block works now
 

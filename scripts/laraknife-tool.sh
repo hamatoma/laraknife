@@ -150,6 +150,7 @@ function BuildLinks(){
       test "$option" = "--force" && rm -fv app/Helpers/$node
       ln -sv ../../$dirResources/helpers/$node app/Helpers/$node
     done
+    test -e app/Helpers/MediaWiki.php || cp -av vendor/hamatoma/laraknife/templates/Helpers/MediaWiki.templ MediaWiki.php
     # === EMail controller
     mkdir -pv app/Mail
     for full in $dirResources/mail/*.php; do
@@ -167,8 +168,14 @@ function BuildLinks(){
     # CSS+JS
     for resource in css js; do
       mkdir -p public/$resource
-      test "$option" = "--force" && rm -fv public/$resource/laraknife.$resource
-      ln -s ../../$dirResources/$resource/laraknife.$resource public/$resource/laraknife.$resource
+    done
+    for file in bootstrap-icon.css bootstrap.min.css fonts laraknife.css; do
+      test "$option" = "--force" && rm -fv public/css/$file
+      ln -s ../../vendor/hamatoma/laraknife/resources/css/$file public/css/$file
+    done
+    for file in bootstrap.min.js  laraknife.js; do
+      test "$option" = "--force" && rm -fv public/js/$file
+      ln -s ../../vendor/hamatoma/laraknife/resources/js/$file public/js/$file
     done
     # images
     local trg=public/favicon.ico
