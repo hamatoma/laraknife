@@ -88,14 +88,10 @@ ul.nav-tab-panel + .lkn-fieldset {
     background-color: aliceblue;
 }
 .lkn-text-frame {
-    margin: 0;
-    padding: 0;
     background-color: aliceblue;
     border-radius: 0.25rem;
 }
 .lkn-header-frame {
-    margin: 1em;
-    padding: 0;
     background-color: aliceblue;
 }
 
@@ -140,6 +136,11 @@ ul.lkn-pagination {
 
 .lkn-float-right {
     float: right;
+    width: fit-content;
+}
+.lkn-float-left{
+    float: left;
+    width: fit-content;
 }
 
 .lkn-filter legend {
@@ -213,12 +214,13 @@ a:active.lkn-overview-cell {
 #img-logo {
     height: 32px;
 }
-.left {
+.lkn-left {
     margin-right: auto;
 }
 .lkn-center {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    text-align: center;
+    width: fit-content;
 }
 .lkn-text {
     background-color: white;
@@ -294,4 +296,8 @@ a:active.lkn-overview-cell {
 }
 .lkn-icon-4 {
     font-size: 4rem;
+}
+.lkn-arrows {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }

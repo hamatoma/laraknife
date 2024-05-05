@@ -1,4 +1,4 @@
-@props(['position' => 'alone', 'label' => '', 'fileLink' => '', 'type' => 'audio/mpeg', 'width1' => 2, 'width2' => 10, 'attribute' => '', 'class' => ''])
+@props(['position' => '', 'label' => '', 'fileLink' => '', 'type' => 'audio/mpeg', 'width1' => 2, 'width2' => 10, 'attribute' => '', 'class' => ''])
 @if($position === 'alone' || $position === 'first')
 <div class="row">
 @endif

@@ -1,4 +1,9 @@
 # Development phase
+## 0.7.9 Pages
+- new: audio-raw.blade
+- audio-blade: position is empty (default)
+- text-area.blade: icons/links for back up and next
+
 ## 0.7.8 MediaWiki
 
 - laraknife.css: blue background of <ins>...</ins> items
