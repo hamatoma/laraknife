@@ -227,6 +227,9 @@ a:active.lkn-overview-cell {
     padding: 1rem;
     margin: 0.5rem 0.5rem;
 }
+.lkn-text p{
+    margin-bottom: 0.25em;
+}
 .lkn-text-info {
     color: blue;
 }
@@ -285,8 +288,10 @@ a:active.lkn-overview-cell {
 }
 .lkn-icon-1 {
     font-size: 1rem;
-}.lkn-icon-2 {
+}
+.lkn-icon-2 {
     font-size: 2rem;
-}.lkn-icon-4 {
+}
+.lkn-icon-4 {
     font-size: 4rem;
 }
