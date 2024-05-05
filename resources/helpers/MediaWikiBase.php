@@ -209,7 +209,7 @@ class MediaWikiBase extends LayoutStatus
     }
     function writeInternalLink(string $link, string $text)
     {
-        if (str_starts_with($link, 'upload') && preg_match('/[.](jpg|png|gif|svg])$/i', $link)) {
+        if (str_starts_with($link, 'upload') && preg_match('/[.](jpe?g|png|gif|svg])$/i', $link)) {
             $link = preg_replace('&[\\/]\.\.[\/]&', '', $link);
             if (!$text) {
                 preg_match('%([^/]+)\.[^.]+$%', $link, $matcher);
@@ -289,7 +289,7 @@ class MediaWikiBase extends LayoutStatus
         }
         if ($offset < strlen($body)) {
             $part = str_replace('<nowiki/>', '', substr($body, $offset));
-            $this->htmlBody .= htmlentities($this->specialMacrosToHtml($part));
+            $this->htmlBody .= $this->specialMacrosToHtml($part);
         }
     }
     function writeUList(string $line)

@@ -277,7 +277,10 @@ a:active.lkn-overview-cell {
     margin-left: 33%;
     max-width: fit-content;
 }
-.lkn-ins, .lkn-del {
+.lkn-ins {
+    background-color: lightblue;
+}
+.lkn-del {
     background-color: yellow;
 }
 .lkn-icon-1 {

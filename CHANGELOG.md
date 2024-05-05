@@ -1,4 +1,10 @@
 # Development phase
+## 0.7.8 MediaWiki
+
+- laraknife.css: blue background of <ins>...</ins> items
+- MediaWikiBase: 
+  - jpeg recoginzed as images
+  - wrong htmlentities() removed
 
 ## 0.7.7 images in MediaWiki
 
