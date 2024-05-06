@@ -523,16 +523,26 @@ class LayoutStatus
     }
     function tableCol(string $line)
     {
-        $this->finishCol();
-        if (($pos = strpos($line, '|')) !== false) {
-            $attributes = $this->checkAttributes(substr($line, 0, $pos));
-            $line = substr($line, $pos + 1);
+        if (strpos($line, '||') !== false) {
+            $lines = explode('||', $line);
+            foreach($lines as $line){
+                $line2 = $this->tableCol($line);
+                $this->writeLine($line2, false);
+            }
+            $rc = '';
         } else {
-            $attributes = '';
+            $this->finishCol();
+            if (($pos = strpos($line, '|')) !== false) {
+                $attributes = $this->checkAttributes(substr($line, 0, $pos));
+                $line = substr($line, $pos + 1);
+            } else {
+                $attributes = '';
+            }
+            $this->htmlBody .= $attributes === '' ? '<td>' : "<td $attributes>";
+            $this->prefixLastCol = '|';
+            $rc = $line;
         }
-        $this->htmlBody .= $attributes === '' ? '<td>' : "<td $attributes>";
-        $this->prefixLastCol = '|';
-        return $line;
+        return $rc;
     }
     function tableCaption(string $caption)
     {
@@ -545,7 +555,21 @@ class LayoutStatus
         if ($this->colNo++ == 0 && $this->rowNo == 0) {
             $this->tableRow('');
         }
-        $this->htmlBody .= '<th>' . htmlentities($line);
+        if (strpos($line, '!!') !== false) {
+            $lines = explode('!!', $line);
+            foreach ($lines as $line) {
+                $this->tableHeader($line);
+            }
+        } else {
+            if (strpos($line, '|') === false) {
+                $tag = '<th>';
+            } else {
+                $parts = explode('|', $line, 2);
+                $tag = '<th ' . $this->checkAttributes($parts[0]) . '>';
+                $line = $parts[1];
+            }
+            $this->htmlBody .= $tag . htmlentities($line);
+        }
         $this->prefixLastCol = '!';
     }
     function tableRow(string $attributes)

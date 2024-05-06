@@ -109,7 +109,9 @@ ul.nav-tab-panel + .lkn-fieldset {
     background-color: white;
     margin-top: 0.25rem;
 }
-
+.lkn-text td, .lkn-text th  {
+    padding: 0 0.5em;
+}
 .lkn-pagination-block {
     display: flex;
     background-color: aliceblue;
@@ -232,6 +234,15 @@ a:active.lkn-overview-cell {
 .lkn-text p{
     margin-bottom: 0.25em;
 }
+.lkn-align-right {
+    text-align: right;
+}
+.lkn-align-left {
+    text-align: left;
+}
+.lkn-align-center {
+    text-align: center;
+}
 .lkn-text-info {
     color: blue;
 }
@@ -300,4 +311,7 @@ a:active.lkn-overview-cell {
 .lkn-arrows {
     margin-left: 0.5em;
     margin-right: 0.5em;
+}
+b {
+    font-weight: bolder;
 }

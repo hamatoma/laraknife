@@ -1,4 +1,11 @@
 # Development phase
+
+## 0.7.10 MediaWiki tables
+- MediaWiki:
+  - tables: multi column definitions: "| col1 || col2"
+  - tables: attributes for columns "| attributes | text"
+- laraknife.css: table attributes
+
 ## 0.7.9 Pages
 - new: audio-raw.blade
 - audio-blade: position is empty (default)
