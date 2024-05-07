@@ -109,6 +109,12 @@ ul.nav-tab-panel + .lkn-fieldset {
     background-color: white;
     margin-top: 0.25rem;
 }
+.lkn-table-no-border {
+    border: none;
+}
+.lkn-table-no-border tr, .lkn-table-no-border td, .lkn-table-no-border th {
+    border: none; 
+}
 .lkn-text td, .lkn-text th  {
     padding: 0 0.5em;
 }
