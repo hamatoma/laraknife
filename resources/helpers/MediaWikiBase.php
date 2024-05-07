@@ -93,12 +93,42 @@ class MediaWikiBase extends LayoutStatus
                 case 'DateTime':
                     $rc = date('%Y.%m.%d %H:%M');
                     break;
-                default:
+                    case 'mark':
+                        $mode = count($matches) > 3 ? substr($matches[3], 1) : 'info';
+                        $rc = "<span class=\"lkn-text-$mode\">$matches[2]</span>";
+                        break;
+                    case 'add':
+                        $rc = '<ins class="lkn-ins">' . (count($matches) >= 4 ? ($matches[2] . $matches[3]) : $matches[2]) . '</ins>';
+                        break;
+                    case 'del':
+                        $rc = '<del class="lkn-del">' . (count($matches) == 4 ? ($matches[2] . $matches[3]) : $matches[2]) . '</del>';
+                        break;
+                    case 'field':
+                        $name = $matches[2];
+                        $value = '';
+                        $size = 8;
+                        if (count($matches) > 3) {
+                            $parts = explode('|', substr($matches[3], 1));
+                            $value = $parts[0];
+                            if (count($parts) > 1) {
+                                $size = $parts[1];
+                            }
+                        }
+                        $rc = "<input class=\"lkn-field\" name=\"$name\" value=\"$value\" size=\"$size\">";
+                        break;
+                    case 'icon':
+                        $name = $matches[2];
+                        $size = count($matches) < 4 ? 0 : intval(substr($matches[3], 1));
+                        $class = $size == 0 ? '' : "lkn-icon-$size";
+                        $rc = "<i class=\"$name $class\"></i>";
+                        break;
+                    default:
                     $rc = $matches[0];
                     break;
             }
             return $rc;
         }, $body);
+        $body = preg_replace('/U\+(x[\dA-F]+;)/', '&#\1', $body);
         return $body;
     }
     function startPreBlock()

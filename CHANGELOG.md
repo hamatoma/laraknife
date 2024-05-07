@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.7.11 MediaWiki, CSS
+
+- MediaWiki: additional special functions, Unicode-patterns
+
 ## 0.7.10 MediaWiki tables
 - MediaWiki:
   - tables: multi column definitions: "| col1 || col2"
