@@ -250,7 +250,7 @@ a:active.lkn-overview-cell {
     text-align: center;
 }
 .lkn-text-info {
-    color: orange;
+    color: #ffac03;
 }
 .lkn-text-info2 {
     color: green;
@@ -273,6 +273,9 @@ a:active.lkn-overview-cell {
     color: red;
 }
 .lkn-text-tagged {
+    background-color: lightgoldenrodyellow;
+}
+.lkn-text-tagged2 {
     background-color: yellow;
 }
 .lkn-indent {
@@ -303,7 +306,7 @@ a:active.lkn-overview-cell {
     background-color: lightblue;
 }
 .lkn-del {
-    background-color: yellow;
+    background-color: lightgoldenrodyellow;
 }
 .lkn-icon-1 {
     font-size: 1rem;
