@@ -380,7 +380,7 @@ function MoveToLaraknife(){
   if [ -z "$module" ]; then
     Usage "missing <module>"
   elif [ ! -d resources/views/$module ]; then
-    Usage "unknown module: $module (missing resources/views/$module)"
+    Usage "unknown module: $module (missing resources/views/$module) Example: move-to-laraknife page"
   elif [ -d vendor/hamatoma/laraknife/resources/views/$module ]; then
     Usage "$module already exists"
   else
@@ -397,8 +397,8 @@ function MoveToLaraknife(){
       mv -v $fn vendor/hamatoma/laraknife/templates/database/migrations
       ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations
     fi
-    fn=$(ls -1 database/seeders/${Module}Seeder.php | head -n1)
-    if [ -f $fn ]; then
+    fn=database/seeders/${Module}Seeder.php
+    if [ -e $fn ]; then
       local node=$(basename $fn)
       mv -v $fn vendor/hamatoma/laraknife/templates/database/seeders
       ln -sv ../../vendor/hamatoma/laraknife/templates/database/seeders/$node database/seeders/$node

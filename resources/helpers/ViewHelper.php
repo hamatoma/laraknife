@@ -15,8 +15,9 @@ class ViewHelper
      * @param array $fields the array with the $_POST / $_GET variables
      * @param string $name the fieldname of the checkbox
      */
-    public static function adaptCheckbox(array &$fields, string $name){
-        if (! array_key_exists($name, $fields)){
+    public static function adaptCheckbox(array &$fields, string $name)
+    {
+        if (!array_key_exists($name, $fields)) {
             $fields[$name] = 0;
         } else {
             $fields[$name] = 1;
@@ -66,17 +67,41 @@ class ViewHelper
         $value,
         string $operator = "=",
     ) {
-        if (strpos($column, '.') === false){
+        if (strpos($column, '.') === false) {
             $column = "`$column`";
         }
-        if ($value === null){
-            if ($operator === '='){
+        if ($value === null) {
+            if ($operator === '=') {
                 array_push($conditions, "$column IS NULL");
             } else {
                 array_push($conditions, "$column IS NOT NULL");
             }
         } else {
             $condition = gettype($value) === 'string' ? "$column$operator'$value'" : "$column$operator$value";
+            array_push($conditions, $condition);
+        }
+    }
+    /**
+     * Adds a SQL condition that finds a value in a list.
+     * Example: the list (value of the column): ",77,99,123," the value:  "99"
+     * @param array $conditions IN/OUT: the new condition is put to that list
+     * @param array $parameters IN/OUT: the named sql parameters (":value")
+     * @param string $column the column with a $separator separated list of values
+     * @param mixed $value the value to find
+     * @param string $separator the separator between two entries in the $column
+     */
+    public static function addConditionFindInList(
+        array &$conditions,
+        array &$parameters,
+        string $column,
+        $value,
+        string $separator = ",",
+    ) {
+        if ($value != null) {
+            if (strpos($column, '.') === false) {
+                $column = "`$column`";
+            }
+            $condition = "$column like '%$separator$value$separator%'";
             array_push($conditions, $condition);
         }
     }
@@ -92,7 +117,7 @@ class ViewHelper
     {
         $from = array_key_exists($fromField, $_POST) ? $_POST[$fromField] : '';
         $to = array_key_exists($toField, $_POST) ? $_POST[$toField] : '';
-        if ($to !== '' && strpos($to, ':') === false){
+        if ($to !== '' && strpos($to, ':') === false) {
             $to .= ' 23:59:59';
         }
         $isValidFrom = $from !== '';
@@ -101,7 +126,7 @@ class ViewHelper
             if ($isValidFrom && !$isValidTo) {
                 array_push($conditions, "`$column`>=?");
                 array_push($parameters, $from);
-            } elseif (! $isValidFrom && $isValidTo) {
+            } elseif (!$isValidFrom && $isValidTo) {
                 array_push($conditions, "`$column`<=?");
                 array_push($parameters, $to);
             } else {
@@ -213,18 +238,19 @@ class ViewHelper
      * @param array $list the list with the field data
      * @param array $dataFields a associative field with fieldname => datatype entries. Datatype: "datetime"
      */
-    public static function adaptFieldValues(array &$list, array $dateFields){
-        foreach($dateFields as $name => $type){
-            if (array_key_exists($name, $list)){
-            switch($type){
-                case 'datetime':
-                    $list[$name] = str_replace('T', ' ', $list[$name]);
-                    break;
-                default:
-                break;
+    public static function adaptFieldValues(array &$list, array $dateFields)
+    {
+        foreach ($dateFields as $name => $type) {
+            if (array_key_exists($name, $list)) {
+                switch ($type) {
+                    case 'datetime':
+                        $list[$name] = str_replace('T', ' ', $list[$name]);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-    }
     }
     /**
      * Extracts the number of a numbered button.

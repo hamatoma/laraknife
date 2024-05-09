@@ -1,5 +1,13 @@
 # Development phase
 
+## 0.7.12 Module Group
+
+- new: module Group
+- file-protected.blade: attribute value renamed to filename
+- ContextLaraKnife:
+  - valueOf(): new parameter $preferFields
+- new ViewHelper::addConditionFindInList()
+
 ## 0.7.11 MediaWiki, CSS
 
 - MediaWiki: additional special functions, Unicode-patterns

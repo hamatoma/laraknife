@@ -52,7 +52,7 @@ class ContextLaraKnife
     public function callback(string $name, $data)
     {
         $rc = null;
-        if (array_key_exists($name, $this->callbacks)) {
+        if ($this->callbacks != null && array_key_exists($name, $this->callbacks)) {
             $item = $this->callbacks[$name];
             $object = $item[0];
             $method = $item[1];
@@ -83,9 +83,9 @@ class ContextLaraKnife
     {
         return $text;
     }
-    public function valueOf(string $name)
+    public function valueOf(string $name, bool $preferFields=false)
     {
-        if ($this->model != null && $this->model->$name !== null) {
+        if ( ! $preferFields && $this->model != null && $this->model->$name !== null) {
             $rc = old($name, $this->model[$name]);
         } else {
             if ($this->fields == null) {
