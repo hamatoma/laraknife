@@ -6,7 +6,7 @@
 <x-laraknife.layout.col-empty width="{{$width1}}"/>
 @endif
 <div class="col-md-{{ $width2 }}">
-    <button class="bg-primary white expand100" name="btnSubmit" value="{{$name}}">{{$label}}</button>
+    <button class="bg-primary white expand100" name="btnSubmit" value="{{$name}}">{{ __($label) }}</button>
 </div>
 @if($position === 'alone' || $position === 'last')
 </div>

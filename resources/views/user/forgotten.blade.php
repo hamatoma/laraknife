@@ -7,7 +7,7 @@
             <x-laraknife.forms.set-position position="first" />
             <x-laraknife.layout.col-empty width="3" />
             <x-laraknife.forms.string position="last" name="email" label="Email" value="{{ $context->valueOf('email') }}" width1="2" width2="4" />
-            <x-laraknife.buttons.button-position position="alone" name="btnSend" label="{{ __('Send') }}" width1="5" width2="4"/>
+            <x-laraknife.buttons.button-position position="alone" name="btnSend" label="Send" width1="5" width2="4"/>
             @if ($context->getSnippet('msg') !== '')
             <x-laraknife.forms.set-position position="first" />
             <x-laraknife.layout.col-empty width="3" />

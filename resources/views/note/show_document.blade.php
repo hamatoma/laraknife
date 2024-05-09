@@ -16,7 +16,7 @@
                 width2="4" attribute="readonly" />
             <x-laraknife.forms.combobox position="last" name="filegroup_scope" label="Filegroup" :options="$optionsFilegroup"
                 width2="4" attribute="readonly" />
-            <x-laraknife.forms.combobox position="first" name="user_id" label="User" :options="$optionsUser" width2="4"
+            <x-laraknife.forms.combobox position="first" name="owner_id" label="Owner" :options="$optionsUser" width2="4"
                 attribute="readonly" />
             <x-laraknife.forms.string position="last" name="filename" label="Filename"
                 value="{{ $context->valueOf('filename') }}" width2="4" attribute="readonly" />

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\Note;
+use App\Models\Group;
 use App\Models\Module;
 use App\Helpers\Helper;
 use App\Helpers\DbHelper;
@@ -36,13 +37,13 @@ class NoteController extends Controller
                     'category_scope' => '1051',
                     'notestatus_scope' => '1011',
                     'visibility_scope' => '1091',
-                    'user_id' => strval(auth()->id())
+                    'owner_id' => strval(auth()->id())
                 ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $fields['category_scope'], '-');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $fields['notestatus_scope'], '-');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('note.create', [
                 'context' => $context,
@@ -67,12 +68,12 @@ class NoteController extends Controller
                     'filename' => '',
                     'filegroup_scope' => '1101',
                     'visibility_scope' => '1091',
-                    'user_id' => auth()->id()
+                    'owner_id' => auth()->id()
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('note.create_document', [
                 'context' => $context,
@@ -101,13 +102,13 @@ class NoteController extends Controller
                     'category_scope' => '1051',
                     'notestatus_scope' => '1011',
                     'visibility_scope' => '1091',
-                    'user_id' => strval(auth()->id())
+                    'owner_id' => strval(auth()->id())
                 ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->user_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $note);
             $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 0, $note->id);
             $rc = view('note.edit', [
@@ -134,7 +135,7 @@ class NoteController extends Controller
                     'filename' => '',
                     'filegroup_scope' => '',
                     'visibility_scope' => '',
-                    'user_id' => ''
+                    'owner_id' => ''
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
@@ -146,6 +147,51 @@ class NoteController extends Controller
                 'optionsFilegroup' => $optionsFilegroup,
                 'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
+            ]);
+        }
+        return $rc;
+    }
+
+    public function editShift(Note $note, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect("/note-index/$note->reference_id");
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'owner_id' => $note->owner_id,
+                    'recipients' => '',
+                ];
+            }
+            if ($request->btnSubmit === 'btnShift' && ($owner = $fields['owner_id']) != null) {
+                $note->update(['owner_id' => $fields['owner_id']]);
+            } elseif ($request->btnSubmit === 'btnCopy' && ($recipients = $fields['recipients']) != null) {
+                if (($group = Group::find($recipients)) != null) {
+                    $ids = explode(',', $group->members);
+                    foreach ($ids as $id) {
+                        if (($id = intval($id)) != 0 && $id != $note->owner_id) {
+                            Note::create([
+                                'title' => $note->title,
+                                'body' => $note->body,
+                                'category_scope' => $note->category_scope,
+                                'visibility_scope' => $note->visibility_scope,
+                                'notestatus_scope' => $note->notestatus_scope,
+                                'owner_id' => $id
+                            ]);
+                        }
+                    }
+                }
+            }
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
+            $optionsRecipients = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['recipients'], __('<Please select>'));
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 2, $note->id);
+            $context = new ContextLaraKnife($request, null, $note);
+            $rc = view('note.edit_shift', [
+                'context' => $context,
+                'optionsOwner' => $optionsOwner,
+                'optionsRecipients' => $optionsRecipients,
+                'navTabsInfo' => $navigationTabInfo
             ]);
         }
         return $rc;
@@ -178,11 +224,11 @@ class NoteController extends Controller
             return redirect('/note-create');
         } else {
             $sql = "
-SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category_scope, t2.name as notestatus_scope, t3.name as user_id 
+SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category_scope, t2.name as notestatus_scope, t3.name as owner_id 
 FROM notes t0
 LEFT JOIN sproperties t1 ON t1.id=t0.category_scope
 LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope
-LEFT JOIN sproperties t3 ON t3.id=t0.user_id
+LEFT JOIN users t3 ON t3.id=t0.owner_id
 LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
 ";
             $parameters = [];
@@ -203,7 +249,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                 ViewHelper::addConditionComparism($conditions, $parameters, 'category_scope', 'category');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'notestatus_scope', 'notestatus');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'visibility_scope', 'visibility');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'user_id', 'user');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'user');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title,body', 'text');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'body');
@@ -246,7 +292,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             if (count($fields) == 0) {
                 $fields = [
                     'filegroup' => '',
-                    'user' => auth()->id(),
+                    'owner' => auth()->id(),
                     'text' => '',
                     'filegroup_scope' => '1101',
                     '_sortParams' => 'id:desc',
@@ -261,7 +307,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup'], 'all');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user']);
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner']);
             $context = new ContextLaraKnife($request, $fields);
             $fileController = new FileController();
             $context->setCallback('buildAnchor', $fileController, 'buildAnchor');
@@ -286,7 +332,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             'category_scope' => 'required',
             'notestatus_scope' => 'required',
             'visibility_scope' => 'required',
-            'user_id' => 'required'
+            'owner_id' => 'required'
         ];
         return $rc;
     }
@@ -298,6 +344,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         Route::put('/note-store', [NoteController::class, 'store'])->middleware('auth');
         Route::post('/note-edit/{note}', [NoteController::class, 'edit'])->middleware('auth');
         Route::get('/note-edit/{note}', [NoteController::class, 'edit'])->middleware('auth');
+        Route::post('/note-edit_shift/{note}', [NoteController::class, 'editShift'])->middleware('auth');
+        Route::get('/note-edit_shift/{note}', [NoteController::class, 'editShift'])->middleware('auth');
         Route::post('/note-index_documents/{note}', [NoteController::class, 'indexDocuments'])->middleware('auth');
         Route::get('/note-index_documents/{note}', [NoteController::class, 'indexDocuments'])->middleware('auth');
         Route::post('/note-update/{note}', [NoteController::class, 'update'])->middleware('auth');
@@ -322,7 +370,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $note->visibility_scope, '');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->user_id);
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id);
             $context = new ContextLaraKnife($request, null, $note);
             $rc = view('note.show', [
                 'context' => $context,
@@ -411,7 +459,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
-            ViewHelper::addFieldIfMissing($fields, 'user_id', auth()->id());
+            ViewHelper::addFieldIfMissing($fields, 'owner_id', auth()->id());
             $validator = Validator::make($fields, $this->rules(false));
             if ($validator->fails()) {
                 $error = $validator->errors();

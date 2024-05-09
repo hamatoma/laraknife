@@ -1,5 +1,11 @@
 # Development phase
 
+## 0.8.1 Notes
+
+- Note:
+  - renamed: user_id -> owner_id
+  - new register page: "Shift"
+
 ## 0.7.12 Module Group
 
 - new: module Group

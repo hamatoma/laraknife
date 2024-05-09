@@ -14,7 +14,7 @@
                 width2="4" attribute="readonly" />
             <x-laraknife.forms.string position="first" name="id" label="Id" value="{{ $context->valueOf('id') }}"
                 width2="4" attribute="readonly" />
-            <x-laraknife.forms.combobox position="last" name="user_id" label="User" :options="$optionsUser" width2="4"
+            <x-laraknife.forms.combobox position="last" name="owner_id" label="Owner" :options="$optionsUser" width2="4"
                 attribute="readonly" />
             <x-laraknife.forms.string position="first" name="title" label="Title"
                 value="{{ $context->valueOf('title') }}" width2="4" attribute="readonly" />
