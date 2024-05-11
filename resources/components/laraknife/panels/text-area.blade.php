@@ -8,17 +8,17 @@
     </div>
     <div class="lkn-arrows">
         @if ($prev !== '')
-            <div class="lkn-float-left">
+            <div class="lkn-float-left lkn-nav-button">
                 <a href="{{ $prev }}"> <i class="bi bi-arrow-left-circle-fill"></i> {{ __('Back') }}</a>
             </div>
         @endif
         @if ($next !== '')
-        <div class="lkn-float-right">
+        <div class="lkn-float-right lkn-nav-button">
             <a href="{{ $next }}">{{ __('Next') }} <i class="bi bi-arrow-right-circle-fill"></i></a>
         </div>
         @endif
         @if ($up !== '')
-            <div class="lkn-center">
+            <div class="lkn-center lkn-nav-button">
                 <a href="{{ $up }}"> <i class="bi bi-arrow-up-circle-fill"></i></a>
             </div>
         @endif

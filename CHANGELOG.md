@@ -1,5 +1,8 @@
 # Development phase
 
+## 0.8.2 Notes
+- text-area.blade: navigation buttons with CSS class
+
 ## 0.8.1 Notes
 
 - Note:

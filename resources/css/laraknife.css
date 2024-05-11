@@ -324,3 +324,6 @@ a:active.lkn-overview-cell {
 b {
     font-weight: bolder;
 }
+.lkn-nav-button {
+    font-size: 1.25rem;
+}
