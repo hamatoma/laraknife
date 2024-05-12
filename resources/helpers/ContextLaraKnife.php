@@ -83,6 +83,9 @@ class ContextLaraKnife
     {
         return $text;
     }
+    public function taskHelper(string $task, $parameter=null){
+        return TaskHelper::contextHelper($task, $parameter);
+    }
     public function valueOf(string $name, bool $preferFields=false)
     {
         if ( ! $preferFields && $this->model != null && $this->model->$name !== null) {

@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ForgottenPassword extends Mailable
+class NoteNotification extends Mailable
 {
     use Queueable, SerializesModels;
     private string $link;
@@ -27,7 +27,7 @@ class ForgottenPassword extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('Forgotten Password?'),
+            subject: __('Responsibility changed') . ': ' . $this->snippets['title'],
         );
     }
 
@@ -37,7 +37,7 @@ class ForgottenPassword extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.forgotten-answer',
+            view: 'mails.note-notification',
             with: $this->snippets
         );
     }

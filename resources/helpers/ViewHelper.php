@@ -185,6 +185,29 @@ class ViewHelper
             $fields[$name] = $value;
         }
     }
+    /**
+     * Converts a text of a given $type into HTML.
+     * @param string $contents: the string to convert
+     * @param int $type the text type: see: SProperties, scope 'markup'
+     * @return string the HTML text
+     */
+    public static function asHtml(string $contents, int $type): string
+    {
+        switch ($type) {
+            case 1122: // mediawiki
+                $wiki = new MediaWiki();
+                $text = $wiki->toHtml($contents);
+                break;
+            case 1223: // html
+                $text = $contents;
+                break;
+            default:
+            case 1121: // plain text
+                $text = '<p>' . str_replace("\n", "</p>\n<p>", $contents) . "</p>";
+                break;
+        }
+        return $text;
+    }
 
     /**
      * Builds the HTML text of the entries ("options") of a combobox ("selection").
@@ -228,6 +251,16 @@ class ViewHelper
                 array_push($rc, ['text' => $text, 'value' => $value, 'active' => $selected === $value]);
             }
         }
+        return $rc;
+    }
+    /**
+     * Builds a complete URL from a given $relativeUrl.
+     * @param string $relativeUrl the URL without the server address, e.g. "/note-index"
+     * @return string the complete URL
+     */
+    public static function buildLink(string $relativeUrl): string
+    {
+        $rc = env('APP_URL', '') . $relativeUrl;
         return $rc;
     }
     /**

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\Note;
+use App\Models\Page;
+use App\Models\User;
 use App\Models\Group;
 use App\Models\Module;
 use App\Helpers\Helper;
@@ -12,11 +14,13 @@ use App\Models\SProperty;
 use App\Helpers\FileHelper;
 use App\Helpers\Pagination;
 use App\Helpers\ViewHelper;
+use App\Helpers\EmailHelper;
 use Illuminate\Http\Request;
 use App\Helpers\ViewHelperLocal;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Validator;
 
 class NoteController extends Controller
@@ -110,7 +114,7 @@ class NoteController extends Controller
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $note);
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 0, $note->id);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 0, $note->id, $note->options);
             $rc = view('note.edit', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
@@ -151,7 +155,6 @@ class NoteController extends Controller
         }
         return $rc;
     }
-
     public function editShift(Note $note, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
@@ -160,12 +163,16 @@ class NoteController extends Controller
             $fields = $request->all();
             if (count($fields) === 0) {
                 $fields = [
-                    'owner_id' => $note->owner_id,
-                    'recipients' => '',
+                'owner_id' => $note->owner_id,
+                'recipients' => '',
                 ];
             }
+            ViewHelper::adaptCheckbox($fields, 'withEmail');
             if ($request->btnSubmit === 'btnShift' && ($owner = $fields['owner_id']) != null) {
                 $note->update(['owner_id' => $fields['owner_id']]);
+                if ($fields['withEmail']){
+                    $this->sendEmail($note->owner_id, $note);
+                }
             } elseif ($request->btnSubmit === 'btnCopy' && ($recipients = $fields['recipients']) != null) {
                 if (($group = Group::find($recipients)) != null) {
                     $ids = explode(',', $group->members);
@@ -179,13 +186,16 @@ class NoteController extends Controller
                                 'notestatus_scope' => $note->notestatus_scope,
                                 'owner_id' => $id
                             ]);
+                            if ($fields['withEmail']){
+                                $this->sendEmail($id, $note);
+                            }
                         }
                     }
                 }
             }
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
             $optionsRecipients = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['recipients'], __('<Please select>'));
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 2, $note->id);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 2, $note->id, $note->options);
             $context = new ContextLaraKnife($request, null, $note);
             $rc = view('note.edit_shift', [
                 'context' => $context,
@@ -311,7 +321,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $context = new ContextLaraKnife($request, $fields);
             $fileController = new FileController();
             $context->setCallback('buildAnchor', $fileController, 'buildAnchor');
-            $navTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 1, $note->id);
+            $navTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 1, $note->id, $note->options);
             return view('note.index_documents', [
                 'context' => $context,
                 'records' => $records,
@@ -358,6 +368,12 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         Route::post('/note-update_document/{file}', [NoteController::class, 'updateDocument'])->middleware('auth');
         Route::get('/note-show_document/{file}/delete', [NoteController::class, 'showDocument'])->middleware('auth');
         Route::delete('/note-show_document/{file}/delete', [NoteController::class, 'destroyDocument'])->middleware('auth');
+        TaskController::routes();
+    }
+    private function sendEmail(int $userId, Note $note){
+        $user = User::find($userId);
+        EmailHelper::sendMail('note.notification', $user->email, ['name' => $user->name, 'title' => $note->title, 'contents' => $note->body, 
+            'from' => auth()->user()->name, 'link' => ViewHelper::buildLink("/note-edit/$note->id")]);
     }
     /**
      * Display the specified resource.

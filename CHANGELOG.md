@@ -1,5 +1,16 @@
 # Development phase
 
+## 0.8.3 Module Task, EMail (Note), 
+
+- ContextLaraKnife: new taskHelper()
+- new module Task:
+  - new TaskController, edit_shift.blade
+- EmailHelper
+  - storing array snippets instead of single values
+  - new: mode note.notification
+- ViewHelper:
+  - new: asHtml(), buildLink()
+
 ## 0.8.2 Notes
 - text-area.blade: navigation buttons with CSS class
 

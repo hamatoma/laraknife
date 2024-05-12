@@ -44,7 +44,7 @@ class StringHelper
      * Converts a string into a word usable as part of an URL.
      * @param string $text the text to convert
      * @param NULL|int $maxLength the result is never longer than that
-     * @return a word usable as part of the string
+     * @return string a word usable as part of the string
      */
     public static function textToUrl(string $text, ?int $maxLength = null): string
     {

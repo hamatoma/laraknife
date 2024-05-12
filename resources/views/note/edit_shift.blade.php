@@ -11,6 +11,7 @@
                 <x-laraknife.forms.combobox position="first" name="recipients" label="Recipient group" :options="$optionsRecipients"
                 width2="4" />
                 <x-laraknife.buttons.button-position position="last" name="btnCopy" label="Copy" width2="4" />
+                <x-laraknife.forms.checkbox position="alone" name="withEmail" label="Send email notification" labelBelow="true" width1="2" />
              </x-laraknife.layout.nav-tabs>
             </x-laraknife.panels.edit>
     </form>

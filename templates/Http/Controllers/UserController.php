@@ -69,7 +69,7 @@ class UserController extends Controller
                 "UPDATE users SET remember_token=?, updated_at='$date' WHERE id=?",
                 [$hash, $user->id]
             );
-            $rc = env('APP_URL', '') . "/user-answer?token=$hash";
+            $rc = ViewHelper::buildLink("/user-answer?token=$hash");
         }
         return $rc;
     }
