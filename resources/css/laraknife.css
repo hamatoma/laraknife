@@ -235,7 +235,6 @@ a:active.lkn-overview-cell {
     border: 0.075rem darkgray solid;
     border-radius: 0.25rem;
     padding: 1rem;
-    margin: 0.5rem 0.5rem;
 }
 .lkn-text p{
     margin-bottom: 0.25em;
@@ -326,4 +325,12 @@ b {
 }
 .lkn-nav-button {
     font-size: 1.25rem;
+}
+#main-content > h1, #main-content >h2 {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.5em 0.75em;
+    border-radius: 0.75rem;
+    width:  fit-content;
+    border: 0.02rem solid black;
 }

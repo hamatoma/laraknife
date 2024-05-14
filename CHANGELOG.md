@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.8.4 Colors and GUI
+
+- main-header.blade+text-area.blade: not needed div removed
+
 ## 0.8.3 Module Task, EMail (Note), 
 
 - ContextLaraKnife: new taskHelper()
