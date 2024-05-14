@@ -1,5 +1,9 @@
 # Development phase
 
+## 0.8.5 Colors and design
+- main header: h1
+- layout.templ: nav bar changed (logout)
+
 ## 0.8.4 Colors and GUI
 
 - main-header.blade+text-area.blade: not needed div removed

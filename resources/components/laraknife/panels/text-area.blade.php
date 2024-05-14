@@ -1,6 +1,6 @@
 @props(['title' => 'Edit', 'error' => '', 'class' => '', 'prev' => '', 'next' => '', 'up' => '', 'audio' => ''])
 <div id="main-content" class="container mt-5 lkn-frame background">
-    <h2 class="lkn-text-area">{{ $title }}</h2>
+    <h1 class="lkn-text-area">{{ $title }}</h1>
     <div id="text-frame-panel" class="lkn-text-frame">
         {{ $slot }}
     </div>

@@ -26,15 +26,18 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md bg-primary ">
-            <a class="navbar-brand" href="/menuitem-menu_main"><img id="img-logo" alt="Logo" src="img/logo_64.png"></a>
+        <nav id="lkn-header" class="navbar navbar-expand-md">
+            <a class="navbar-brand" href="/menuitem-menu_main"><img id="img-logo" alt="Logo" src="/img/logo_64.png"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarTop">
+            <div id="navbarTop" class="collapse navbar-collapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/menuitem-menu_main">Start</a>
+                        <a class="nav-link" href="/page-showmenu/main">Start</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/menuitem-menu_main">Verwaltung</a>
                     </li>
                     <li>
                         <a class="nav-link" href="/public/doc/Impressum.pdf" target="_blank">{{ __('Imprint') }}</a>
@@ -43,13 +46,15 @@
                         <a class="nav-link" href="/public/doc/Datenschutz.pdf" target="_blank">{{ __('Privacy') }}</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav mr-auto lkn-logout">
+                <ul id="lkn-navbar-right" class="navbar-nav mr-auto lkn-logout">
                     @auth
                     <li class="nav-item border rounded-3">
                         <a class="nav-link" href="/user-edit-current">{{ session('userName') }}</a>
                     </li>
                     @endauth
-                    <li><a href="/user-logout" class="btn btn-success">{{ __('Logout') }}</a></li>
+                    <li class="nav-item border rounded-3">
+                        <a class="nav-link" href="/user-logout">{{ __('Logout')  }}</a>
+                    </li>
                 </ul>
            </div>                
         </nav>
