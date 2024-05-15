@@ -197,7 +197,9 @@ a:active.lkn-overview-cell {
     font-size: 100px;
     margin-top: -20px;
 }
-
+a.lkn-overview-cell {
+    overflow: hidden;
+}
 a.lnk-overview-cell,
 a:visited.lkn-overview-cell,
 a:link.lkn-overview-cell,

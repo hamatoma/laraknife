@@ -1,5 +1,8 @@
 # Development phase
 
+## 0.8.6 Design
+- overview cells ()
+
 ## 0.8.5 Colors and design
 - main header: h1
 - layout.templ: nav bar changed (logout)
