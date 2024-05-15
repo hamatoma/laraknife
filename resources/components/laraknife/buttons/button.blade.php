@@ -3,5 +3,5 @@
 <x-laraknife.layout.col-empty width="{{$width1}}"/>
 @endif
 <div class="col-md-{{ $width2 }}">
-    <button class="bg-primary white expand100" name="btnSubmit" value="{{$name}}">{{$label}}</button>
+    <button class="lkn-button expand100" name="btnSubmit" value="{{$name}}">{{$label}}</button>
 </div>

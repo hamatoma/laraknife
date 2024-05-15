@@ -12,6 +12,7 @@
                 width2="4" />
                 <x-laraknife.buttons.button-position position="last" name="btnCopy" label="Copy" width2="4" />
                 <x-laraknife.forms.checkbox position="alone" name="withEmail" label="Send email notification" labelBelow="true" width1="2" />
+                <x-laraknife.buttons.button-position position="alone" name="btnCancel" label="Cancel" width1="8" width2="4" />
              </x-laraknife.layout.nav-tabs>
             </x-laraknife.panels.edit>
     </form>

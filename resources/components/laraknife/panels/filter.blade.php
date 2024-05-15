@@ -1,5 +1,5 @@
 @props(['legend' => ''])
-<fieldset class="lkn-filter">
+<fieldset class="lkn-filter lkn-panel">
     @if ($legend !== '')
         <legend>{{ $legend }}</legend>
     @endif

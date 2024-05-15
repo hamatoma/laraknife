@@ -1,5 +1,10 @@
 # Development phase
 
+## 0.8.7 Design MediaWikiBase
+- buttons: lkn-button
+- panels: lkn-panel
+- MediaWikiBase: new: @block @blockend
+
 ## 0.8.6 Design
 - overview cells ()
 

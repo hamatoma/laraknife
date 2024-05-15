@@ -1,7 +1,7 @@
 @props(['title' => 'Show', 'mode' => 'delete'])
 <div id="main-content" class="container mt-5">
     <x-laraknife.panels.common title="{{ $title }}" />
-    <fieldset class="lkn-show-panel">
+    <fieldset class="lkn-panel">
         {{ $slot }}
         <div class="row lkn-empty-line-above">
             @if ($mode === 'delete')

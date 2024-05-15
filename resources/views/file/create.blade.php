@@ -10,11 +10,12 @@
             <x-laraknife.forms.combobox position="last" name="user_id" label="User" :options="$optionsUser" width2="4" />
             <x-laraknife.forms.string position="first" name="title" label="Title"
                 value="{{ $context->valueOf('title') }}" width2="4" />
-                <x-laraknife.forms.combobox position="first" name="visibility_scope" label="Visibility" :options="$optionsVisibility"
+            <x-laraknife.forms.combobox position="last" name="visibility_scope" label="Visibility" :options="$optionsVisibility"
                 width2="4" />
             <x-laraknife.forms.file position="first" name="file" label="File" width2="4" />
             <x-laraknife.forms.string position="last" name="filename" label="Filename"
-                value="{{ $context->valueOf('filename') }}" width2="4" placeholder="Overwrites the upload name (if not empty)"/>
+                value="{{ $context->valueOf('filename') }}" width2="4"
+                placeholder="Overwrites the upload name (if not empty)" />
             <x-laraknife.forms.text position="alone" name="description" label="Description"
                 value="{{ $context->valueOf('description') }}" width2="10" rows="4" />
         </x-laraknife.panels.create>

@@ -1,5 +1,7 @@
-button {
+.lkn-button {
     border-radius: 0.5rem;
+    /*padding: 0.05rem 0.05rem 0.1rem 0.1rem; */
+    padding: 0;
 }
 
 .lkn-sortable th {
@@ -200,24 +202,6 @@ a:active.lkn-overview-cell {
 a.lkn-overview-cell {
     overflow: hidden;
 }
-a.lnk-overview-cell,
-a:visited.lkn-overview-cell,
-a:link.lkn-overview-cell,
-a:active.lkn-overview-cell {
-    border: 1px solid #5aabd4;
-    color: #36449e;
-    box-shadow: 0 0 5px 0 #36449e;
-}
-
-a.lkn-overview-cell,
-a:visited.lkn-overview-cell,
-a:link.lkn-overview-cell,
-a:active.lkn-overview-cell {
-    background-color: #EEE;
-}
-#main-content .nav-item {
-    background-color: #EEE;
-}
 .lkn-logout {
     margin-left: auto;
 }
@@ -233,8 +217,6 @@ a:active.lkn-overview-cell {
     width: fit-content;
 }
 .lkn-text {
-    background-color: white;
-    border: 0.075rem darkgray solid;
     border-radius: 0.25rem;
     padding: 1rem;
 }
@@ -250,46 +232,7 @@ a:active.lkn-overview-cell {
 .lkn-align-center {
     text-align: center;
 }
-.lkn-text-info {
-    color: #ffac03;
-}
-.lkn-text-info2 {
-    color: green;
-}
-.lkn-text-info3 {
-    color: blue;
-}
-.lkn-text-info4 {
-    color: cyan;
-}
-.lkn-text-error {
-    color: red;
-    background-color: yellow;
-}
-.lkn-text-warning {
-    color: green;
-    background-color: yellow;
-}
-.lkn-text-important {
-    color: red;
-}
-.lkn-text-tagged {
-    background-color: lightgoldenrodyellow;
-}
-.lkn-text-tagged2 {
-    background-color: yellow;
-}
-.lkn-indent {
-    margin-left: 0;
-}
-.lkn-indent .lkn-indent {
-    margin-left: 1rem;
-}
-.lkn-text-frame-background {
-    background-color: aliceblue;
-}
 .lkn-header-frame h1, .text-header-frame h2, .text-header-frame h3 {
-    color: blue;
     margin-left: auto;
     margin-right: auto;   
     text-align: center;
@@ -302,12 +245,6 @@ a:active.lkn-overview-cell {
 .lkn-audio-control {
     margin-left: 33%;
     max-width: fit-content;
-}
-.lkn-ins {
-    background-color: lightblue;
-}
-.lkn-del {
-    background-color: lightgoldenrodyellow;
 }
 .lkn-icon-1 {
     font-size: 1rem;
@@ -334,4 +271,9 @@ b {
     padding: 0.5em 0.75em;
     border-radius: 0.75rem;
     width:  fit-content;
+}
+.lkn-frame-indented {
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
 }

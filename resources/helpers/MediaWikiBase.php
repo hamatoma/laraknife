@@ -207,6 +207,18 @@ class MediaWikiBase extends LayoutStatus
                             case '|':
                                 $this->writeLine($line, false);
                                 break;
+                            case '@':
+                                if (str_starts_with($line, '@blockend')){
+                                    $this->stopSentence();
+                                    $this->addHtml("</div>\n");
+                                } elseif (str_starts_with($line, '@block')){
+                                        $this->stopSentence();
+                                        $params = $this->checkAttributes(substr($line, 6));
+                                        $this->addHtml($params !== '' ? "<div $params>" : '<div>');
+                                } else {
+                                    $this->writeLine(trim($line));
+                                }
+                                break;
                             default:
                                 $this->writeLine(trim($line));
                                 break;
