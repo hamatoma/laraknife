@@ -1,0 +1,160 @@
+/* purple colors: head: 143F4E icons: 83163F shadow: 888888 panel: c2b0a8 link: 477085 info: 9D8C84 */
+/* standard colors: head: 36449E icons: blue shadow: aliceblue panel: aliceblue link: blue info: green */
+.lkn-text-info {color: blue;} 
+
+/* headlines: */
+h1{ color: #36449E; border-bottom: solid 0.1rem #bf5c82; }
+h2{ color: blue; border-bottom: solid 0.1rem blue; }
+h3{ color: green ; border-bottom: solid 0.1rem green; }
+h4{ color: green ; border-bottom: solid 0.1rem green; }
+.lkn-text { 
+    color: black;
+    background-color: white;
+    border: 0.15rem solid #36449E;
+}
+/* Links */
+
+/* chapter headline */
+#main-content h1 { border: none; color: #bf5c82; }
+/* top menu */
+#lkn-header {    background-color: #36449E;    color: white;}
+/* panels: */
+.lkn-text-frame-background{ background-color: #e1d6ad !important }
+.lkn-panel,
+.lkn-nav-tab-panel,
+#main-content li.lkn-nav-item-active,
+.lkn-filter,
+.lkn-form-table,
+.lkn-filter,
+.lkn-form-table,
+.lkn-header-frame,
+.lkn-pagination-block
+{
+    background-color: aliceblue;
+}
+.lkn-page-item.active .lkn-page-link {
+    background-color: #e1d6ad;
+    border-color: #e1d6ad;
+}
+.lkn-field-error {
+    color: red;
+}
+/* overview page */
+a.lnk-overview-cell,
+a:visited.lkn-overview-cell,
+a:link.lkn-overview-cell,
+a:active.lkn-overview-cell {
+    border: 0.25rem solid #bf5c82;
+    color: blue;;
+    /*box-shadow: 0 0 5px 0 #bf5c82;*/
+}
+.lkn-icon-as-link,
+a.lkn-overview-cell,
+a:visited.lkn-overview-cell,
+a:link.lkn-overview-cell,
+a:active.lkn-overview-cell {
+    background-color: #EEE;
+    color: blue;;
+}
+.lkn-overview-cell h2 {
+    color: #bf5c82;
+    border: none;
+}
+#main-content .nav-item {
+    background-color: #EEE;
+}
+.lkn-text-info {color: blue;} 
+.lkn-text-info2 {color: #green;}
+.lkn-text-info3 {color: #36449E;}
+.lkn-text-info4 {color: blue;}
+.lkn-filter {
+    background: aliceblue;
+}
+.lkn-text-error {
+    color: red;
+    background-color: yellow;
+}
+.lkn-text-warning {
+    color: green;
+    background-color: yellow;
+}
+.lkn-text-important {
+    color: red;
+}
+.lkn-text-tagged {
+    background-color: rgba(255, 166, 0, 0.418);
+}
+.lkn-text-tagged2 {
+    background-color: yellow;
+}
+.lkn-header-frame h1, .text-header-frame h2, .text-header-frame h3 {
+    color: whitesmoke;
+    background-color: #fdaf40;
+}
+.lkn-ins {
+    background-color: lightblue;
+}
+.lkn-del {
+    background-color: rgba(255, 166, 0, 0.418);
+}
+.lkn-button {
+  background-color: blue !important;
+  color: white;
+  border: 0.1rem solid #36449E;
+  box-shadow: 0 0 0.3rem 0.3rem aliceblue;
+}
+/* Links */
+
+a, a:active, a:link, a:visited, a:any-link { 
+    color: blue; }
+a:hover { 
+        color: black; }
+a.nav-item, a:active.nav-item, a:link.nav-item, a:visited.nav-item, a:any-link.nav-item { 
+    color: blue; }
+a:hover.nav-item { color: black; }
+nav a:active, nav a:link, nav a:visited, nav a:any-link {
+    color: white;
+}
+nav a:hover { color: rgba(255, 166, 0, 0.418); }
+/* Register tabs: */
+.page-link { color: black !important; background-color: aliceblue; }
+.page-link.active, .active > .page-link { color: white !important; background-color: blue; }
+.page-item { color: black; background-color: aliceblue; }
+
+#main-content > div > h1, #main-content > div > h2 {
+    color: #fdaf40;
+    background-color: rgba(240, 240, 240, 0.75);
+}
+#main-content .nav-link {
+    color: black;
+}
+#main-content .nav-link-item{
+    background-color: #e1d6ad;
+}
+#main-content .nav-link:hover {
+    color: white;
+}
+#main-content .nav-link.lkn-nav-item-active {
+    color: blue !important;
+}
+#main-content nav-item.lkn-nav-item-active {
+    background-color: whitesmoke !important;
+}
+#main-content .nav-item {
+    border-bottom-color: black !important;
+}
+
+#lkn-header .nav-link, #lkn-header .nav-item { color: white; font-weight: bolder;}
+
+#main-content .nav-tabs.nav-link { background-color: #e1d6ad !important; }
+
+#lkn-btn-logout {
+    background-color: #bf5c82 !important;
+}
+/* Icons: */
+i.text-primary { color: blue !important; }
+
+.lkn-frame-indented {
+    border: solid 0.1rem blue;
+}
+

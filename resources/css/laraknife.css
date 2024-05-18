@@ -36,6 +36,7 @@
 .lkn-panel,
 .lkn-nav-tab-panel {
     background-color: aliceblue;
+    border-radius: 0.25rem;
 }
 .lkn-noform-text p {
     margin-bottom: 0.25em;

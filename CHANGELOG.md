@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.8.8 Design
+
+- new: purple.css green.css standard.css
+
 ## 0.8.7 Design MediaWikiBase
 - buttons: lkn-button
 - panels: lkn-panel
