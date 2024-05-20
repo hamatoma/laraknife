@@ -111,9 +111,19 @@ ul.nav-tab-panel + .lkn-fieldset {
 .lkn-table {
     background-color: white;
     margin-top: 0.25rem;
+    border: 0.1rem solid #888888;
+}
+.lkn-table tr, .lkn-table td, .lkn-table th {
+    border: 0.1rem solid #888888;   
 }
 .lkn-table-no-border {
     border: none;
+}
+.lkn-table-no-grid tr, .lkn-table-no-grid th, .lkn-table-no-grid td{
+    border: none;  
+}
+.lkn-table-no-body-grid tr, .lkn-table-no-body-grid td{
+    border: none;  
 }
 .lkn-table-no-border tr, .lkn-table-no-border td, .lkn-table-no-border th {
     border: none; 
