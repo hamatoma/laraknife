@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Helpers\StringHelper;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use App\Helpers\ViewHelperLocal;
 use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
@@ -86,10 +87,8 @@ class UserController extends Controller
                 $fields = [
                     'name' => '',
                     'email' => '',
-                    'password' => '',
-                    'password_confirmation' => '',
                     'role_id' => '',
-                    'localization' => 'en_GB'
+                    'localization' => 'de_DE'
                 ];
             }
             $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
@@ -117,11 +116,14 @@ class UserController extends Controller
         } else {
             $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
             $localizationOptions = SProperty::optionsByScope('localization', $user->localization, '', 'name', 'shortname');
+
             $context = new ContextLaraKnife($request, null, $user);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('user-edit', 0, $user->id);
             $rc = view('user.edit', [
                 'context' => $context,
                 'roleOptions' => $roleOptions,
-                'localizationOptions' => $localizationOptions
+                'localizationOptions' => $localizationOptions,
+                'navTabsInfo' => $navigationTabInfo
             ]);
         }
         return $rc;
@@ -167,7 +169,14 @@ class UserController extends Controller
             if ($rc == null) {
                 $examples = StringHelper::createPassword() . "<br/>\n" . StringHelper::createPassword()
                     . "<br>\n" . StringHelper::createPassword();
-                $rc = view('user.changepw', ['user' => $user, 'examples' => $examples]);
+                $context = new ContextLaraKnife($request, null, $user);
+                $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('user-edit', 0, $user->id);
+                $rc = view('user.changepw', [
+                    'context' => $context,
+                    'user' => $user,
+                    'examples' => $examples,
+                    'navTabsInfo' => $navigationTabInfo
+                ]);
             }
         }
         return $rc;
@@ -293,10 +302,10 @@ class UserController extends Controller
                         $userId = 1;
                     }
                     $rc = $this->loginUser($request, $userId);
-                    if ($rc != null && $request->has('autologin')){
+                    if ($rc != null && $request->has('autologin')) {
                         $key = StringHelper::createPassword();
-                        $minutes = 60*24*30;
-                        $endTime = \time() + 60*$minutes;
+                        $minutes = 60 * 24 * 30;
+                        $endTime = \time() + 60 * $minutes;
                         $end = new \DateTime("@$endTime");
                         $rc->withCookie(cookie('autologin', $key, $minutes));
                         $this->loginStoreInDb($userId, $key, $end);
@@ -340,8 +349,9 @@ class UserController extends Controller
         }
         return $rc;
     }
-    public function loginStoreInDb(int $userId, ?string $key, ?\DateTime $end){
-        if ($key == null){
+    public function loginStoreInDb(int $userId, ?string $key, ?\DateTime $end)
+    {
+        if ($key == null) {
             $hash = '';
             $end = new \DateTime();
         } else {
@@ -353,7 +363,7 @@ class UserController extends Controller
     }
     public function logout(Request $request)
     {
-        if ( ($id = Auth::id()) != null){
+        if (($id = Auth::id()) != null) {
             $this->loginStoreInDb($id ?? 0, null, null);
         }
         Auth::logout();
@@ -370,9 +380,7 @@ class UserController extends Controller
                 'name' => 'required|unique:users',
                 'email' => 'required|email|unique:users',
                 'role_id' => 'required',
-                'localization' => 'required',
-                'password' => 'required|confirmed',
-                'password_confirmation' => 'required'
+                'localization' => 'required'
             ];
         } else {
             $rc = [
@@ -444,8 +452,9 @@ class UserController extends Controller
                 if ($fields['localization'] !== App::getLocale()) {
                     App::setLocale($fields['localization']);
                 }
-                $validated['password'] = UserController::hash($email, $fields['password']);
-                User::create($validated);
+                $validated['password'] = strval(rand()) . strval(time()) .  strval(rand());
+                $user = User::create($validated);
+                $rc = redirect("/user-editpassword/$user->id");
             }
         }
         if ($rc == null) {

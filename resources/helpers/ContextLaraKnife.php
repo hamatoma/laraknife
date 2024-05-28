@@ -79,6 +79,13 @@ class ContextLaraKnife
         $rc = $this->role->priority <= 19;
         return $rc;
     }
+    public function isAdminOrOwner(int $id = null): bool{
+        $rc = $this->isAdmin();
+        if (! $rc && $id != null){
+            $rc = $id === auth()->user()->id();
+        }
+        return $rc;
+    }
     public function text(string $text): string
     {
         return $text;

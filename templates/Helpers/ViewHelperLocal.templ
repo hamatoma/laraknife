@@ -16,9 +16,17 @@ class ViewHelperLocal
         $rc = null;
         switch ($name) {
             case 'note-edit':
-                $rc = new NavigationTabs([
+                $list = [
                     "Properties;/note-edit/$referenceId",
-                    "Documents;/note-index_documents/$referenceId"
+                    "Documents;/note-index_documents/$referenceId",
+                    "Shift;/note-edit_shift/$referenceId",
+                ];
+                $rc = new NavigationTabs($list, $indexActive);
+                break;
+            case 'user-edit':
+                $rc = new NavigationTabs([
+                    "Properties;/user-edit/$referenceId",
+                    "Password;/user-edit_password/$referenceId"
                 ], $indexActive);
                 break;
             default:

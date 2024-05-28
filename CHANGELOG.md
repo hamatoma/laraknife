@@ -1,5 +1,23 @@
 # Development phase
 
+# 0.9.1 Installation, design
+
+- col-empty.blade: fix: &bsp; for visibility
+- nav-tabs.blade, standard.blade: new: 2 optional buttons
+- laraknife.css, purple.css, standard.css: improvements
+- ContextLaraKnife: new: isAdminOrOwner()
+- User: register tabs, creation with random password
+- laraknife-tool.sh:
+  - new: module page
+  - new: Task (copy)
+  - fix: MediaWiki
+  - CSS: links to standard/purple/green
+  - fix: call of ./script
+- CreateLaraProj.sh: new: APP_THEME
+- layout.templ: improved includes
+- ViewHelperLocal: new: "user-edit"
+- new: TaskController
+
 # 0.8.8 Design
 
 - new: purple.css green.css standard.css

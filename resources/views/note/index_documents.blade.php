@@ -4,7 +4,7 @@
     <form id="note-edit-documents" action="/note-index_documents/{{$note->id}}" method="POST">
         @csrf
         <x-laraknife.panels.standard title="{{ __('Documents of a Note') }}" fieldset="false">
-        <x-laraknife.layout.nav-tabs :info="$navigationTabs" fieldset="false">
+        <x-laraknife.layout.nav-tabs :info="$navigationTabs" fieldset="false" button1Name="" button2Width1="4">
             <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
                 <x-laraknife.forms.string position="alone" name="text" label="Text"
                     value="{{ $context->valueOf('text') }}" width2="10" />

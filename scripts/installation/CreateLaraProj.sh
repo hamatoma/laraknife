@@ -57,6 +57,7 @@ EOS
   M_PW=Be.Happy4711
   sed -i \
   -e "s/APP_NAME=.*/APP_NAME=$PROJ/" \
+  -e 's/APP_ENV/APP_THEME=standard\nAPP_ENV/' \
   -e "s/APP_LOCALE=en.*/APP_LOCALE=de_DE/" \
   -e "s/MAIL_MAILER=.*/MAIL_MAILER=smtp/" \
   -e "s/MAIL_HOST=.*/MAIL_HOST=$M_HOST/" \
@@ -70,10 +71,10 @@ EOS
   php artisan migrate
   npm install
   Wait "npm is installed. Please type Strg-C after the next step" 
-  npm build dev
+  npm run build dev
   SCRIPT2=/tmp/IncludeLara.sh
   wget "https://public.hamatoma.de/public/IncludeLara.sh" -O $SCRIPT2
   chmod +x $SCRIPT2
-  echo "= start $SCRIPT2 git $BASE"
+  echo "= start $SCRIPT2 $BASE { local | git }"
   php artisan lang:publish
 fi

@@ -44,7 +44,7 @@ a.lnk-overview-cell,
 a:visited.lkn-overview-cell,
 a:link.lkn-overview-cell,
 a:active.lkn-overview-cell {
-    border: 0.25rem solid #bf5c82;
+    border: 0.25rem solid blue;
     color: blue;;
     /*box-shadow: 0 0 5px 0 #bf5c82;*/
 }
@@ -63,10 +63,10 @@ a:active.lkn-overview-cell {
 #main-content .nav-item {
     background-color: #EEE;
 }
-.lkn-text-info {color: blue;} 
-.lkn-text-info2 {color: #green;}
-.lkn-text-info3 {color: #36449E;}
-.lkn-text-info4 {color: blue;}
+.lkn-text-info {color: orange;} 
+.lkn-text-info2 {color: blue;}
+.lkn-text-info3 {color: green;}
+.lkn-text-info4 {color: brown;}
 .lkn-filter {
     background: aliceblue;
 }
@@ -109,10 +109,14 @@ a, a:active, a:link, a:visited, a:any-link {
     color: blue; }
 a:hover { 
         color: black; }
+/* Header-Navigation */
 a.nav-item, a:active.nav-item, a:link.nav-item, a:visited.nav-item, a:any-link.nav-item { 
     color: blue; }
-a:hover.nav-item { color: black; }
 nav a:active, nav a:link, nav a:visited, nav a:any-link {
+    color: white;
+}
+.nav-link:hover {
+    border: 1px solid white;
     color: white;
 }
 nav a:hover { color: rgba(255, 166, 0, 0.418); }
@@ -157,4 +161,4 @@ i.text-primary { color: blue !important; }
 .lkn-frame-indented {
     border: solid 0.1rem blue;
 }
-
+.lkn-border { border: solid 0.15rem #111111;}

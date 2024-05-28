@@ -9,7 +9,7 @@ h4{ color: #9D8C84 ; border-bottom: solid 0.1rem #9D8C84; }
 .lkn-text { 
     color: black;
     background-color: white;
-    border: 0.15rem solid #143F4E;
+    border: 0.15rem solid #607375;
 }
 /* Links */
 
@@ -29,7 +29,7 @@ h4{ color: #9D8C84 ; border-bottom: solid 0.1rem #9D8C84; }
 .lkn-header-frame
 {
     background-color: #c2b0a8;
-    border: 0.2rem solid #143F4E;
+    border: 0.15rem solid #607375;
 }
 .lkn-pagination-block
 {
@@ -66,10 +66,10 @@ a:active.lkn-overview-cell {
 #main-content .nav-item {
     background-color: #EEE;
 }
-.lkn-text-info {color: #83163F;} 
-.lkn-text-info2 {color: #9D8C84;}
-.lkn-text-info3 {color: #143F4E;}
-.lkn-text-info4 {color: #477085;}
+.lkn-text-info {color: orange;} 
+.lkn-text-info2 {color: blue;}
+.lkn-text-info3 {color: green;}
+.lkn-text-info4 {color: brown;}
 .lkn-filter {
     background: #c2b0a8;
 }
@@ -112,10 +112,14 @@ a, a:active, a:link, a:visited, a:any-link {
     color: #477085; }
 a:hover { 
         color: black; }
+/* Header-Navigation */
 a.nav-item, a:active.nav-item, a:link.nav-item, a:visited.nav-item, a:any-link.nav-item { 
     color: blue; }
-a:hover.nav-item { color: black; }
 nav a:active, nav a:link, nav a:visited, nav a:any-link {
+    color: white;
+}
+.nav-link:hover {
+    border: 1px solid white;
     color: white;
 }
 nav a:hover { color: rgba(255, 166, 0, 0.418); }
@@ -128,6 +132,9 @@ nav a:hover { color: rgba(255, 166, 0, 0.418); }
     color: #fdaf40;
     background-color: rgba(240, 240, 240, 0.75);
 }
+#main-content > div.lkn-form-table > h2 {
+    color: #83163F;
+    background-color: inherit;
 #main-content .nav-link {
     color: black;
 }
@@ -160,3 +167,4 @@ i.text-primary { color: #477085 !important; }
 .lkn-frame-indented {
     border: solid 0.1rem #83163F;
 }
+.lkn-border { border: solid 0.15rem #111111;}

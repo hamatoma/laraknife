@@ -51,9 +51,15 @@
 .lkn-show-panel,
 div.row  .lkn-nav-tab-panel {
     border: grey solid 0.07rem;
-    padding: 2rem 3rem;
+    padding: 2rem;
     border-radius: 0.5rem;
     box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
+}
+.nav-tabs li.nav-item, .lkn-nav-item-active, ul.lkn-nav-tab, li.nav-item, li.lkn-nav-item {
+    border-bottom: none;
+}
+.nav-tabs .lkn-panel, .lkn-nav-tab-panel{
+    border-top-left-radius: 0;
 }
 fieldset.lkn-noform-text {
     background-color: white;
@@ -71,7 +77,6 @@ fieldset.lkn-noform-text {
 #main-content li.lkn-nav-item-active {
     background-color: aliceblue;
 }
-div.lkn-nav-tab-panel,
 ul.nav-tab-panel,
 .lkn-filter,
 .lkn-fieldset,
@@ -171,7 +176,7 @@ ul.lkn-pagination {
     padding: 0.1rem 0.5rem 0.1rem 0.5rem;
     font-size: 0.9em;
     background-color: inherit;
-    border: 0.075rem black solid;
+    border: 0.1rem #888888 solid;
     border-radius: 0.25rem;
 }
 

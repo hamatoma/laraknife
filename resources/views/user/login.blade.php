@@ -3,7 +3,7 @@
 @section('content')
     <form id="user-edit" action="/user-login" method="POST">
         @csrf
-        <x-laraknife.panels.standard title="{{ __('Login') }}">
+        <x-laraknife.panels.standard title="{{ __('Login') }}" button1Name="" button2Name="">
             <x-laraknife.forms.set-position position="first" />
             <x-laraknife.layout.col-empty width="3" />
             <x-laraknife.forms.string position="last" name="email" label="Email" value="{{ $context->valueOf('email') }}"

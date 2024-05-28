@@ -3,7 +3,7 @@
 @section('content')
     <form id="note-update_document" action="/note-update_document/{{ $context->model->id }}" method="POST">
         @csrf
-        <x-laraknife.panels.edit title="{{ __('Change of a File') }}">
+        <x-laraknife.panels.edit title="{{ __('Change of a File') }}" button1Name="" button2Name="">
             <x-laraknife.forms.string position="alone" name="title" label="Title" value="{{ $context->valueOf('title') }}"
                 width2="10" />
             <x-laraknife.forms.text position="alone" name="description" label="Description"

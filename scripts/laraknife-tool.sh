@@ -106,8 +106,8 @@ function AdaptModules(){
   else
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
-      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;/' \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;#N##A#PageController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -129,7 +129,7 @@ function BuildLinks(){
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
     # === Modules
-    for module in SProperty Role User Menuitem Module Note File Term; do
+    for module in SProperty Role User Menuitem Module Note File Term Page; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
@@ -138,8 +138,14 @@ function BuildLinks(){
         ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
       fi
     done
+    for module in Task; do
+      local fn=app/Http/Controllers/${module}Controller.php
+      if [ ! -f $fn ]; then
+        cp -av ../../../$dirTemplates/Http/Controllers/${module}Controller.php $fn
+      fi
+    done
     # === Views
-    for module in laraknife sproperty role user menuitem note file term; do
+    for module in laraknife sproperty role user menuitem note file term page; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
@@ -150,7 +156,8 @@ function BuildLinks(){
       test "$option" = "--force" && rm -fv app/Helpers/$node
       ln -sv ../../$dirResources/helpers/$node app/Helpers/$node
     done
-    test -e app/Helpers/MediaWiki.php || cp -av vendor/hamatoma/laraknife/templates/Helpers/MediaWiki.templ MediaWiki.php
+    local fn=app/Helpers/MediaWiki.php
+    test -e $fn || cp -av vendor/hamatoma/laraknife/templates/Helpers/MediaWiki.templ $fn
     # === EMail controller
     mkdir -pv app/Mail
     for full in $dirResources/mail/*.php; do
@@ -169,7 +176,7 @@ function BuildLinks(){
     for resource in css js; do
       mkdir -p public/$resource
     done
-    for file in bootstrap-icon.css bootstrap.min.css fonts laraknife.css; do
+    for file in bootstrap-icons.css bootstrap.min.css fonts laraknife.css purple.css standard.css green.css; do
       test "$option" = "--force" && rm -fv public/css/$file
       ln -s ../../vendor/hamatoma/laraknife/resources/css/$file public/css/$file
     done
@@ -230,10 +237,10 @@ EOS
     test "$option" = "--force" && rm -fv resources/views/components/laraknife
     ln -sv ../../../$dirResources/components/laraknife resources/views/components/
     # ==== Translations
-    mkdir -p resources/lang/sources
+    mkdir -vp resources/lang/sources
     test "$option" = "--force" && rm -fv resources/lang/sources/laraknife.de.json
     ln -s ../../../$dirResources/lang/$LANG_DEFAULT.json resources/lang/sources/laraknife.de.json
-    mkdir -p lang/$LANG_DEFAULT
+    mkdir -vp lang/$LANG_DEFAULT
     for fullFile in $dirResources/lang/$LANG_DEFAULT/*; do
       local file=$(basename $fullFile)
       local fn=lang/$LANG_DEFAULT/$file
@@ -266,7 +273,7 @@ EOS
 php app/Helpers/Builder.php $*
 EOS
   chmod +x $script
-  ./$script
+  ./$script version
   test "$option" = "--force" && rm larascripts
   ln -s $base/scripts larascripts
   composer dump-autoload
