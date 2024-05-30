@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.9.2 Mandator, Account, Transaction, Design
+
+- laraknife.css: lkn-overview-cell: position of the icon
+- new: DateTimeHelper
+- new: modules Mandator, Account, Transaction
+
 # 0.9.1 Installation, design
 
 - col-empty.blade: fix: &bsp; for visibility

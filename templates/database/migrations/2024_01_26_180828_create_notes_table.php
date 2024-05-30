@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('visibility_scope');
             // foreign key of sproperties.
             $table->integer('notestatus_scope');
-            $table->foreignId('user_id')->references('id')->on('users')->nullable();
+            $table->foreignId('owner_id')->references('id')->on('users')->nullable();
         });
     }
 

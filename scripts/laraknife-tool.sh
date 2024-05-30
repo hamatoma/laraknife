@@ -106,8 +106,8 @@ function AdaptModules(){
   else
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
-      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;#N##A#PageController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;/' \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;#N##A#PageController;#N##A#GroupController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;#N#Group#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -129,7 +129,7 @@ function BuildLinks(){
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
     # === Modules
-    for module in SProperty Role User Menuitem Module Note File Term Page; do
+    for module in SProperty Role User Menuitem Module Note File Term Page Group; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
@@ -145,7 +145,7 @@ function BuildLinks(){
       fi
     done
     # === Views
-    for module in laraknife sproperty role user menuitem note file term page; do
+    for module in laraknife sproperty role user menuitem note file term page group; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
