@@ -57,7 +57,7 @@ elif [ ! -e .dev.user ]; then
   echo "+++ call './Own all' before! You can ignore errors of Own.sh"
 elif [ ! -f .env ]; then
   echo "+++ missing .env"
-  echo "cp -a env.example .env"
+  echo "cp -a .env.example .env"
   echo "adapt: APP_URL DB_USERNAME..."
 elif [ ! -d /var/lib/mysql/lrv#PROJECT~ ]; then
   echo "+++ missing db lrv#PROJECT~"

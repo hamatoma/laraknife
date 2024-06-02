@@ -1,11 +1,15 @@
 #! /bin/bash
 INCLUDE=missing.seeders
 test -f $INCLUDE && . $INCLUDE
-if [ -z "MISSING" ]; then
+if [ "$(id -u)" != 0 ]; then
+  echo "+++ be root!"
+elif [ -z "MISSING" ]; then
   echo "+++ missing $INCLUDE"
 else
-  for module in $MISSING; then
+  rm -f storage/logs/laravel.log
+  for module in $MISSING; do
     echo "= $module"
-    php artisan db:seeder --class=${module}Seeder
+    sudo -u hm php artisan db:seed --class=${module}Seeder
   done
 fi
+

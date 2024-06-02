@@ -1,5 +1,10 @@
 # Development phase
 
+# 0.9.3 Installation
+
+- new: scripts/InstallInitApp.sh
+- improved RunSeeder.sh and InitApp.templ
+
 # 0.9.2 Mandator, Account, Transaction, Design
 
 - laraknife.css: lkn-overview-cell: position of the icon
