@@ -26,7 +26,31 @@ class ViewHelperLocal
             case 'user-edit':
                 $rc = new NavigationTabs([
                     "Properties;/user-edit/$referenceId",
-                    "Password;/user-edit_password/$referenceId"
+                    "Password;/user-editpassword/$referenceId"
+                ], $indexActive);
+                break;
+            case 'mandator-edit':
+                $rc = new NavigationTabs([
+                    "Properties;/mandator-edit/$referenceId",
+                    "Accounts;/account-index/$referenceId"
+                ], $indexActive);
+                break;
+            case 'account-edit':
+                $rc = new NavigationTabs([
+                    "Properties;/account-edit/$referenceId",
+                    "Transactions;/transaction-index/$referenceId"
+                ], $indexActive);
+                break;
+            case 'transaction-create':
+                $rc = new NavigationTabs([
+                    "Properties;/transaction-edit/$referenceId",
+                ], $indexActive);
+                break;
+            case 'transaction-edit':
+                $rc = new NavigationTabs([
+                    "Properties;/transaction-edit/$referenceId",
+                    "Ownership;/transaction-editowner/$referenceId",
+                    "Documents;/files-indextrans/$referenceId"
                 ], $indexActive);
                 break;
             default:

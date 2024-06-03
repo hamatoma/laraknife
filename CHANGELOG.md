@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.9.4 Mandator, Account, Transaction
+
+- new: Modules Mandator, Account, Transaction
+- InitApp.templ:
+  - new: PrepareDb()
+
 # 0.9.3 Installation
 
 - new: scripts/InstallInitApp.sh

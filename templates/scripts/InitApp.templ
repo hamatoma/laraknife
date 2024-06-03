@@ -6,7 +6,7 @@ function Wait(){
 }
 function SeedIt(){
   for class in DatabaseSeeder ModuleSeeder SPropertySeeder RoleSeeder UserSeeder \
-      MenuitemSeeder FileSeeder NoteSeeder; do
+      MenuitemSeeder FileSeeder GroupSeeder PageSeeder NoteSeeder; do
     sudo -u $DEV_USER ./artisan db:seed --class=$class
   done
 }
@@ -14,6 +14,16 @@ function CreateStorage(){
   mkdir -p storage/logs
   if [ ! -d storage/framework/cache ]; then
     mkdir -p storage/framework/cache storage/framework/views storage/framework/sessions
+  fi
+}
+function PrepareDb(){
+  PASSW=topSecret
+  if [ -z "$(grep DB_CONNECTION=mysql .env)" ]; then
+    sed -i -e 's/DB_CONNECTION=.*/DB_CONNECTION=mysql/' -e "s/DB_DATABASE=.*/DB_DATABASE=lrv$PROJ/" \
+      -e "s/DB_USERNAME=.*/DB_USERNAME=$PROJ/" -e "s/DB_PASSWORD=.*/DB_PASSWORD=$PASSW/" .env
+    sudo mysql mysql <<EOS
+GRANT ALL ON lrv$PROJ.* to '$PROJ'@'localhost' IDENTIFIED BY '$PASSW';
+EOS
   fi
 }
 function LinkLaraknife(){
@@ -29,6 +39,8 @@ function DoIt(){
   chown -R $DEV_USER:www-data bootstrap/cache
   sudo -u $DEV_USER composer update
   Wait
+  PrepareDb
+  Wait
   sudo -u $DEV_USER ./artisan migrate
   Wait
   SeedIt
@@ -36,6 +48,7 @@ function DoIt(){
   egrep '"vite":' package.json && sudo -u $DEV_USER npm install vite
   Wait
   sudo -u $DEV_USER npm run build
+  php artisan key:generate
   cat <<'EOS' >ToDo
 = see .lrv.credential for first login
 php artisan key:generate
