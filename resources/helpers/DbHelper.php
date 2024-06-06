@@ -69,6 +69,20 @@ class DbHelper
         return $sql;
     }
     /**
+     * Builds the sum of a given $column from all $records.
+     * @param array $records the record to inspect
+     * @param string $column the name of the column to inspect
+     * @param string $format the format like in sprintf()
+     * @return string the sum as string
+     */
+    public static function buildSum(array $records, string $column, string $format="%0.2f"): string{
+        $rc = 0;
+        foreach($records as &$record){
+            $rc += $record->$column;
+        }
+        return sprintf($format, $rc);
+    }
+    /**
      * Returns one column from a record given by the primary key.
      * @param mixed $primaryKey specifies the record
      * @param string $column specifies the column

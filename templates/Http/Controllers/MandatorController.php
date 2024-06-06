@@ -59,7 +59,7 @@ class MandatorController extends Controller
                     ];
             }
             $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('mandator-edit', 0, $mandator->id);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('mandator-edit', 1, $mandator->id);
             $context = new ContextLaraKnife($request, null, $mandator);
             $rc = view('mandator.edit', [
                 'context' => $context,

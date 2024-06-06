@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\File;
 use App\Models\User;
+use App\Models\Module;
 use App\Helpers\Helper;
 use App\Models\Account;
 use App\Models\Mandator;
@@ -60,6 +62,45 @@ class TransactionController extends Controller
         }
         return $rc;
     }
+    public function createDocument(Transaction $transaction, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect("/transaction-index_documents/$transaction->id");
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'title' => '',
+                    'description' => '',
+                    'filename' => '',
+                    'filegroup_scope' => '1101',
+                    'visibility_scope' => '1091',
+                    'owner_id' => auth()->id()
+                ];
+            }
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $id = $transaction->account_id;
+            $account = Account::find($id);
+            $fields['account_id'] = $account->id;
+            $fields['account'] = $account->name;
+            $fields['accountAmount'] = $account->amount;
+            $mandator = Mandator::find($account->mandator_id);
+            $fields['mandator'] = $mandator->name;
+            $context = new ContextLaraKnife($request, $fields);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-create-document', 6, $transaction->id, strval($mandator->id), $account->id);
+            $rc = view('transaction.create_document', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
+                'optionsUser' => $optionsUser,
+                'transaction' => $transaction,
+                'navTabsInfo' => $navigationTabInfo
+            ]);
+        }
+        return $rc;
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -97,9 +138,11 @@ class TransactionController extends Controller
             $account = Account::find($id);
             $fields['account_id'] = $account->id;
             $fields['account'] = $account->name;
-            $fields['mandator'] = Mandator::find($account->mandator_id)->name;
+            $fields['accountAmount'] = $account->amount;
+            $mandator = Mandator::find($account->mandator_id);
+            $fields['mandator'] = $mandator->name;
             $context = new ContextLaraKnife($request, $fields, $transaction);
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-edit', 0, $transaction->id);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-edit', 3, $transaction->id, strval($mandator->id), $account->id);
             $rc = view('transaction.edit', [
                 'context' => $context,
                 'optionsTransactiontype' => $optionsTransactiontype,
@@ -109,6 +152,45 @@ class TransactionController extends Controller
         }
         return $rc;
     }
+    public function editDocument(File $file, Transaction $transaction, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect("/transaction-index_documents/$file->reference_id");
+        } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'title' => '',
+                    'description' => '',
+                    'filename' => '',
+                    'filegroup_scope' => '',
+                    'visibility_scope' => '',
+                    'owner_id' => ''
+                ];
+            }
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
+            $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $id = $transaction->account_id;
+            $account = Account::find($id);
+            $fields['account_id'] = $account->id;
+            $fields['account'] = $account->name;
+            $fields['accountAmount'] = $account->amount;
+            $mandator = Mandator::find($account->mandator_id);
+            $fields['mandator'] = $mandator->name;
+            $context = new ContextLaraKnife($request, null, $file);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-edit-document', 6, $transaction->id, $file->id, $account->id);
+            $rc = view('transaction.edit_document', [
+                'context' => $context,
+                'optionsFilegroup' => $optionsFilegroup,
+                'optionsVisibility' => $optionsVisibility,
+                'optionsUser' => $optionsUser,
+                'navTabsInfo' => $navigationTabInfo
+            ]);
+        }
+        return $rc;
+    }
+
     public function editOwner(Transaction $transaction, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
@@ -129,8 +211,14 @@ class TransactionController extends Controller
                 }
             }
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $transaction->owner_id, __('<Please select>'));
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-edit', 1, $transaction->id, $transaction->options);
-            $context = new ContextLaraKnife($request, null, $transaction);
+            $account = Account::find($accountId = $transaction->account_id);
+            $fields['account_id'] = $account->id;
+            $fields['account'] = $account->name;
+            $fields['accountAmount'] = $account->amount;
+            $mandator = Mandator::find($account->mandator_id);
+            $fields['mandator'] = $mandator->name;
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-edit', 4, $transaction->id, $transaction->options, $account->id);
+            $context = new ContextLaraKnife($request, $fields, $transaction);
             $rc = view('transaction.edit_owner', [
                 'context' => $context,
                 'optionsOwner' => $optionsOwner,
@@ -195,14 +283,17 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
+            $fields['sum'] = DbHelper::buildSum($records, 'amount');
             $optionsTransactiontype = SProperty::optionsByScope('transactiontype', $fields['transactiontype'], 'all');
             $optionsTransactionstate = SProperty::optionsByScope('transactionstate', $fields['transactionstate'], 'all');
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner'], __('<Please select>'));
             $fields['account_id'] = $account->id;
-            $fields['mandator'] = Mandator::find($account->mandator_id)->name;
+            $mandator = Mandator::find($account->mandator_id);
+            $fields['mandator'] = $mandator->name;
             $fields['account'] = $account->name;
+            $fields['accountAmount'] = $account->amount;
             $context = new ContextLaraKnife($request, $fields);
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('account-edit', 1, $account->id);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('account-edit', 3, $account->id, null, $mandator->id);
             return view('transaction.index', [
                 'context' => $context,
                 'records' => $records,
@@ -211,6 +302,60 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
                 'optionsOwner' => $optionsOwner,
                 'pagination' => $pagination,
                 'navTabsInfo' => $navigationTabInfo
+            ]);
+        }
+    }
+    public function indexDocuments(Transaction $transaction, Request $request)
+    {
+        $moduleId = Module::idOfModule('Transaction');
+        if ($request->btnSubmit === 'btnNew') {
+            return redirect("/transaction-create_document/$transaction->id");
+        } else {
+            $sql = "
+SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id 
+FROM files t0
+LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope
+LEFT JOIN sproperties t2 ON t2.id=t0.user_id
+";
+            $parameters = [];
+            $conditions = [];
+            $fields = $request->all();
+            if (count($fields) == 0) {
+                $fields = [
+                    'filegroup' => '',
+                    'owner' => auth()->id(),
+                    'text' => '',
+                    'filegroup_scope' => '1101',
+                    '_sortParams' => 'id:desc',
+                ];
+            } else {
+                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
+            }
+            ViewHelper::addConditionConstComparison($conditions, $parameters, 'module_id', $moduleId);
+            ViewHelper::addConditionConstComparison($conditions, $parameters, 'reference_id', $transaction->id);
+            $sql = DbHelper::addConditions($sql, $conditions);
+            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+            $pagination = new Pagination($sql, $parameters, $fields);
+            $records = $pagination->records;
+            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup'], 'all');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner']);
+            $account = Account::find($transaction->account_id);
+            $fields['account_id'] = $account->id;
+            $mandator = Mandator::find($account->mandator_id);
+            $fields['mandator'] = $mandator->name;
+            $fields['account'] = $account->name;
+            $fields['accountAmount'] = $account->amount;
+            $fields['transaction_id'] = $transaction->id;
+            $context = new ContextLaraKnife($request, $fields);
+            $fileController = new FileController();
+            $context->setCallback('buildAnchor', $fileController, 'buildAnchor');
+            $navTabInfo = ViewHelperLocal::getNavigationTabInfo('transaction-edit', 5, $account->id, null, $mandator->id);
+            return view('transaction.index_documents', [
+                'context' => $context,
+                'records' => $records,
+                'pagination' => $pagination,
+                'navigationTabs' => $navTabInfo,
+                'transaction' => $transaction,
             ]);
         }
     }
@@ -237,11 +382,19 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
         Route::post('/transaction-index/{account}', [TransactionController::class, 'index'])->middleware('auth');
         Route::get('/transaction-create/{account}', [TransactionController::class, 'create'])->middleware('auth');
         Route::put('/transaction-store/{account}', [TransactionController::class, 'store'])->middleware('auth');
+        Route::put('/transaction-store_document/{transaction}', [TransactionController::class, 'storeDocument'])->middleware('auth');
+        Route::put('/transaction-update_document/{file}/{transaction}', [TransactionController::class, 'updateDocument'])->middleware('auth');
         Route::post('/transaction-edit/{transaction}', [TransactionController::class, 'edit'])->middleware('auth');
         Route::get('/transaction-edit/{transaction}', [TransactionController::class, 'edit'])->middleware('auth');
         Route::post('/transaction-editowner/{transaction}', [TransactionController::class, 'editOwner'])->middleware('auth');
         Route::get('/transaction-editowner/{transaction}', [TransactionController::class, 'editOwner'])->middleware('auth');
+        Route::post('/transaction-edit_document/{file}/{transaction}', [TransactionController::class, 'editDocument'])->middleware('auth');
+        Route::get('/transaction-edit_document/{file}/{transaction}', [TransactionController::class, 'editDocument'])->middleware('auth');
+        Route::post('/transaction-index_documents/{transaction}', [TransactionController::class, 'indexDocuments'])->middleware('auth');
+        Route::get('/transaction-index_documents/{transaction}', [TransactionController::class, 'indexDocuments'])->middleware('auth');
         Route::get('/transaction-show/{transaction}/delete', [TransactionController::class, 'show'])->middleware('auth');
+        Route::get('/transaction-create_document/{transaction}', [TransactionController::class, 'createDocument'])->middleware('auth');
+        Route::post('/transaction-create_document/{transaction}', [TransactionController::class, 'createDocument'])->middleware('auth');
         Route::delete('/transaction-show/{transaction}/delete', [TransactionController::class, 'destroy'])->middleware('auth');
     }
     /**
@@ -252,6 +405,7 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/transaction-index')->middleware('auth');
         } else {
+            $fields = $request->all();
             $optionsTransactiontype = SProperty::optionsByScope('transactiontype', $transaction->transactiontype_scope, '');
             $optionsTransactionstate = SProperty::optionsByScope('transactionstate', $transaction->transactionstate_scope, '');
             $optionsAccount = DbHelper::comboboxDataOfTable('accounts', 'name', 'id', $fields['account_id'], __('<Please select>'));
@@ -303,11 +457,56 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['account_id'] = $account->id;
                 $transaction = Transaction::create($validated);
+                $account->update(['amount' => $account->amount + floatval($fields['amount'])]);
                 $rc = redirect("/transaction-edit/$transaction->id");
             }
         }
         if ($rc == null) {
             $rc = redirect("/transaction-index/$account->id");
+        }
+        return $rc;
+    }
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function storeDocument(Transaction $transaction, Request $request)
+    {
+        $rc = null;
+        if ($request->btnSubmit === 'btnStore') {
+            $fields = $request->all();
+            $validator = Validator::make($fields, ['title' => 'required', 'filegroup_scope' => 'required', 'visibility_scope' => 'required']);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $controller = new FileController();
+                $fields['module_id'] = Module::idOfModule('Transaction');
+                $fields['reference_id'] = $transaction->id;
+                $fields['description'] = strip_tags($fields['description']);
+                $controller->storeFile($request, $fields);
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect("/transaction-index_documents/$transaction->id");
+        }
+        return $rc;
+    }
+    public function updateDocument(File $file, Transaction $transaction, Request $request)
+    {
+        $rc = null;
+        if ($request->btnSubmit === 'btnStore') {
+            $fields = $request->all();
+            $fields['description'] = strip_tags($fields['description']);
+            $validator = Validator::make($fields, ['title' => 'required']);
+            if ($validator->fails()) {
+                $rc = back()->withErrors($validator)->withInput();
+            } else {
+                $fields2 = $request->only(['title', 'description', 'filegroup_scope']);
+                $file->update($fields2);
+            }
+        }
+        if ($rc == null) {
+            $rc = redirect("/transaction-index_documents/$file->reference_id");
         }
         return $rc;
     }

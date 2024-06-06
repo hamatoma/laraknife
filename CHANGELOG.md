@@ -1,5 +1,10 @@
 # Development phase
 
+# 0.9.5 Transaction
+
+- DbHelper: new: buildSum()
+- Mandator, Account, Transaction: consistent register tabs (in views)
+
 # 0.9.4 Mandator, Account, Transaction
 
 - new: Modules Mandator, Account, Transaction

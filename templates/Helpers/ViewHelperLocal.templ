@@ -3,7 +3,9 @@ namespace App\Helpers;
 
 use App\Helpers\NavigationTabs;
 
-
+define('ROLE_ADMIN', 10);
+define('ROLE_MANAGER', 20);
+define('ROLE_USER', 50);
 /**
  * Helpers for views
  *
@@ -11,7 +13,15 @@ use App\Helpers\NavigationTabs;
  */
 class ViewHelperLocal
 {
-    public static function getNavigationTabInfo(string $name, int $indexActive, int $referenceId): ?NavigationTabs
+    /**
+     * Returns a NavigationTabs instance given by name.
+     * @param string $name the name of the tab info
+     * @param int $indexActive the index (0..N-1) of the tab that should be the active tab
+     * @param int $referenceId used for links
+     * @param string $options
+     * @param int $referenceId2 used for other links
+     */
+    public static function getNavigationTabInfo(string $name, int $indexActive, int $referenceId, ?string $options=null, ?int $referenceId2 = null): ?NavigationTabs
     {
         $rc = null;
         switch ($name) {
@@ -31,14 +41,17 @@ class ViewHelperLocal
                 break;
             case 'mandator-edit':
                 $rc = new NavigationTabs([
+                    'Mandators;/mandator-index',
                     "Properties;/mandator-edit/$referenceId",
                     "Accounts;/account-index/$referenceId"
                 ], $indexActive);
                 break;
             case 'account-edit':
                 $rc = new NavigationTabs([
+                    'Mandators;/mandator-index',
+                    "Accounts;/account-index/$options",
                     "Properties;/account-edit/$referenceId",
-                    "Transactions;/transaction-index/$referenceId"
+                    "Transactions;/transaction-index/$referenceId",
                 ], $indexActive);
                 break;
             case 'transaction-create':
@@ -46,16 +59,50 @@ class ViewHelperLocal
                     "Properties;/transaction-edit/$referenceId",
                 ], $indexActive);
                 break;
-            case 'transaction-edit':
+            case 'transaction-create-document':
                 $rc = new NavigationTabs([
+                    'Mandators;/mandator-index',
+                    "Accounts;/account-index/$referenceId2",
+                    "Transactions;/transaction-index/$referenceId2",
                     "Properties;/transaction-edit/$referenceId",
-                    "Ownership;/transaction-editowner/$referenceId",
-                    "Documents;/files-indextrans/$referenceId"
+                    "Responsibility;/transaction-editowner/$referenceId",
+                    "Documents;/transaction-index_documents/$referenceId",
+                    "Document;/transaction-create_document/$referenceId"
+                ], $indexActive);
+                break;
+            case 'transaction-edit-document':
+                $rc = new NavigationTabs([
+                    'Mandators;/mandator-index',
+                    "Accounts;/account-index/$referenceId2",
+                    "Transactions;/transaction-index/$referenceId2",
+                    "Properties;/transaction-edit/$referenceId",
+                    "Responsibility;/transaction-editowner/$referenceId",
+                    "Documents;/transaction-index_documents/$referenceId",
+                    "Document;/transaction-edit_document/$options/$referenceId"
+                ], $indexActive);
+                break;
+           case 'transaction-edit':
+                $rc = new NavigationTabs([
+                    'Mandators;/mandator-index',
+                    "Accounts;/account-index/$referenceId2",
+                    "Transactions;/transaction-index/$referenceId2",
+                    "Properties;/transaction-edit/$referenceId",
+                    "Responsibility;/transaction-editowner/$referenceId",
+                    "Documents;/transaction-index_documents/$referenceId",
                 ], $indexActive);
                 break;
             default:
                 break;
         }
         return $rc;
+    }
+    /**
+     * Tests whether the current user has a role.
+     * @param int $neededPriority ROLE_ADMIN...ROLE_GUEST
+     */
+    public static function hasNeededRole(int $neededPriority): bool
+    {
+        $role = Auth::user()->role_id;
+        return $role <= $neededPriority;
     }
 }

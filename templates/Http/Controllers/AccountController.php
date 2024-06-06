@@ -77,7 +77,7 @@ class AccountController extends Controller
                     ];
                 }
                 $context = new ContextLaraKnife($request, $fields, $account);
-                $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('account-edit', 0, $account->id);
+                $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('account-edit', 2, $account->id);
                 $rc = view('account.edit', [
                     'context' => $context,
                     'navTabsInfo' => $navigationTabInfo
@@ -130,7 +130,7 @@ LEFT JOIN mandators t1 ON t1.id=t0.mandator_id
             $records = $pagination->records;
             $fields['mandator_id'] = $mandator->id;
             $context = new ContextLaraKnife($request, $fields);
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('mandator-edit', 1, $mandator->id);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('mandator-edit', 2, $mandator->id);
             $rc = view('account.index', [
                 'context' => $context,
                 'records' => $records,

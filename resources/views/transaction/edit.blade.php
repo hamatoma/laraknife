@@ -6,9 +6,12 @@
         <x-laraknife.panels.standard title="{{ __('Change of a Transaction') }}" fieldset="false">
             <x-laraknife.layout.nav-tabs :info="$navTabsInfo" fieldset="true">
                 <x-laraknife.forms.string position="first" name="account" label="Account"
-                    value="{{ $context->valueOf('account') }}" width2="4" attribute="readonly" />
+                    value="{{ $context->valueOf('account') }}" width2="3" attribute="readonly" />
+                <x-laraknife.forms.string position="middle" name="accountAmount" label=""
+                    value="{{ $context->valueOf('accountAmount') }}" width1="0" width2="1" attribute="readonly" />
                 <x-laraknife.forms.string position="last" name="mandator" label="Mandator"
                     value="{{ $context->valueOf('mandator') }}" width2="4" attribute="readonly" />
+                <hr>
                 <x-laraknife.forms.string position="first" name="name" label="Name"
                     value="{{ $context->valueOf('name') }}" width2="4" />
                 <x-laraknife.forms.string type="date" position="last" name="date" label="Date"
