@@ -248,7 +248,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                     'category' => '1051',
                     'notestatus' => '1011',
                     'visibility' => '1091',
-                    'user' => strval(auth()->id()),
+                    'owner' => strval(auth()->id()),
                     'title' => '',
                     'body' => '',
                     '_sortParams' => 'id:asc'
@@ -271,7 +271,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
             $optionsCategory = SProperty::optionsByScope('category', $fields['category'], 'all');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $fields['notestatus'], 'all');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility'], 'all');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user']);
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner']);
             $context = new ContextLaraKnife($request, $fields);
             return view('note.index', [
                 'context' => $context,
