@@ -1,5 +1,20 @@
 # Development phase
 
+# 0.9.6 export of pages, module Export
+
+- new: delete-file.blade
+- new: simple.blade
+- ContextLaraKnife: new. buildFileLink()
+- FileHelper:
+  - new: buildExportName(), decodeUrl(), encodeUrl()
+  - new: fileInfoList()
+  - new: class FileInfo
+- StringHelper:
+  - new: charSetAlphaNumeric
+  - new: randomString()
+- new: module Export
+- refactoring of all seeders: makeing that idempotent (can be called multiple times)
+
 # 0.9.5 Transaction
 
 - DbHelper: new: buildSum()

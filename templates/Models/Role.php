@@ -16,4 +16,22 @@ class Role extends Model
         'name',
         'priority',
     ];
+    /**
+     * Inserts a record of modules if it does not already exist.
+     * @param string $name
+     * @param int $priority a lower values have more rights
+     */
+    public static function insertIfNotExists(string $name, int $priority, int $id = null)
+    {
+        if (self::where(['name' => $name])->first() == null) {
+            $attributes = [
+                'name' => $name,
+                'priority' => $priority,
+            ];
+            if ($id != null){
+                $attributes['id'] = $id;
+            }
+            DB::table('roles')->insert($attributes);
+        }
+    }
 }

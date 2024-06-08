@@ -49,6 +49,11 @@ class ContextLaraKnife
         return $rc;
     }
 
+    public function buildFileLink(string $node, string $relPath, string $label=null): string{
+        $label ??= $node;
+        $rc = "<a href=\"/$relPath/$node\">$label</a>";
+        return $rc;
+    }
     public function callback(string $name, $data)
     {
         $rc = null;

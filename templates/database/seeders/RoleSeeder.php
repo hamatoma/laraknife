@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
+use App\Models\Module;
+use App\Models\Menuitem;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -13,25 +16,12 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('roles')->insert([
-            'id' => 1,
-            'name' => 'Administrator',
-            'priority' => '10'
-        ]);
-        DB::table('roles')->insert([
-            'id' => 2,
-            'name' => 'Manager',
-            'priority' => '20'
-        ]);
-        DB::table('roles')->insert([
-            'id' => 3,
-            'name' => 'User',
-            'priority' => '50'
-        ]);
-        DB::table('roles')->insert([
-            'id' => 4,
-            'name' => 'Guest',
-            'priority' => '90'
-        ]);
+        Menuitem::insertIfNotExists('roles', 'bi-person-check-fill');
+        Module::insertIfNotExists('Role');
+
+        Role::insertIfNotExists('Administrator', 10, 1);
+        Role::insertIfNotExists('Manager', 20, 2);
+        Role::insertIfNotExists('User', 50, 3);
+        Role::insertIfNotExists('Guest', 99, 4);
     }
 }

@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Module;
+use App\Models\Menuitem;
+use App\Models\SProperty;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -13,47 +16,15 @@ class SPropertySeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('sproperties')->insert([
-            'id' => 1001,
-            'scope' => 'status',
-            'name' => 'active',
-            'order' => '10',
-            'shortname' => 'A'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1002,
-            'scope' => 'status',
-            'name' => 'inactive',
-            'order' => '20',
-            'shortname' => 'I'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1201,
-            'scope' => 'localization',
-            'name' => 'English (Britisch)',
-            'order' => '10',
-            'shortname' => 'en_GR'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1202,
-            'scope' => 'localization',
-            'name' => 'German (Germany)',
-            'order' => '20',
-            'shortname' => 'de_DE'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1203,
-            'scope' => 'localization',
-            'name' => 'French (France)',
-            'order' => '30',
-            'shortname' => 'fr_FR'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1204,
-            'scope' => 'localization',
-            'name' => 'Italian (Italy)',
-            'order' => '40',
-            'shortname' => 'it_IT'
-        ]);
- }
+        Menuitem::insertIfNotExists('sproperties', 'bi bi-card-list');
+        Module::insertIfNotExists('SProperty', 'sproperties');
+
+        SProperty::insertIfNotExists(1001, 'status', 'active', '10', 'A');
+        SProperty::insertIfNotExists(1002, 'status', 'inactive', '20', 'I');
+
+        SProperty::insertIfNotExists(1201, 'localization', 'English (Britisch)', '10', 'en_GR');
+        SProperty::insertIfNotExists(1202, 'localization', 'German (Germany)', '20', 'de_DE');
+        SProperty::insertIfNotExists(1203, 'localization', 'French (France)', '30', 'fr_FR');
+        SProperty::insertIfNotExists(1204, 'localization', 'Italian (Italy)', '40', 'it_IT');
+    }
 }

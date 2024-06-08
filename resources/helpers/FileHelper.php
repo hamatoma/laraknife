@@ -6,10 +6,30 @@ use Illuminate\Http\Request;
 class FileHelper
 {
     /**
+     * Builds a filename as two instances: an URL and a real filename.
+     * 
+     * The node starts with the username: that allows filtering.
+     *  
+     * @param string $name the basic part of the filename without extension
+     * @param string $extension the file type, e.g. '.txt'
+     * @return string the constructed filename e.g. '/srv/www/storage/export/jonny_pages_102383.txt'
+     */
+    public static function buildExportName(string $name, string $extension, bool $unique = true): string
+    {
+        $user = auth()->user()->name;
+        $rc = $_SERVER['DOCUMENT_ROOT'] . "/export/$user.$name";
+        if ($unique) {
+            $rc .= '_' . strval(time() % 86400);
+        }
+        $rc .= $extension;
+        return $rc;
+    }
+
+    /**
      * Builds the download link of an uploaded file.
      * @param string $filename the filename without path
      * @param string $date the date/time of the upload
-     * @return string the relative link, e.g. "/upload/2024/02/113_london.jpg'
+     * @return string the relative link, e.g. "/upload/2024/02/113_london.jpg"
      */
     public static function buildFileLink(string $filename, string $date): string
     {
@@ -31,6 +51,33 @@ class FileHelper
         }
         return $rc;
     }
+    public static function decodeUrl(string $text): string
+    {
+        $count = strlen($text);
+        $rc = preg_replace_callback(
+            '/%[0-9a-fA-F][0-9a-fA-F]/',
+            function ($matches) {
+                $cc = hex_dec(substr($matches[0], 1));
+                return chr($cc);
+            },
+            $text
+        );
+        return $rc;
+    }
+    public static function encodeUrl(string $text): string
+    {
+        $count = strlen($text);
+        $rc = '';
+        for ($ix = 0; $ix < $count; $ix++) {
+            $cc = $text[$ix];
+            if ($cc >= '@' && $cc <= 'Z' || $cc >= 'a' && $cc <= 'z' || strpos("0123456789_+-.", $cc) !== false) {
+                $rc .= $cc;
+            } else {
+                $rc .= sprintf("%%%02X", ord($cc));
+            }
+        }
+        return $rc;
+    }
     /**
      * Deletes the uploaded file.
      * @param string $filename the name to rename (without path)
@@ -49,6 +96,27 @@ class FileHelper
     public static function extensionOf(string $filename): string
     {
         $rc = ($ixDot = strrpos($filename, '.')) === false ? '' : substr($filename, $ixDot);
+        return $rc;
+    }
+    /**
+     * Returns a list of FileInfo instances of a given $directory.
+     * @param string $directory that directory will be scanned
+     * @param NULL|string $pattern a regular expression for filtering. Only matching files will be returned. Example: "/^.*.txt$"
+     * @return array the list of filtered files from $directory 
+     */
+    public static function fileInfoList(string $directory, string $pattern = null): array
+    {
+        $rc = [];
+        $nodes = scandir($directory);
+        foreach ($nodes as $node) {
+            if ($node !== '.' && $node !== '..' && ($pattern == null || preg_match($pattern, $node))) {
+                $full = "$directory/$node";
+                $size = filesize($full);
+                $timestamp = filemtime($full);
+                $date = new \DateTime("@$timestamp");
+                array_push($rc, new FileInfo($node, $date, $size / 1E6));
+            }
+        }
         return $rc;
     }
     /**
@@ -99,6 +167,25 @@ class FileHelper
         if (empty($rc)) {
             $rc = '_';
         }
+        return $rc;
+    }
+}
+class FileInfo
+{
+    public $node;
+    public $date;
+    public $sizeMByte;
+    public $id;
+    public function __construct(string $node, \DateTime $date, float $sizeMByte, int $id = 0)
+    {
+        $this->node = $node;
+        $this->date = $date;
+        $this->sizeMByte = $sizeMByte;
+        $this->id = $id;
+    }
+    public function urlEncoded()
+    {
+        $rc = FileHelper::encodeUrl($this->node);
         return $rc;
     }
 }

@@ -17,22 +17,25 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $pw = StringHelper::createPassword();
-        $email = 'administrator@example.com';
-        \file_put_contents('.lrv.credentials', "$email\n$pw\n");
-        DB::table('users')->insert([
-            'name' => 'Administrator',
-            'email' => $email,
-            'password' => UserController::hash($email, $pw),
-            'role_id' => 1
-        ]);
-        $email = 'guest@example.com';
-        $pw =  StringHelper::createPassword();
-        DB::table('users')->insert([
-            'name' => 'Guest',
-            'email' => $email,
-            'password' => UserController::hash($email, $pw),
-            'role_id' => 4
-        ]);
+        $records = DB::select('select * from users');
+        if ($records == null || count($records) == 0){
+            $pw = StringHelper::createPassword();
+            $email = 'administrator@example.com';
+            \file_put_contents('.lrv.credentials', "$email\n$pw\n");
+            DB::table('users')->insert([
+                'name' => 'Administrator',
+                'email' => $email,
+                'password' => UserController::hash($email, $pw),
+                'role_id' => 1
+            ]);
+            $email = 'guest@example.com';
+            $pw =  StringHelper::createPassword();
+            DB::table('users')->insert([
+                'name' => 'Guest',
+                'email' => $email,
+                'password' => UserController::hash($email, $pw),
+                'role_id' => 4
+            ]);
+        }
     }
 }

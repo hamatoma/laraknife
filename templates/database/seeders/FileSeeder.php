@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Module;
+use App\Models\Menuitem;
+use App\Models\SProperty;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -13,31 +16,14 @@ class FileSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('sproperties')->insert([
-            'id' => 1101,
-            'scope' => 'filegroup',
-            'name' => 'public',
-            'order' => '10',
-            'shortname' => 'PUB'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1102,
-            'scope' => 'filegroup',
-            'name' => 'private',
-            'order' => '20',
-            'shortname' => 'PRIV'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1103, 'scope' => 'filegroup', 'name' => 'Audio file', 'order' => '30', 'shortname' => 'AUDIO'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1104, 'scope' => 'filegroup', 'name' => 'Video file', 'order' => '40', 'shortname' => 'VIDEO'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1105, 'scope' => 'filegroup', 'name' => 'Image file', 'order' => '50', 'shortname' => 'IMG'
-        ]);
-        DB::table('sproperties')->insert([
-            'id' => 1106, 'scope' => 'filegroup', 'name' => 'Document file', 'order' => '60', 'shortname' => 'DOC'
-        ]);
+        Menuitem::insertIfNotExists('files', 'bi bi-file-pdf');
+        Module::insertIfNotExists('Files');
+
+        SProperty::insertIfNotExists(1101, 'filegroup', 'public', '10', 'PUB');
+        SProperty::insertIfNotExists(1102, 'filegroup', 'private', '20', 'PRIV');
+        SProperty::insertIfNotExists(1103, 'filegroup', 'audio file', '30', 'AUDIO');
+        SProperty::insertIfNotExists(1104, 'filegroup', 'video file', '40', 'VIDEO');
+        SProperty::insertIfNotExists(1105, 'filegroup', 'image file', '50', 'IMG');
+        SProperty::insertIfNotExists(1106, 'filegroup', 'document file', '60', 'IMG');
     }
 }

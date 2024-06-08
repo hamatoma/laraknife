@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 class StringHelper
 {
+    public static $charSetAlphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890_";
     /**
      * Creates a good random password: uppercase, lowercase, digits, specials.
      * @param int $length the length of the result
@@ -54,9 +55,18 @@ class StringHelper
         }
         return strtolower($rc);
     }
-    public static function randomChar(string $charSet)
+    public static function randomChar(string $charSet): string
     {
         $rc = $charSet[rand(0, strlen($charSet) - 1)];
+        return $rc;
+    }
+    public static function randomString(string $charSet, int $length): string
+    {
+        $rc = '';
+        $max = strlen($charSet) - 1;
+        for ($ix = 0; $ix < $length; $ix++){
+            $rc .= $charSet[rand(0, $max)];
+        }
         return $rc;
     }
     /**

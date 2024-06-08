@@ -103,6 +103,7 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
             } else {
                 $conditions = [];
                 ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
+                ViewHelper::addConditionFindInList($conditions, $parameters, 't1.members', strval(auth()->user()->id));
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);

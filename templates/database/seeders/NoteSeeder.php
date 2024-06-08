@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Module;
+use App\Models\Menuitem;
 use App\Models\SProperty;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +16,9 @@ class NoteSeeder extends Seeder
      */
     public function run(): void
     {
-        // int $id, string $scope, string $name, int $order, string $shortname
+        Menuitem::insertIfNotExists('notes', 'bi bi-card-checklist');
+        Module::insertIfNotExists('Note');
+        
         SProperty::insertIfNotExists(1011, 'notestatus', 'open', '10', 'O');
         SProperty::insertIfNotExists( 1012, 'notestatus', 'closed', '20', 'C' );
 

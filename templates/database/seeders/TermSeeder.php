@@ -2,20 +2,21 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\Module;
 use App\Models\Menuitem;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class MenuitemSeeder extends Seeder
+class TermSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Module::insertIfNotExists('Menuitem');
-        Menuitem::insertIfNotExists('menuitems', 'bi bi-menu-up', 'Start Menu');
+        Menuitem::insertIfNotExists('terms', 'bi bi-calendar-date');
+        Module::insertIfNotExists('Term');
     }
 }
