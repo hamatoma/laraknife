@@ -57,7 +57,7 @@ class FileHelper
         $rc = preg_replace_callback(
             '/%[0-9a-fA-F][0-9a-fA-F]/',
             function ($matches) {
-                $cc = hex_dec(substr($matches[0], 1));
+                $cc = hexdec(substr($matches[0], 1));
                 return chr($cc);
             },
             $text

@@ -53,7 +53,7 @@ div.row  .lkn-nav-tab-panel {
     border: grey solid 0.07rem;
     padding: 2rem;
     border-radius: 0.5rem;
-    box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3);
+    /* box-shadow: 0.5rem 0.5rem rgb(240, 240, 240, 0.3); */
 }
 .nav-tabs li.nav-item, .lkn-nav-item-active, ul.lkn-nav-tab, li.nav-item, li.lkn-nav-item {
     border-bottom: none;
@@ -101,11 +101,6 @@ ul.nav-tab-panel + .lkn-fieldset {
 }
 .lkn-header-frame {
     background-color: aliceblue;
-}
-
-.lkn-behind-filter {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
 }
 
 .lkn-page-item.active .lkn-page-link {
@@ -292,4 +287,18 @@ b {
     margin: 1rem;
     padding: 1rem;
     border-radius: 0.75rem;
+}
+.lkn-panel + .row, .lkn-panel + .lkn-behind-filter {
+    margin-top: 0.5rem;
+}
+.lkn-behind-filter {
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+.lkn-nav-tab-panel > .lkn-filter {
+    margin-top: 1rem;
+    border: none;
+}
+.lkn-nav-tab-panel > .lkn-form-table {
+    border: None;
 }

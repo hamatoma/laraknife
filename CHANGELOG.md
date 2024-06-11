@@ -1,5 +1,16 @@
 # Development phase
 
+# 0.9.7 Refactoring design, import
+
+- many improvements in CSS and components: margins, colors ...
+- Export:
+  - new: page import
+- ExportController:
+  - new: import(), importFile(), importToDatabase(), infoOfImportFile()
+
+- PageController:
+  - changed: syntax for export file
+  
 # 0.9.6 export of pages, module Export
 
 - new: delete-file.blade

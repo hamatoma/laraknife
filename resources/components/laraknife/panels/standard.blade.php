@@ -17,14 +17,16 @@
     @if ($fieldset === 'true')
         <fieldset class="lkn-standard-panel {{ $class }}">
             {{ $slot }}
-            @if ($button1Name !== '')
-                <x-laraknife.buttons.button width1="{{ $button1Width1 }}" width2="{{ $button1Width2 }}"
-                    name="{{ $button1Name }}" label="{{ __($button1Label) }}" />
-            @endif
-            @if ($button2Name !== '')
-                <x-laraknife.buttons.button width1="{{ $button2Width1 }}" width2="{{ $button2Width2 }}"
-                    name="{{ $button2Name }}" label="{{ __($button2Label) }}" />
-            @endif
+            <div class="row lkn-empty-line-above">
+                @if ($button1Name !== '')
+                    <x-laraknife.buttons.button width1="{{ $button1Width1 }}" width2="{{ $button1Width2 }}"
+                        name="{{ $button1Name }}" label="{{ __($button1Label) }}" />
+                @endif
+                @if ($button2Name !== '')
+                    <x-laraknife.buttons.button width1="{{ $button2Width1 }}" width2="{{ $button2Width2 }}"
+                        name="{{ $button2Name }}" label="{{ __($button2Label) }}" />
+                @endif
+            </div>
         </fieldset>
     @else
         {{ $slot }}

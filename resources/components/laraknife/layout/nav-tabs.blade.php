@@ -26,8 +26,7 @@
 <div class="@if ($fieldset === 'true') lkn-panel @endif lkn-nav-tab-panel">
     {{ $slot }}
     @if ($button1Name !== '' || $button2Name !== '')
-        <x-laraknife.layout.row-empty />
-        <div class="row">
+        <div class="row lkn-empty-line-above">
     @endif
     @if ($button1Name !== '')
         <x-laraknife.buttons.button-position width1="{{ $button1Width1 }}" width2="{{ $button1Width2 }}"

@@ -8,7 +8,7 @@
                 <x-laraknife.forms.string position="alone" name="patterns" label="Patterns"
                     value="{{ $context->valueOf('patterns') }}" width2="4" />
             </x-laraknife.panels.filter>
-
+        <x-laraknife.buttons.button-position position="alone" name="btnImport" label="Import" width1="8" width2="4" />
             <x-laraknife.panels.simple>
                 <table class="table table-striped">
                     <thead>
