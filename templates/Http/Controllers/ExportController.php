@@ -182,7 +182,7 @@ class ExportController extends Controller
     {
         $rc = '';
         $lines = explode("\n", file_get_contents($filename));
-        if (!str_starts_with($lines[0], '!LaraKnife-Export')) {
+        if (!str_starts_with($lines[0], ':LaraKnife-Export')) {
             $rc = __('+++ Not an import file: missing MAGIC');
         } else {
             $tables = [];

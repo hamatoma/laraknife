@@ -302,3 +302,16 @@ b {
 .lkn-nav-tab-panel > .lkn-form-table {
     border: None;
 }
+.lkn-font-200{
+    font-size: 200%;
+}
+.lkn-font-150{
+    font-size: 150%;
+}
+.lkn-font-125{
+    font-size: 125%;
+}
+.lkn-text-frame {
+    border: solid black 0.01rem;
+    border-radius: 1rem;
+}

@@ -1,5 +1,13 @@
 # Development phase
 
+# 0.9.8 Farbwechsel, Korrektur Import
+
+- laraknife.css:
+  - neu .lkn-font-xxx
+- purple.css: Farbwechsel bei .lkn-text-infoX
+- ExportController:
+  - Korrektur: MAGIC-Erkennung Import
+
 # 0.9.7 Refactoring design, import
 
 - many improvements in CSS and components: margins, colors ...

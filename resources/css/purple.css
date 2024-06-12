@@ -1,7 +1,4 @@
 /* purple colors: head: 143F4E icons: 83163F shadow: 888888 panel: c2b0a8 link: 477085 info: 9D8C84 */
-.lkn-text-info {
-    color: #83163F;
-}
 
 /* headlines: */
 h1 {
@@ -109,19 +106,39 @@ a:active.lkn-overview-cell {
 }
 
 .lkn-text-info {
-    color: orange;
+    color: white;
+    background-color: #83163F;
 }
 
 .lkn-text-info2 {
-    color: blue;
+    color: white;
+    background-color: blue;
 }
 
 .lkn-text-info3 {
-    color: green;
+    color: white;
+    background-color: #143F4E;
 }
 
 .lkn-text-info4 {
-    color: brown;
+    color: white;
+    background-color: orangered;
+}
+
+.lkn-background-info {
+    background-color: #83163F;
+}
+
+.lkn-background-info2 {
+    background-color: blue;
+}
+
+.lkn-background-info3 {
+    background-color: #143F4E;
+}
+
+.lkn-background-info4 {
+    background-color: orangered;
 }
 
 .lkn-filter {
@@ -201,11 +218,12 @@ a:any-link.nav-item {
 #lkn-header a:any-link {
     color: white;
 }
-#lkn-header 
-.nav-link:hover {
+
+#lkn-header .nav-link:hover {
     border: 1px solid white;
     color: white;
 }
+
 #main-content .nav-link:hover {
     text-decoration: underline;
 }
