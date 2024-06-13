@@ -311,7 +311,10 @@ b {
 .lkn-font-125{
     font-size: 125%;
 }
-.lkn-text-frame {
+.lkn-text-box {
     border: solid black 0.01rem;
     border-radius: 1rem;
+    margin: 1rem;
+    padding: 1rem;
+    width: fit-content;
 }
