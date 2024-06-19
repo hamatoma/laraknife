@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('duration');
             $table->text('description')->nullable;
             $table->integer('visibility_scope');
-            $table->foreignId('owner_id')->references('id')->on('users')->nullable();
+            $table->foreignId('owner_id')->nullable()->references('id')->on('users');
         });
     }
 

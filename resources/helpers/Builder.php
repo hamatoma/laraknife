@@ -413,7 +413,7 @@ class FieldInfo
                 break;
             case 'foreignId':
                 $this->type = 'reference';
-                // $table->foreignId('verifiedby')->references('id')->on('users')->nullable();
+                // $table->foreignId('verifiedby')->nullable()->references('id')->on('users');
                 // .....................................................1.......1............2.......2
                 if ($parameters != null && preg_match("/references.[\"']([^\"']+).*->on.[\"']([^\"']+)/", $parameters, $match)) {
                     $this->refTable = $match[2];

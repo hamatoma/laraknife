@@ -61,8 +61,9 @@ div.row  .lkn-nav-tab-panel {
 .nav-tabs .lkn-panel, .lkn-nav-tab-panel{
     border-top-left-radius: 0;
 }
+.lkn-background-white,
 fieldset.lkn-noform-text {
-    background-color: white;
+    background-color: white !important;
 }
 #main-content li.lkn-nav-tab-panel{
     border-top-left-radius: 0;
@@ -319,4 +320,28 @@ b {
 }
 .lkn-fit {
     width: fit-content;
+}
+.lkn-pseudo-field-error,
+.lkn-pseudo-field {
+    border: solid darkgray 0.2rem;
+    border-radius: 0.5rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+.lkn-pseudo-field-error {
+    border: solid orangered 0.2rem;
+    border-radius: 0.5rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+.lkn-error-field {
+    border: solid orangered 0.2rem;
+}
+.lkn-gap-top-1 {
+    margin-top: 1rem;
+}.lkn-gap-bottom-1 {
+    margin-bottom: 1rem;
+}
+.lkn-text-area {
+    padding: 1em;
 }

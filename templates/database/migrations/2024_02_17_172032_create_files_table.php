@@ -19,8 +19,8 @@ return new class extends Migration {
             $table->integer('filegroup_scope');
             $table->integer('visibility_scope');
             $table->float('size');
-            $table->foreignId('user_id')->references('id')->on('users')->nullable();
-            $table->foreignId('module_id')->references('id')->on('modules')->nullable();
+            $table->foreignId('user_id')->nullable()->references('id')->on('users');
+            $table->foreignId('module_id')->nullable()->references('id')->on('modules');
             $table->bigInteger('reference_id')->nullable();
         });
     }

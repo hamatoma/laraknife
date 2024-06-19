@@ -16,13 +16,17 @@ return new class extends Migration
             $table->timestamps();
             $table->string('title');
             $table->text('body')->nullable();
+            $table->text('options')->nullable();
             // foreign key of sproperties.
             $table->integer('category_scope');
             // foreign key of sproperties.
             $table->integer('visibility_scope');
             // foreign key of sproperties.
             $table->integer('notestatus_scope');
-            $table->foreignId('owner_id')->references('id')->on('users')->nullable();
+            $table->foreignId('owner_id')->nullable()->references('id')->on('users');
+            $table->foreignId('group_id')->nullable()->references('id')->on('groups');
+            $table->foreignId('module_id')->nullable()->references('id')->on('modules');
+            $table->bigint('reference_id')->nullable();
         });
     }
 

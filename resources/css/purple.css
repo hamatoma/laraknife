@@ -258,54 +258,67 @@ nav a:hover {
 #main-content>div.lkn-form-table>h2 {
     color: #83163F;
     background-color: inherit;
+}
 
-    #main-content .nav-link {
-        color: black;
-    }
+#main-content .nav-link {
+    color: black;
+}
 
-    #main-content .nav-link-item {
-        background-color: #e1d6ad;
-    }
+#main-content .nav-link-item {
+    background-color: #e1d6ad;
+}
 
-    #main-content .nav-link:hover {
-        color: white;
-    }
+#main-content .nav-link:hover {
+    color: white;
+}
 
-    #main-content .nav-link.lkn-nav-item-active {
-        color: blue !important;
-    }
+#main-content .nav-link.lkn-nav-item-active {
+    color: blue !important;
+}
 
-    #main-content nav-item.lkn-nav-item-active {
-        background-color: whitesmoke !important;
-    }
+#main-content nav-item.lkn-nav-item-active {
+    background-color: whitesmoke !important;
+}
 
-    #main-content .nav-item {
-        border-bottom-color: black !important;
-    }
+#main-content .nav-item {
+    border-bottom-color: black !important;
+}
 
-    #lkn-header .nav-link,
-    #lkn-header .nav-item {
-        color: white;
-        font-weight: bolder;
-    }
+#lkn-header .nav-link,
+#lkn-header .nav-item {
+    color: white;
+    font-weight: bolder;
+}
 
-    #main-content .nav-tabs.nav-link {
-        background-color: #e1d6ad !important;
-    }
+#main-content .nav-tabs.nav-link {
+    background-color: #e1d6ad !important;
+}
 
-    #lkn-btn-logout {
-        background-color: #83163F;
-    }
+#lkn-btn-logout {
+    background-color: #83163F;
+}
 
-    /* Icons: */
-    i.text-primary {
-        color: #477085 !important;
-    }
+/* Icons: */
+i.text-primary {
+    color: #477085 !important;
+}
 
-    .lkn-frame-indented {
-        border: solid 0.1rem #83163F;
-    }
+.lkn-frame-indented {
+    border: solid 0.1rem #83163F;
+}
 
-    .lkn-border {
-        border: solid 0.15rem #111111;
-    }
+.lkn-border {
+    border: solid 0.15rem #111111;
+}
+
+.lkn-pseudo-field {
+    border: solid darkgray 0.2rem;
+}
+
+.lkn-pseudo-field-error {
+    border: solid orangered 0.2rem;
+}
+
+.lkn-text-area {
+    background-color: white !important;
+}

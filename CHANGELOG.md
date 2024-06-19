@@ -1,5 +1,19 @@
 # Development phase
 
+# 0.9.9 Note: task "clozeText", groups 
+
+- button-position.blade: new: class
+- const-text.blade: new: class
+- nav-tabs.blade: new: class
+- MediaWikiBase:
+  - new: clozeMode, clozeData, errors, setClozeParameters()
+- StringHelper:
+  - new: explodeAssoc() implodeAssoc()
+- Note:
+  - new: group_id, reference_id module_id
+  - new: tabs register "notes"
+- Group: new: combobox()
+
 # 0.9.8 Farbwechsel, Korrektur Import
 
 - laraknife.css:

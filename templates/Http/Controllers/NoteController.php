@@ -106,21 +106,24 @@ class NoteController extends Controller
                     'category_scope' => '1051',
                     'notestatus_scope' => '1011',
                     'visibility_scope' => '1091',
-                    'owner_id' => strval(auth()->id())
+                    'owner_id' => strval(auth()->id()),
+                    'group_id' => ''
                 ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
+            $optionsGroup = Group::combobox($note->group_id, __('<no group>'));
             $context = new ContextLaraKnife($request, null, $note);
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 0, $note->id, $note->options);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 1, $note->id, $note->options, $note->reference_id);
             $rc = view('note.edit', [
                 'context' => $context,
                 'optionsCategory' => $optionsCategory,
                 'optionsNotestatus' => $optionsNotestatus,
                 'optionsVisibility' => $optionsVisibility,
                 'optionsUser' => $optionsUser,
+                'optionsGroup' => $optionsGroup,
                 'navTabsInfo' => $navigationTabInfo
             ]);
         }
@@ -195,7 +198,7 @@ class NoteController extends Controller
             }
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
             $optionsRecipients = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['recipients'], __('<Please select>'));
-            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 2, $note->id, $note->options);
+            $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 3, $note->id, $note->options, $note->reference_id);
             $context = new ContextLaraKnife($request, null, $note);
             $rc = view('note.edit_shift', [
                 'context' => $context,
@@ -321,7 +324,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $context = new ContextLaraKnife($request, $fields);
             $fileController = new FileController();
             $context->setCallback('buildAnchor', $fileController, 'buildAnchor');
-            $navTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 1, $note->id, $note->options);
+            $navTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 2, $note->id, $note->options, $note->reference_id);
             return view('note.index_documents', [
                 'context' => $context,
                 'records' => $records,

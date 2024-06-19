@@ -12,7 +12,7 @@ class Migration_test{
             $table->integer('category_scope');
             // foreign key of sproperties.
             $table->integer('notestatus_scope');
-            $table->foreignId('user_id')->references('id')->on('users')->nullable();
+            $table->foreignId('user_id')->nullable()->references('id')->on('users');
         });
     }
 }

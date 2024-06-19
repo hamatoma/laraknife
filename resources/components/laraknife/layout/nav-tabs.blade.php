@@ -9,6 +9,7 @@
     'button2Label' => 'Cancel',
     'button2Width1' => 2,
     'button2Width2' => 4,
+    'class' => '',
 ])
 <ul class="nav nav-tabs lkn-nav-tab">
     @foreach ($info->items as $item)
@@ -23,7 +24,7 @@
         </li>
     @endforeach
 </ul>
-<div class="@if ($fieldset === 'true') lkn-panel @endif lkn-nav-tab-panel">
+<div class=" {{ $class }}@if ($fieldset === 'true') lkn-panel @endif lkn-nav-tab-panel">
     {{ $slot }}
     @if ($button1Name !== '' || $button2Name !== '')
         <div class="row lkn-empty-line-above">
@@ -37,6 +38,6 @@
             name="{{ $button2Name }}" label="{{ __($button2Label) }}" />
     @endif
     @if ($button1Name !== '' || $button2Name !== '')
-        </div>
-    @endif
+</div>
+@endif
 </div>

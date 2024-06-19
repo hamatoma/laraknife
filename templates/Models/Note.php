@@ -19,6 +19,9 @@ class Note extends Model
         'notestatus_scope',
         'visibility_scope',
         'owner_id',
-        'options'
+        'options',
+        'group_id',
+        'reference_id',
+        'module_id'
     ];
 }

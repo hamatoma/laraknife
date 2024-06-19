@@ -5,13 +5,24 @@ namespace App\Helpers;
 
 class MediaWikiBase extends LayoutStatus
 {
-    protected $inlineRegExpression;
-    protected $lineRegExpression;
+    protected ?string $inlineRegExpression;
+    protected ?string $lineRegExpression;
+    /// "fill": shows the default value "preview": shows the solutions "check": compares values with solutions
+    protected ?string $clozeMode;
+    public int $clozeErrors;
+    protected ?array $clozeData;
     function __construct()
     {
         parent::__construct();
         $this->inlineRegExpression = null;
         $this->lineRegExpression = null;
+        $this->clozeMode = null;
+        $this->clozeData = null;
+        $this->clozeErrors = 0;
+    }
+    public function setClozeParameters(string $clozeMode = "fill", ?array $clozeData = null){
+        $this->clozeMode = $clozeMode;
+        $this->clozeData = $clozeData;
     }
     /**
      * Returns the reference used in the href="<reference>" part of the link.

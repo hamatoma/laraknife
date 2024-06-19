@@ -1,4 +1,4 @@
-@props(['position' => 'alone', 'text' => '', 'label' => '', 'width1' => 2, 'width2' => 10, 'attribute' => ''])
+@props(['position' => 'alone', 'text' => '', 'label' => '', 'width1' => 2, 'width2' => 10, 'attribute' => '', 'class' => ''])
 @if($position === 'alone' || $position === 'first')
 <div class="row">
 @endif
@@ -12,7 +12,7 @@
 </div>
 @endif
 @if ($width2 > 0)
-<div class="col-md-{{ $width2 }}">
+<div class="col-md-{{ $width2 }} {{$class}}">
      {!! $text !!}
 </div>
 @endif
