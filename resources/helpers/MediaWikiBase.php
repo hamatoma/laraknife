@@ -20,7 +20,8 @@ class MediaWikiBase extends LayoutStatus
         $this->clozeData = null;
         $this->clozeErrors = 0;
     }
-    public function setClozeParameters(string $clozeMode = "fill", ?array $clozeData = null){
+    public function setClozeParameters(string $clozeMode = "fill", ?array $clozeData = null)
+    {
         $this->clozeMode = $clozeMode;
         $this->clozeData = $clozeData;
     }
@@ -104,36 +105,36 @@ class MediaWikiBase extends LayoutStatus
                 case 'DateTime':
                     $rc = date('%Y.%m.%d %H:%M');
                     break;
-                    case 'mark':
-                        $mode = count($matches) > 3 ? substr($matches[3], 1) : 'info';
-                        $rc = "<span class=\"lkn-text-$mode\">$matches[2]</span>";
-                        break;
-                    case 'add':
-                        $rc = '<ins class="lkn-ins">' . (count($matches) >= 4 ? ($matches[2] . $matches[3]) : $matches[2]) . '</ins>';
-                        break;
-                    case 'del':
-                        $rc = '<del class="lkn-del">' . (count($matches) == 4 ? ($matches[2] . $matches[3]) : $matches[2]) . '</del>';
-                        break;
-                    case 'field':
-                        $name = $matches[2];
-                        $value = '';
-                        $size = 8;
-                        if (count($matches) > 3) {
-                            $parts = explode('|', substr($matches[3], 1));
-                            $value = $parts[0];
-                            if (count($parts) > 1) {
-                                $size = $parts[1];
-                            }
+                case 'mark':
+                    $mode = count($matches) > 3 ? substr($matches[3], 1) : 'info';
+                    $rc = "<span class=\"lkn-text-$mode\">$matches[2]</span>";
+                    break;
+                case 'add':
+                    $rc = '<ins class="lkn-ins">' . (count($matches) >= 4 ? ($matches[2] . $matches[3]) : $matches[2]) . '</ins>';
+                    break;
+                case 'del':
+                    $rc = '<del class="lkn-del">' . (count($matches) == 4 ? ($matches[2] . $matches[3]) : $matches[2]) . '</del>';
+                    break;
+                case 'field':
+                    $name = $matches[2];
+                    $value = '';
+                    $size = 8;
+                    if (count($matches) > 3) {
+                        $parts = explode('|', substr($matches[3], 1));
+                        $value = $parts[0];
+                        if (count($parts) > 1) {
+                            $size = $parts[1];
                         }
-                        $rc = "<input class=\"lkn-field\" name=\"$name\" value=\"$value\" size=\"$size\">";
-                        break;
-                    case 'icon':
-                        $name = $matches[2];
-                        $size = count($matches) < 4 ? 0 : intval(substr($matches[3], 1));
-                        $class = $size == 0 ? '' : "lkn-icon-$size";
-                        $rc = "<i class=\"$name $class\"></i>";
-                        break;
-                    default:
+                    }
+                    $rc = "<input class=\"lkn-field\" name=\"$name\" value=\"$value\" size=\"$size\">";
+                    break;
+                case 'icon':
+                    $name = $matches[2];
+                    $size = count($matches) < 4 ? 0 : intval(substr($matches[3], 1));
+                    $class = $size == 0 ? '' : "lkn-icon-$size";
+                    $rc = "<i class=\"$name $class\"></i>";
+                    break;
+                default:
                     $rc = $matches[0];
                     break;
             }
@@ -192,10 +193,17 @@ class MediaWikiBase extends LayoutStatus
                         $line = '';
                     }
                     if ($line !== '') {
-                        if ($linePrefix != $this->prefixLastLine){
+                        if (strpos('=*#: -|@,', $linePrefix) === false){
+                            $linePrefix = "\n";
+                        }
+                        if ($linePrefix != $this->prefixLastLine) {
                             $this->stopParagraph();
                         }
                         switch ($linePrefix) {
+                            case ',':
+                                $this->writeText(substr($line, 1));
+                                $this->htmlBody .= "\n";
+                                break;
                             case '=':
                                 if (($rc = preg_match('/^(=+)\s*(.*)(\1)\s*$/', $line, $match)) !== false) {
                                     $this->writeHeader($match[2], strlen($match[1]));
@@ -222,13 +230,13 @@ class MediaWikiBase extends LayoutStatus
                                 $this->writeLine($line, false);
                                 break;
                             case '@':
-                                if (str_starts_with($line, '@blockend')){
+                                if (str_starts_with($line, '@blockend')) {
                                     $this->stopSentence();
                                     $this->addHtml("</div>\n");
-                                } elseif (str_starts_with($line, '@block')){
-                                        $this->stopSentence();
-                                        $params = $this->checkAttributes(substr($line, 6));
-                                        $this->addHtml($params !== '' ? "<div $params>" : '<div>');
+                                } elseif (str_starts_with($line, '@block')) {
+                                    $this->stopSentence();
+                                    $params = $this->checkAttributes(substr($line, 6));
+                                    $this->addHtml($params !== '' ? "<div $params>" : '<div>');
                                 } else {
                                     $this->writeLine(trim($line));
                                 }
@@ -382,7 +390,7 @@ class MediaWikiBase extends LayoutStatus
     function writeLine(string $line, bool $withNewline = true)
     {
         if ($this->prefixLastLine == ' ') {
-            $this->htmlBody .= "<br/>";
+            $this->htmlBody .= "<br>";
         }
         $this->startParagraph();
         $this->writeText($line);
@@ -455,14 +463,12 @@ class LayoutStatus
     }
     function changeIndentLevel(int $currentLevel)
     {
-        if ($this->indentLevel == $currentLevel) {
-            $this->htmlBody .= "\n";
-        } else {
-            if ($this->indentLevel === $currentLevel){
-                $this->htmlBody .= "</dd>\n<dd>"; 
+        if ($currentLevel !== $this->indentLevel || $currentLevel > 0) {
+            if ($this->indentLevel === $currentLevel && $currentLevel > 0) {
+                $this->htmlBody .= "</dd>\n<dd>";
             }
             while ($this->indentLevel < $currentLevel) {
-                if ($currentLevel > 1){
+                if ($currentLevel > 1) {
                     $this->htmlBody .= "\n";
                 }
                 $this->htmlBody .= '<dl><dd>';
@@ -563,9 +569,6 @@ class LayoutStatus
         if ($this->openParagraph) {
             $this->openParagraph = false;
             if (!$this->openTable) {
-                if ( ($last = strlen($this->htmlBody) - 1) >= 0 && $this->htmlBody[$last] == "\n"){
-                    $this->htmlBody = substr($this->htmlBody, 0, $last);
-                }
                 $this->htmlBody .= "</p>\n";
             }
         }
@@ -590,7 +593,7 @@ class LayoutStatus
     {
         if (strpos($line, '||') !== false) {
             $lines = explode('||', $line);
-            foreach($lines as $line){
+            foreach ($lines as $line) {
                 $line2 = $this->tableCol($line);
                 $this->writeLine($line2, false);
             }

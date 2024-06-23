@@ -1,5 +1,12 @@
 # Development phase
 
+# 0.10.1 MediaWikiBase
+
+- MediaWikiBase:
+  - new paragraph type: raw text: starts with ","
+  - <br /> is replaced with <br> (correct HTML5)
+  - better "\n" handling in <p> paragraphs
+  
 # 0.9.10 MediaWikiBase
 
 - MediaWikiBase:

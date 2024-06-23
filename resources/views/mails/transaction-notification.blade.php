@@ -1,5 +1,5 @@
 <p>{{ __('Hello') }} {{ $name }}, </p>
-<p>{{ __('The responsibility has been transferred to you') }} ({{ $from }}).<br />
+<p>{{ __('The responsibility has been transferred to you') }} ({{ $from }}).<br>
     <a href="{{ $link }}">{{ $link }}</a>
 </p>
 <hr>

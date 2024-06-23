@@ -167,7 +167,7 @@ class UserController extends Controller
                 }
             }
             if ($rc == null) {
-                $examples = StringHelper::createPassword() . "<br/>\n" . StringHelper::createPassword()
+                $examples = StringHelper::createPassword() . "<br>\n" . StringHelper::createPassword()
                     . "<br>\n" . StringHelper::createPassword();
                 $context = new ContextLaraKnife($request, null, $user);
                 $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('user-edit', 0, $user->id);
