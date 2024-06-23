@@ -192,6 +192,9 @@ class MediaWikiBase extends LayoutStatus
                         $line = '';
                     }
                     if ($line !== '') {
+                        if ($linePrefix != $this->prefixLastLine){
+                            $this->stopParagraph();
+                        }
                         switch ($linePrefix) {
                             case '=':
                                 if (($rc = preg_match('/^(=+)\s*(.*)(\1)\s*$/', $line, $match)) !== false) {
@@ -455,12 +458,18 @@ class LayoutStatus
         if ($this->indentLevel == $currentLevel) {
             $this->htmlBody .= "\n";
         } else {
+            if ($this->indentLevel === $currentLevel){
+                $this->htmlBody .= "</dd>\n<dd>"; 
+            }
             while ($this->indentLevel < $currentLevel) {
-                $this->htmlBody .= '<div class="lkn-indent">';
+                if ($currentLevel > 1){
+                    $this->htmlBody .= "\n";
+                }
+                $this->htmlBody .= '<dl><dd>';
                 ++$this->indentLevel;
             }
             while ($this->indentLevel > $currentLevel) {
-                $this->htmlBody .= '</div>';
+                $this->htmlBody .= "</dd></dl>\n";
                 --$this->indentLevel;
             }
         }
@@ -554,6 +563,9 @@ class LayoutStatus
         if ($this->openParagraph) {
             $this->openParagraph = false;
             if (!$this->openTable) {
+                if ( ($last = strlen($this->htmlBody) - 1) >= 0 && $this->htmlBody[$last] == "\n"){
+                    $this->htmlBody = substr($this->htmlBody, 0, $last);
+                }
                 $this->htmlBody .= "</p>\n";
             }
         }

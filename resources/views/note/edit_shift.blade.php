@@ -7,7 +7,7 @@
             <x-laraknife.layout.nav-tabs :info="$navTabsInfo" fieldset="true" button1Name="" button2Width1="8">
                 <x-laraknife.forms.combobox position="first" name="owner_id" label="Owner" :options="$optionsOwner"
                     value="{{ $context->valueOf('owner_id') }}" width2="4" />
-                <x-laraknife.buttons.button-position position="last" name="btnShift" label="Store" width2="4" />
+                <x-laraknife.buttons.button-position position="last" name="btnShift" label="Shift" width2="4" />
                 <x-laraknife.forms.combobox position="first" name="recipients" label="Recipient group" :options="$optionsRecipients"
                 width2="4" />
                 <x-laraknife.buttons.button-position position="last" name="btnCopy" label="Copy" width2="4" />

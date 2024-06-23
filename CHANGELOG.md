@@ -1,5 +1,12 @@
 # Development phase
 
+# 0.9.10 MediaWikiBase
+
+- MediaWikiBase:
+  - Fix: call of stopParagraph() if line prefix has changed
+  - indention: use of <dl><dd>... instead of <div class="lkn-indent">
+- edit_shift.blade: "Shift" instead of "Store"
+
 # 0.9.9 Note: task "clozeText", groups 
 
 - button-position.blade: new: class
