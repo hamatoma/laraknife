@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.10.3 MediaWikiBase
+
+- writeHeader(): calling writeText() for interpreting the text.
+
 # 0.10.2 CSS, MediaWikiBase
 
 - laraknife.css:

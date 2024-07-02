@@ -268,8 +268,9 @@ class MediaWikiBase extends LayoutStatus
     function writeHeader(string $line, int $level)
     {
         $this->stopSentence();
-        $tag = "h$level";
-        $this->tagPair($tag, trim($line));
+        $this->htmlBody .= "<h$level>";
+        $this->writeText($line);
+        $this->htmlBody .= "</h$level>";
     }
     function writeInternalLink(string $link, string $text)
     {
