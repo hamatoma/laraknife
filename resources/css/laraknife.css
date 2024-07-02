@@ -313,11 +313,14 @@ b {
     font-size: 125%;
 }
 .lkn-text-box {
-    border: solid black 0.01rem;
-    border-radius: 1rem;
-    margin: 1rem;
-    padding: 1rem;
+    border-left: solid darkgrey 0.01rem;
+    margin: 0;
+    padding: 0.5rem;
 }
+.lkn-text-area {
+    padding: 1em;
+}
+    
 .lkn-fit {
     width: fit-content;
 }
@@ -346,3 +349,4 @@ b {
     padding: 1em;
 }
 dd { margin: 0 0 0 1rem; }
+b, strong {font-weight: bolder; color: darkblue;}

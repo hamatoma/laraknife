@@ -589,6 +589,11 @@ class LayoutStatus
             $this->htmlBody .= "</table>\n";
         }
     }
+    function tableCaption(string $caption)
+    {
+        $this->stopParagraph();
+        $this->tagPair('caption', $caption);
+    }
     function tableCol(string $line)
     {
         if (strpos($line, '||') !== false) {
@@ -612,11 +617,6 @@ class LayoutStatus
         }
         return $rc;
     }
-    function tableCaption(string $caption)
-    {
-        $this->stopParagraph();
-        $this->tagPair('caption', $caption);
-    }
     function tableHeader(string $line)
     {
         $this->finishCol();
@@ -636,7 +636,8 @@ class LayoutStatus
                 $tag = '<th ' . $this->checkAttributes($parts[0]) . '>';
                 $line = $parts[1];
             }
-            $this->htmlBody .= $tag . htmlentities($line);
+            $this->htmlBody .= $tag; 
+            $this->writeText($line);
         }
         $this->prefixLastCol = '!';
     }

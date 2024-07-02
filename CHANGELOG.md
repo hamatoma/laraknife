@@ -1,5 +1,12 @@
 # Development phase
 
+# 0.10.2 CSS, MediaWikiBase
+
+- laraknife.css:
+  - lkn-text-box, b, strong
+- MediaWikiBase
+  - fix: macro interpretation in table header
+
 # 0.10.1 MediaWikiBase
 
 - MediaWikiBase:

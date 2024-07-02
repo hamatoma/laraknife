@@ -322,3 +322,7 @@ i.text-primary {
 .lkn-text-area {
     background-color: white !important;
 }
+.lkn-text-box {
+    border-left: solid #83163F 0.01rem;
+    color: #83163F;
+}
