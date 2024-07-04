@@ -123,7 +123,7 @@ ul.nav-tab-panel + .lkn-fieldset {
 .lkn-table-no-grid tr, .lkn-table-no-grid th, .lkn-table-no-grid td{
     border: none;  
 }
-.lkn-table-no-body-grid tr, .lkn-table-no-body-grid td{
+.lkn-table-no-body-grid tr, .lkn-table-no-body-grid td, .lkn-table-no-body-grid th{
     border: none;  
 }
 .lkn-table-no-border tr, .lkn-table-no-border td, .lkn-table-no-border th {

@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.10.4 Files, CSS
+
+- edit.blade + index.blade: updated_at instread of created_at
+- laraknife.css: ".lkn-table-no-body-grid th" like "... td"
+  
+
 # 0.10.3 MediaWikiBase
 
 - writeHeader(): calling writeText() for interpreting the text.

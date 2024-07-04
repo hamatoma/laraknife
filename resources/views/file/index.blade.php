@@ -49,7 +49,7 @@
                             <td>{{ $file->user }}</td>
                             <td>{{ $file->size }}</td>
                             <td>{{ $file->visibility }}</td>
-                            <td>{{ $file->created_at }}</td>
+                            <td>{{ $file->updated_at }}</td>
                             <td><x-laraknife.icons.delete-record module="file" no="{{ $file->id }}" /></td>
                         </tr>
                     @endforeach

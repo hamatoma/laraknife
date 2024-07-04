@@ -10,7 +10,7 @@
         <x-laraknife.forms.combobox position="last" name="user_id" label="User" :options="$optionsUser" width2="4" attribute="readonly"/>
         <x-laraknife.forms.string position="alone" name="filename" label="Filename" value="{{ $context->valueOf('filename') }}" width2="10" attribute="readonly"/>
         <x-laraknife.forms.string position="first" name="size" label="Size" value="{{ $context->valueOf('size') }}" width2="4" attribute="readonly" />
-        <x-laraknife.forms.string position="last" name="created_at" label="Date" value="{{ $context->valueOf('created_at') }}" width2="4" attribute="readonly"/>
+        <x-laraknife.forms.string position="last" name="updated_at" label="Date" value="{{ $context->valueOf('updated_at') }}" width2="4" attribute="readonly"/>
         </x-laraknife.panels.edit>
     </form>
 @endsection
