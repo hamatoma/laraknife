@@ -1,5 +1,10 @@
 # Development phase
 
+# 0.10.5 Files
+
+- FileController
+  - index(): default value of "user_id" is "<all>"
+
 # 0.10.4 Files, CSS
 
 - edit.blade + index.blade: updated_at instread of created_at
