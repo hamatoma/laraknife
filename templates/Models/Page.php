@@ -23,7 +23,10 @@ class Page extends Model
         'order',
         'columns',
         'audio_id',
-        'cacheof_id',
+        'reference_id',
+        'previous_id',
+        'up_id',
+        'next_id',
         'owner_id'
     ];
 }

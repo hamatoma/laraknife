@@ -22,10 +22,12 @@ return new class extends Migration
             $table->integer('markup_scope');
             $table->integer('order')->nullable();
             $table->integer('language_scope');
-            $table->integer('columns')->default(1);
             $table->foreignId('audio_id')->nullable()->references('id')->on('files');
-            $table->foreignId('cacheof_id')->nullable()->references('id')->on('pages');
+            $table->foreignId('reference_id')->nullable()->references('id')->on('pages');
             $table->foreignId('owner_id')->references('id')->on('users');
+            $table->foreignId('previous_id')->nullable()->references('id')->on('pages');
+            $table->foreignId('next_id')->nullable()->references('id')->on('pages');
+            $table->foreignId('up_id')->nullable()->references('id')->on('pages');
         });
     }
 

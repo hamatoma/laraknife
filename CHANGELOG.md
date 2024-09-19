@@ -1,5 +1,15 @@
 # Development phase
 
+# 0.10.6 CSS MediaWikiBase Pages
+- laraknife.css: attributes of .table and .lkn-text-box
+- MediaWikiBase: check of the uniqueness of fieldnames and correction if needed
+  - new: checkFieldnames() buildNextFieldname()
+  - toHtml(): the input string now can be changed
+- Pages: 
+  - removed: column "columns"
+  - renamed: cacheof_id -> reference_id
+  - new: previous_id, next_id, up_id
+
 # 0.10.5 Files
 
 - FileController

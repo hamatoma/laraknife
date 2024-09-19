@@ -11,6 +11,10 @@ class MediaWikiBase extends LayoutStatus
     protected ?string $clozeMode;
     public int $clozeErrors;
     protected ?array $clozeData;
+    protected ?array $fieldnames;
+    protected ?string $lastFieldname;
+    protected bool $correctFieldnames;
+    public string $corrections;
     function __construct()
     {
         parent::__construct();
@@ -19,11 +23,10 @@ class MediaWikiBase extends LayoutStatus
         $this->clozeMode = null;
         $this->clozeData = null;
         $this->clozeErrors = 0;
-    }
-    public function setClozeParameters(string $clozeMode = "fill", ?array $clozeData = null)
-    {
-        $this->clozeMode = $clozeMode;
-        $this->clozeData = $clozeData;
+        $this->fieldnames = null;
+        $this->correctFieldnames = false;
+        $this->lastFieldname = null;
+        $this->corrections = '';
     }
     /**
      * Returns the reference used in the href="<reference>" part of the link.
@@ -37,6 +40,71 @@ class MediaWikiBase extends LayoutStatus
     function buildInternalLink(string $title, string $text = null): string
     {
         return $title;
+    }
+    /**
+     * A unique fieldname is returned based on the last found correct fieldname.
+     * @return string a unique fieldname
+     */
+    function buildNextFieldname(): string
+    {
+        $rc = null;
+        if ($this->correctFieldnames){
+            if (count($this->fieldnames) == 0){
+                $rc = 'fld1A1';
+            } else {
+                $lastName = $this->fieldnames[count($this->fieldnames) - 1];
+                if (preg_match('/(\d+)$/', $lastName, $matcher)){
+                    $no = intval($matcher[1]);
+                    do {
+                        $no++;
+                        $rc = substr($lastName, 0, strlen($lastName) - strlen($matcher[1])) . strval($no);
+                    } while (in_array($rc, $this->fieldnames));
+                } else {
+                    $no = 1;
+                    do {
+                        $no++;
+                        $rc = $lastName . strval($no);
+                    } while(in_array($rc, $this->fieldnames));
+                }
+                $this->corrections .= " $rc";
+            }
+            array_push($this->fieldnames, $rc);
+        }
+    return $rc;
+    }
+    /**
+     * Tests all fieldnames of the page for uniqueness.
+     * If a fieldname is already defined and $this->correctFieldname is set the fieldname is replaced by a unique name.
+     * @param string $body IN/OUT: the markup source code to check. Will be changed on errors.
+     */
+    function checkFieldnames(string &$body)
+    {
+        $newBody = '';
+        $start = 0;
+        $lastEnd = 0;
+        while (preg_match('/%field\(\w+/', $body, $matcher, PREG_OFFSET_CAPTURE, $start) > 0){
+                $fieldname = substr($matcher[0][0], 7);
+                $offset = intval($matcher[0][1]) + 7;
+                $start = $offset + strlen($fieldname);
+                if (! in_array($fieldname, $this->fieldnames)){
+                    array_push($this->fieldnames, $fieldname);
+                } else {
+                    if ($this->correctFieldnames){
+                        $newName = $this->buildNextFieldname();
+                    } else {
+                        // make a warning in front of "%field(..)":
+                        $offset -=7;
+                        // a red exclamation symbol, warning, exclamation
+                        $newName = 'U+x2757;U+x26A0;!!';
+                        $fieldname = '';
+                    }
+                    $newBody .= substr($body, $lastEnd, $offset - $lastEnd) . $newName;
+                    $lastEnd = $offset + strlen($fieldname);
+            }
+        }
+        if ($newBody !== ''){
+            $body = $newBody . substr($body, $lastEnd);
+        }
     }
     function countRepeats(string $text, string $marker): int
     {
@@ -94,6 +162,15 @@ class MediaWikiBase extends LayoutStatus
         }
         $this->htmlBody .= "<hr class=\"lkn-hrule-$width\">\n";
     }
+    public function setClozeParameters(string $clozeMode = "fill", ?array $clozeData = null)
+    {
+        $this->clozeMode = $clozeMode;
+        $this->clozeData = $clozeData;
+        if ($clozeMode === 'preview'){
+            $this->fieldnames = [];
+            $this->correctFieldnames = true;
+        }
+    }
     function specialMacrosToHtml(string $body): string
     {
         $pos = 0;
@@ -148,13 +225,21 @@ class MediaWikiBase extends LayoutStatus
         $this->htmlBody .= "<pre>";
         $this->preformatted = true;
     }
-    function toHtml(string $wiki_text): string
+    /**
+     * Converts a wiki markup text into HTML.
+     * @param string $wikiText IN/OUT: the markup to convert. May be corrected.
+     * @return string
+     */
+    function toHtml(string &$wikiText): string
     {
+        if ($this->fieldnames !== null){
+            $this->checkFieldnames($wikiText);
+        }
         $this->htmlBody = '';
-        $lines = explode("\n", $wiki_text);
+        $lines = explode("\n", $wikiText);
         foreach ($lines as $ii => $line) {
             $linePrefix = '';
-            if (($line_trimmed = trim($line)) === '') {
+            if (($lineTrimmed = trim($line)) === '') {
                 $this->writeParagraphEnd();
             } elseif ($this->openTable && strncmp($line, '|}', 2) == 0) {
                 $this->stopTable();
@@ -168,7 +253,7 @@ class MediaWikiBase extends LayoutStatus
                     if ($rest !== '') {
                         $this->htmlBody .= htmlentities($rest) . "\n";
                     }
-                } elseif ($line_trimmed === '</pre>') {
+                } elseif ($lineTrimmed === '</pre>') {
                     $this->finishPreBlock();
                 } elseif ($this->preformatted) {
                     $this->htmlBody .= htmlentities($line) . "\n";

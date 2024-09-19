@@ -8,7 +8,7 @@ use App\Models\SProperty;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class PageSeeder extends Seeder
+class PageSeeder extends SeederS
 {
     /**
      * Run the database seeds.
@@ -17,6 +17,7 @@ class PageSeeder extends Seeder
     {
         Menuitem::insertIfNotExists('pages', 'bi bi-journals');
         Module::insertIfNotExists('Page');
+
         SProperty::insertIfNotExists(1121, 'markup', 'plain text', 10, 'PT');
         SProperty::insertIfNotExists(1122, 'markup', 'mediawiki', 20, 'MW');
         SProperty::insertIfNotExists(1123, 'markup', 'HTML', 30, 'HL');
