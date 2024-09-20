@@ -12,12 +12,15 @@
       <x-laraknife.forms.string position="first" name="title" label="Title" value="{{ $context->valueOf('title') }}" width2="4" />
       <x-laraknife.forms.string position="last" name="contents" label="Contents" value="{{ $context->valueOf('contents') }}" width2="4" />
       </x-laraknife.panels.filter>
-      <x-laraknife.panels.index-button buttonType="new"/>
+      <x-laraknife.buttons.button-position position="first" name="btnNew" label="New" width1="0" width2="6"/>
+      <x-laraknife.buttons.button-position position="last" name="btnExport" label="Export" width1="0" width2="6"/>
       <x-laraknife.panels.sortable-table :context="$context" :pagination="$pagination">
         <thead>
           <tr>
             <th></th>
+            <th sortId="id">{{__('Id')}}</th>
             <th sortId="title">{{__('Title')}}</th>
+            <th sortId="name">{{__('Name')}}</th>
             <th sortId="pagetype">{{__('Pagetype')}}</th>
             <th sortId="markup">{{__('Markup')}}</th>
             <th sortId="language">{{__('Language')}}</th>
@@ -28,8 +31,12 @@
         <tbody>
 @foreach ($records as $page)
         <tr>
-            <td><x-laraknife.icons.change-record module="page" no="{{ $page->id }}" /></td>
+            <td><x-laraknife.icons.change-record module="page" no="{{ $page->id }}" />
+              {!! $context->taskHelper('page-index-icon', strval($page->id)) !!}
+            </td>
+              <td> {{ __($page->id) }}</td>
               <td><a href="/page-showpretty/{{ $page->id }}">{{$page->title}}</a></td>
+              <td> {{ __($page->name) }}</td>
               <td> {{ __($page->pagetype) }}</td>
               <td> {{ __($page->markup) }}</td>
               <td> {{ __($page->language) }}</td>

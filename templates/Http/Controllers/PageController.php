@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\File;
 use App\Models\Page;
 use App\Models\Module;
-use App\Helpers\Helper;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
 use App\Helpers\MediaWiki;
@@ -16,12 +15,17 @@ use Illuminate\Http\Request;
 use App\Helpers\StringHelper;
 use App\Helpers\TextProcessor;
 use App\Helpers\ContextLaraKnife;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
 class PageController extends Controller
 {
+    private function asHtml(Page &$page, ?string $contents = null): string
+    {
+        $contents ??= $page->contents;
+        $rc = ViewHelper::asHtml($contents, $page->markup_scope);
+        return $rc;
+    }
     private function asPreview(Page &$page, ?string $contents = null): string
     {
         $contents ??= $page->contents;
@@ -77,6 +81,47 @@ class PageController extends Controller
         }
         return $rc;
     }
+    public function export(array &$records)
+    {
+        $fn = FileHelper::buildExportName('page-export', '.txt');
+        $sep = '~' . StringHelper::randomString(StringHelper::$charSetAlphaNumeric, 3) . '%';
+        $count = count($records);
+        $host = env('APP_URL');
+        $date = (new \DateTime('now'))->format('Y-m-d H:i');
+        $contents = ":LaraKnife-Export
+:host=$host
+:exported=$date
+:separator=$sep
+:records=$count
+";
+        $recordNo = 0;
+        foreach ($records as &$record) {
+            $recordNo++;
+            $contents .= ":action=insert
+:table=pages
+!id=page$recordNo
+!reference_id=$record->reference_id
+!audio_id=$record->audio_id
+!owner_id=$record->owner_id
+!previous_id=$record->previous_id
+!next_id=$record->next_id
+!up_id=$record->up_id
+title=$record->title
+name=$record->name
+pagetype_scope=$record->pagetype_scope
+markup_scope=$record->markup_scope
+order=$record->order
+language_scope=$record->language_scope
+~contents=$record->contents
+$sep
+~info=$record->info
+$sep
+";
+        }
+        file_put_contents($fn, $contents);
+        $rc = redirect('/export-index');
+        return $rc;
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -89,7 +134,7 @@ class PageController extends Controller
             if (count($fields) === 0) {
                 $fields = [
                     'title' => $page->title,
-                    'name' => $page->title,
+                    'name' => $page->name,
                     'columns' => $page->columns,
                     'contents' => $page->contents,
                     'info' => $page->info,
@@ -97,9 +142,16 @@ class PageController extends Controller
                     'markup_scope' => $page->markup_scope,
                     'language_scope' => $page->language_scope,
                     'order' => $page->order ?? '0',
-                    'audio_id' => $page->audio_id
+                    'audio_id' => $page->audio_id,
+                    'previous_id' => $page->previous_id,
+                    'next_id' => $page->next_id,
+                    'up_id' => $page->up_id,
+                    'message' => ''
                 ];
             } else {
+                if (strpos($fields['title'], '"') !== false){
+                    $fields['title'] = str_replace('"', "\u{201F}", $fields['title']);
+                }
                 $fields['pagetype_scope'] = $page->pagetype_scope;
                 $fields['markup_scope'] = $page->markup_scope;
                 $fields['language_scope'] = $page->language_scope;
@@ -111,8 +163,20 @@ class PageController extends Controller
             $optionsPagetype = SProperty::optionsByScope('pagetype', $page->pagetype_scope, '');
             $optionsMarkup = SProperty::optionsByScope('markup', $page->markup_scope, '');
             $optionsLanguage = SProperty::optionsByScope('localization', $page->language_scope, '');
-            $preview = $this->asPreview($page);
-            $fields = $request->btnSubmit !== 'btnPreview' ? null : ['preview' => $preview];
+            if ($request->btnSubmit === 'btnPreview') {
+                $wiki = new MediaWiki();
+                //$wiki->setClozeParameters('preview');
+                $wikiText = $fields['contents'];
+                $fields['preview'] = $wiki->toHtml($wikiText);
+                if ($wikiText !== $page->contents){
+                    $page->contents = $wikiText;
+                    $fields['message'] = '+++ ' . __('There are corrections:') . $wiki->corrections;
+                }
+            }
+            if ($page->audio_id != null) {
+                $file = File::find($page->audio_id);
+                $fields['audio'] = $file->filename;
+            }
             $context = new ContextLaraKnife($request, $fields, $page);
             $rc = view('page.edit', [
                 'context' => $context,
@@ -138,8 +202,9 @@ class PageController extends Controller
      */
     public function index(Request $request)
     {
+        $rc = null;
         if ($request->btnSubmit === 'btnNew') {
-            return redirect('/page-create');
+            $rc = redirect('/page-create');
         } else {
             $sql = "
 SELECT t0.*,
@@ -151,7 +216,7 @@ FROM pages t0
 LEFT JOIN sproperties t1 ON t1.id=t0.pagetype_scope
 LEFT JOIN sproperties t2 ON t2.id=t0.markup_scope
 LEFT JOIN sproperties t3 ON t3.id=t0.language_scope
-LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
+LEFT JOIN users t4 ON t4.id=t0.owner_id
 ";
             $parameters = [];
             $fields = $request->all();
@@ -170,28 +235,34 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
                 ViewHelper::addConditionComparism($conditions, $parameters, 'markup_scope', 'markup');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'language_scope', 'language');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'name,title,info', 'title');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'info,contents', 'contents');
+                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,title,t0.info', 'title');
+                ViewHelper::addConditionPattern($conditions, $parameters, 't0.info,contents', 'contents');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
-            $optionsPagetype = SProperty::optionsByScope('pagetype', $fields['pagetype'], 'all');
-            $optionsMarkup = SProperty::optionsByScope('markup', $fields['markup'], 'all');
-            $optionsLanguage = SProperty::optionsByScope('localization', $fields['markup'], 'all');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner']);
-            $context = new ContextLaraKnife($request, $fields);
-            return view('page.index', [
-                'context' => $context,
-                'records' => $records,
-                'optionsPagetype' => $optionsPagetype,
-                'optionsMarkup' => $optionsMarkup,
-                'optionsLanguage' => $optionsLanguage,
-                'optionsOwner' => $optionsOwner,
-                'pagination' => $pagination
-            ]);
+            if ($request->btnSubmit === 'btnExport') {
+                $rc = $this->export($records);
+            }
+            if ($rc == null) {
+                $optionsPagetype = SProperty::optionsByScope('pagetype', $fields['pagetype'], 'all');
+                $optionsMarkup = SProperty::optionsByScope('markup', $fields['markup'], 'all');
+                $optionsLanguage = SProperty::optionsByScope('localization', $fields['markup'], 'all');
+                $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner']);
+                $context = new ContextLaraKnife($request, $fields);
+                $rc = view('page.index', [
+                    'context' => $context,
+                    'records' => $records,
+                    'optionsPagetype' => $optionsPagetype,
+                    'optionsMarkup' => $optionsMarkup,
+                    'optionsLanguage' => $optionsLanguage,
+                    'optionsOwner' => $optionsOwner,
+                    'pagination' => $pagination
+                ]);
+            }
         }
+        return $rc;
     }
     /**
      * Returns the validation rules.
@@ -255,12 +326,36 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/page-index')->middleware('auth');
         } else {
-            $text = $this->asPreview($page);
-            $link = $page->audio_id == null ? null : File::relativeFileLink($page->audio_id);
-            $context = new ContextLaraKnife($request, ['text' => $text, 'link' => $link], $page);
-            $rc = view('page.showcol1', [
-                'context' => $context,
-            ]);
+            $textRaw = $page->contents;
+            $view = 'page.show-col1';
+            $audio = $page->audio_id == null ? null : File::relativeFileLink($page->audio_id);
+            $params = ['audio' => $audio];
+            switch ($page->pagetype_scope) {
+                default:
+                    $columns = 1 + substr_count($textRaw, "\n---- %col%");
+                    if ($columns <= 1) {
+                        $params["text1"] = $this->asHtml($page);
+                    } else {
+                        $wiki = new MediaWiki();
+                        $parts = explode("\n---- %col%", $textRaw, 4);
+                        for ($no = 1; $no <= $columns; $no++) {
+                            $params["text$no"] = $wiki->toHtml($parts[$no - 1]);
+                        }
+                        $view = "page.show-col$columns";
+                    }
+                    break;
+            }
+            if ($page->previous_id != null) {
+                $params['prev'] = "/page-showpretty/$page->previous_id";
+            }
+            if ($page->next_id != null) {
+                $params['next'] = "/page-showpretty/$page->next_id";
+            }
+            if ($page->up_id != null) {
+                $params['up'] = "/page-showpretty/$page->up_id";
+            }
+            $context = new ContextLaraKnife($request, $params, $page);
+            $rc = view($view, ['context' => $context]);
         }
         return $rc;
     }
@@ -273,20 +368,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
                 'context' => $context,
             ]);
         } else {
-            $params = [];
-            $columns = $page->columns;
-            if ($columns <= 1) {
-                $params['text'] = $this->asPreview($page);
-            } else {
-                $cols = explode('----', $page->contents);
-                for ($no = 1; $no <= $columns; $no++) {
-                    $params["text$no"] = $this->asPreview($page, $cols[$no - 1]);
-                }
-            }
-            $context = new ContextLaraKnife($request, $params, $page);
-            $rc = view("page.showcol$columns", [
-                'context' => $context,
-            ]);
+            $rc = $this->showPretty($page, $request);
         }
         return $rc;
     }
@@ -325,7 +407,10 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['owner_id'] = $fields['owner_id'];
                 $validated['contents'] = MediaWiki::expandStarItems($validated['contents']);
-                Page::create($validated);
+                $page = Page::create($validated);
+                if ($page != null) {
+                    $rc = redirect("/page-edit/$page->id");
+                }
             }
         }
         if ($rc == null) {
@@ -338,13 +423,32 @@ LEFT JOIN sproperties t4 ON t4.id=t0.owner_id
      */
     public function update(Page $page, Request $request, array &$fields)
     {
-        $validator = Validator::make($fields, $this->rules(false));
+        $rules = $this->rules(false);
+        if ($fields['order'] == null) {
+            $fields['order'] = 0;
+        }
+        if ($fields['reference_id'] != null) {
+            $rules['reference_id'] = 'exists:pages,id';
+        }
+        if ($fields['previous_id'] != null) {
+            $rules['previous_id'] = 'exists:pages,id';
+        }
+        if ($fields['up_id'] != null) {
+            $rules['up_id'] = 'exists:pages,id';
+        }
+        if ($fields['next_id'] != null) {
+            $rules['next_id'] = 'exists:pages,id';
+        }
+        $validator = Validator::make($fields, $rules);
         if ($validator->fails()) {
+            $errors = $validator->errors();
             $rc = back()->withErrors($validator)->withInput();
         } else {
             $validated = $validator->validated();
             $validated['info'] = strip_tags($validated['info']);
-            if (empty($page->audio_id) && $request->file('file') != null) {
+            $audioId = $page->audio_id;
+            $x = $request->file('file');
+            if ($audioId == null && $request->file('file') != null) {
                 $filename = FileHelper::textToFilename($page->title);
                 $moduleId = Module::idOfModule('Page');
                 $fileId = File::storeFile($request, $page->title, 1103, 1091, 'audio file of page', $filename, $moduleId, $page->id);

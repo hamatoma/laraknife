@@ -1,6 +1,14 @@
 # Development phase
 
+# 0.10.7 TaskHelper Pages
+
+- new: TaskHelper.php
+- Pages
+  - views: adaption in edit, index. new: show-colX.php
+  - PageController: Adjustments due to table changes
+
 # 0.10.6 CSS MediaWikiBase Pages
+
 - laraknife.css: attributes of .table and .lkn-text-box
 - MediaWikiBase: check of the uniqueness of fieldnames and correction if needed
   - new: checkFieldnames() buildNextFieldname()
