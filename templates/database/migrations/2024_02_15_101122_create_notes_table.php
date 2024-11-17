@@ -26,7 +26,7 @@ return new class extends Migration
             $table->foreignId('owner_id')->nullable()->references('id')->on('users');
             $table->foreignId('group_id')->nullable()->references('id')->on('groups');
             $table->foreignId('module_id')->nullable()->references('id')->on('modules');
-            $table->bigint('reference_id')->nullable();
+            $table->unsignedBigInteger('reference_id')->nullable();
         });
     }
 

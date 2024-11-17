@@ -16,7 +16,7 @@ class SPropertySeeder extends Seeder
      */
     public function run(): void
     {
-        Menuitem::insertIfNotExists('sproperties', 'bi bi-card-list');
+        Menuitem::insertIfNotExists('sproperties', 'bi bi-card-list', 'Properties', '/sproperty-index');
         Module::insertIfNotExists('SProperty', 'sproperties');
 
         SProperty::insertIfNotExists(1001, 'status', 'active', '10', 'A');

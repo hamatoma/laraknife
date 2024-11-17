@@ -73,6 +73,7 @@ function ReplaceLinkDir(){
   local file=$1
   local dir=$(dirname $file)
   local node=$(basename $file)
+  echo "== ReplaceLinkDir $file"
   pushd $dir >/dev/null 2>&1
   if [ ! -L $node ]; then
     echo "+++ dir: $(pwd)"
@@ -89,6 +90,7 @@ function ReplaceLinkDir(){
 function AdaptModules(){
   local fn=app/Models/User.php
   found=$(grep role_id $fn)
+  echo "== AdaptModules"
   if [ -n "$found" ]; then
     echo "= role_id already found"
   else
@@ -106,8 +108,8 @@ function AdaptModules(){
   else
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
-      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;#N##A#PageController;#N##A#GroupController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;#N#Group#C#;/' \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;#N##A#PageController;#N##A#GroupController;#N##A#ExportController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;#N#Group#C#;#N#Export#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -123,6 +125,7 @@ function BuildLinks(){
   local base=vendor/hamatoma/laraknife
   local dirResources=$base/resources
   local dirTemplates=$base/templates
+  echo "== BuildLinks $option"
   if [ ! -d $dirResources ]; then
     Usage "wrong current directory: use root directory of the package. [missing $dirResources]"
   elif [ ! -d $dirTemplates ]; then
@@ -138,14 +141,14 @@ function BuildLinks(){
         ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
       fi
     done
-    for module in Task; do
+    for module in Export Task; do
       local fn=app/Http/Controllers/${module}Controller.php
       if [ ! -f $fn ]; then
-        cp -av ../../../$dirTemplates/Http/Controllers/${module}Controller.php $fn
+        cp -av $dirTemplates/Http/Controllers/${module}Controller.php $fn
       fi
     done
     # === Views
-    for module in laraknife sproperty role user menuitem note file term page group; do
+    for module in laraknife sproperty role user menuitem note file term page group task export; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
@@ -195,8 +198,16 @@ function BuildLinks(){
       cp -av $dirResources/img/laraknife_logo_64.png $trg
     fi
     # storage:
+    local subdirs="export temp"
+    for dir in $subdirs; do
+      test -d storage/app/public/$dir || mkdir -v storage/app/public/$dir
+    done
+    sudo chown -R www-data:www-data storage
     cd public
     ln -s ../storage/app/public upload
+    for dir in $subdirs; do
+      test -L $dir || ln -sv ../storage/app/public/$dir $dir
+    done
     cd ..
     local fn=public/css/$PROJ.css
     cat <<EOS >$fn
@@ -251,6 +262,7 @@ EOS
     local script=Join
     cat <<EOS >$script
 #! /bin/bash
+echo "== Join"
 php app/Helpers/Builder.php update:languages resources/lang/sources lang/$LANG_DEFAULT.json
 EOS
     chmod +x $script
@@ -258,6 +270,7 @@ EOS
   script=Build
   cat <<'EOS' >$script
 #! /bin/bash
+echo "== Build"
 composer update
 composer dump-autoload
 if [ "$1" = prod ]; then
@@ -270,6 +283,7 @@ EOS
   script=Lara
   cat <<'EOS' >$script
 #! /bin/bash
+echo "== Lara $*"
 php app/Helpers/Builder.php $*
 EOS
   chmod +x $script
@@ -280,6 +294,7 @@ EOS
 }
 # ===
 function CopyAndLinkFiles(){
+  echo "== CopyAndLinkFiles"
   cp -av vendor/hamatoma/laraknife/templates/Helpers/ViewHelperLocal.templ app/Helpers/ViewHelperLocal.php
   cat <<EOS >missing.seeders
 # Enter the module names separated by " ".
@@ -294,6 +309,7 @@ EOS
 function CopyFromLaraknife(){
   . project.env
   local module="$1"
+  echo "== CopyFromLaraknife $module"
   if [ -z "$module" ]; then
     Usage "missing <module>"
   elif [ ! -d resources/views/$module ]; then
@@ -315,27 +331,36 @@ function CopyFromLaraknife(){
 # ===
 function CreateLayout(){
   . project.env
+  echo "== CreateLayout"
   mkdir -p resources/views/layouts
   local fn=resources/views/layouts/$PROJ.blade.php
   sed -e "s/PROJECT/$PROJ/g" vendor/hamatoma/laraknife/templates/layout.templ >$fn
   cd resources/views/layouts
   ln -sv $PROJ.blade.php backend.blade.php
-  cd ../../..
   echo "= layout $fn and backend.blade.php have been created"
+  ln -sv backend.blade.php frontend.blade.php
+  cd ../../..
 }
 # ===
 function FillDb(){
+  echo "== FillDb"
+  sudo chmod -R uog+rw storage/logs
   php artisan migrate
   php artisan db:seed --class=ModuleSeeder
   php artisan db:seed --class=RoleSeeder
   php artisan db:seed --class=UserSeeder
+  php artisan db:seed --class=GroupSeeder
   php artisan db:seed --class=SPropertySeeder
   php artisan db:seed --class=MenuitemSeeder
   php artisan db:seed --class=FileSeeder
   php artisan db:seed --class=NoteSeeder
+  php artisan db:seed --class=TermSeeder
+  php artisan db:seed --class=PageSeeder
+  php artisan db:seed --class=ExportSeeder
 }
 # ===
 function InitI18N(){
+  echo "== InitI18N"
   local fn=config/app.php
   if [ ! -f $fn ]; then
     echo "++ missing $fn"
@@ -360,6 +385,7 @@ EOS
 # ===
 function LinkModule(){
   local module="$1"
+  echo "== LinkModule $module"
   if [ -z "$module" ]; then
     Usage "missing <module>"
   elif [ ! -d vendor/hamatoma/laraknife/resources/views/$module ]; then
@@ -384,6 +410,7 @@ function LinkModule(){
 function MoveToLaraknife(){
   . project.env
   local module="$1"
+  echo "== MoveToLaraknife $module"
   if [ -z "$module" ]; then
     Usage "missing <module>"
   elif [ ! -d resources/views/$module ]; then
@@ -419,6 +446,7 @@ function SetupNginx(){
   local documentRoot="$3"
   local phpVersion="$4"
   local trg=/etc/nginx/sites-available/$domain
+  echo "== SetupNginx $1 $2 $3 $4"
   test -z "$phpVersion" && phpVersion=8.2
   if [ ! -d /etc/nginx ]; then
     Usage "missing /etc/nginx"

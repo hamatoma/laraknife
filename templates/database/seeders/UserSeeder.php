@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Helpers\StringHelper;
+use App\Models\Module;
+use App\Models\Menuitem;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +19,8 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        Menuitem::insertIfNotExists('users', 'bi bi-person');
+        Module::insertIfNotExists('User');
         $records = DB::select('select * from users');
         if ($records == null || count($records) == 0){
             $pw = StringHelper::createPassword();

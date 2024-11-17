@@ -1,5 +1,17 @@
 # Development phase
 
+# 0.10.8 Builder MediaWikiBase Export seeders
+
+- new wiki_help.txt
+- Builder.php: new in main(): "import-table"
+- MediaWikiBase: fix: "=" (header): no crash if no ending "="
+- new: TranslatorHelper.php SimpleTranslatorHelper.php StandardTranslatorHelper
+- corrections in laraknife-tool.sh
+- new: ExportSeeder.php
+- new: Export.php
+- ExportController: new importFile()
+- MenuItem.php: new: buildMinimalMenu()
+
 # 0.10.7 TaskHelper Pages
 
 - new: TaskHelper.php

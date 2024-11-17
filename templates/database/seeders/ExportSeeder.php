@@ -4,19 +4,19 @@ namespace Database\Seeders;
 
 use App\Models\Module;
 use App\Models\Menuitem;
+use App\Models\SProperty;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class MenuitemSeeder extends Seeder
+class ExportSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Module::insertIfNotExists('Menuitem');
-        Menuitem::insertIfNotExists('menuitems', 'bi bi-menu-up', 'Start Menu');
-        Menuitem::buildMinimalMenu();
+        Menuitem::insertIfNotExists('exports', 'bi bi-file-earmark-arrow-down');
+        Module::insertIfNotExists('Exports');
     }
 }

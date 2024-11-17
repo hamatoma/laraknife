@@ -51,4 +51,20 @@ class Menuitem extends Model
             ]);
         }
     }
+    /**
+     * Creates the entries of menuitems_roles to show a minimal menu.
+    */
+    public static function buildMinimalMenu()
+    {
+        $count = DB::table('menuitems')->select(DB::raw('count(*) as xcount'))->value('xcount');
+        for ($no = 1; $no <= $count; $no++){
+
+            DB::table('menuitems_roles')->insert([
+            'menuitem_id' => strval($no),
+            'order' => strval($no * 10),
+            'role_id' => 1
+            ]);
+        }
+
+    }
 }

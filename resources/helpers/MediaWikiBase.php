@@ -290,7 +290,7 @@ class MediaWikiBase extends LayoutStatus
                                 $this->htmlBody .= "\n";
                                 break;
                             case '=':
-                                if (($rc = preg_match('/^(=+)\s*(.*)(\1)\s*$/', $line, $match)) !== false) {
+                                if (($rc = preg_match('/^(=+)\s*(.*)(\1)\s*$/', $line, $match)) !== false && count($match) > 2) {
                                     $this->writeHeader($match[2], strlen($match[1]));
                                 } else {
                                     $this->writeLine($line);

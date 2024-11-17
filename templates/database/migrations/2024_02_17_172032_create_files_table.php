@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->float('size');
             $table->foreignId('user_id')->nullable()->references('id')->on('users');
             $table->foreignId('module_id')->nullable()->references('id')->on('modules');
-            $table->bigInteger('reference_id')->nullable();
+            $table->unsignedBigInteger('reference_id')->nullable();
         });
     }
 

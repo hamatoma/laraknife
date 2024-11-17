@@ -1,0 +1,98 @@
+!LaraKnife-Export
+:host=http://gadeku.test
+:exported=2024-06-10 19:09
+:separator=~Kr1%
+:records=1
+:action=insert
+:table=pages
+!id=page1
+title=Wikisyntax
+name=wikisyntax
+pagetype_scope=1142
+markup_scope=1122
+order=0
+language_scope=1202
+~contents=Die Beschreibungssprache ist an die Sprache von Wikipedia angelehnt.
+=== Schriftattribute ===
+<pre>
+'''fett''', ''kursiv'', '''''kursiv und fett'''''<br/>
+<span class="lkn-text-error">Fehler</span> <span class="lkn-text-warning">Warnung</span> <span class="lkn-text-info">Info</span>
+<span class="lkn-text-tagged">Markiert</span>
+</pre>
+So sieht es dann aus:
+
+'''fett''', ''kursiv'', '''''kursiv und fett'''''<br/>
+<span class="lkn-text-error">Fehler</span> <span class="lkn-text-warning">Warnung</span> <span class="lkn-text-info">Info</span>
+<span class="lkn-text-tagged">Markiert</span>
+
+
+=== Absätze ===
+Das erste Zeichen am Anfang der Zeile bestimmt den Absatztyp:
+<pre>
+= Überschrift =
+== Überschrift2 ==
+* Bool
+** true
+** false
+* int
+
+# Einleitung
+## Abstract
+# Hauptteil
+
+Einrückung:
+
+: eingerückt
+:: noch mehr eingerückt
+----  Vier Minuszeichen werden zu einer horizontalen Linie
+Verwendung als Spaltentrenner:
+ ---- %col%
+</pre>
+So sieht das dann aus:
+
+= Überschrift =
+== Überschrift2 ==
+* Bool
+** true
+** false
+* int
+
+# Einleitung
+## Abstract
+# Hauptteil
+
+: eingerückt
+:: noch mehr eingerückt
+
+Vier Minuszeichen werden zu einer horizontalen Linie
+---- 
+Verwendung als Spaltentrenner:
+ ---- %col%
+=== Bilder ===
+<pre>
+[[upload/2024/05/7_laraknife_logo_256.png|Logo]]
+</pre>
+
+[[upload/2024/05/7_laraknife_logo_256.png|Logo]]
+
+=== Spezialelemente ===
+<pre>
+%trans(läuft|laufen)% markiert ein Wort, dessen Übersetzung dann als Tooltip angezeigt wird.<br/>
+%add(Rythmus)% markiert den Text "Rythmus" als eingefügter Text<br/>
+%del(Rhytmus)% markiert den Text "Rhytmus" als gelöschten Text<br/>
+%field(fldName|Hans|4)% erzeugt ein Eingabefeld mit den Namen fldName, dem Wert "Hans" und der Länge 4.<br/>
+%mark(Wichtig!|important)% %mark(Fehler!|error)% %mark(Warnung!|warning)% %mark(Markiert!|tagged)%<br/>
+%icon(bi bi-pencil-fill)% %icon(bi bi-pencil-fill-1)% %icon(bi bi-pencil-fill|2)% %icon(bi bi-pencil-fill|4)%</br>
+</pre>
+Das sieht dann so aus:
+
+%trans(läuft|laufen)% markiert ein Wort, dessen Übersetzung dann als Tooltip angezeigt wird.<br/>
+%add(Rythmus)% markiert den Text "Rythmus" als eingefügter Text<br/>
+%del(Rhytmus)% markiert den Text "Rhytmus" als gelöschten Text<br/>
+%field(fldName|Hans|4)% erzeugt ein Eingabefeld mit den Namen fldName, dem Wert "Hans" und der Länge 4.<br/>
+%mark(Wichtig!|important)% %mark(Fehler!|error)% %mark(Warnung!|warning)% %mark(Markiert!|tagged)%<br/>
+Datum: %date()%  Datum/Zeit: %dateTime()%<br/>
+%icon(bi bi-pencil-fill)% %icon(bi bi-pencil-fill-1)% %icon(bi bi-pencil-fill|2)% %icon(bi bi-pencil-fill|4)%</br>
+~Kr1%
+~info=
+~Kr1%

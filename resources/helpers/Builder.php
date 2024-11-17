@@ -10,10 +10,11 @@ if (is_dir($_dir)){
     require_once "OsHelper.php";
     $_dir = null;
 }
+use App\Models\Export;
 use App\Helpers\OsHelper;
 use App\Helpers\StringHelper;
 
-$VERSION = '2024.04.12';
+$VERSION = '2024.09.25';
 class Builder
 {
     protected array $lines = [];
@@ -555,9 +556,10 @@ function main()
                     case 'version':
                         global $VERSION;
                         echo $VERSION, "\n";
+                        break;
                     case 'update:languages':
                         if (count($args) < 3) {
-                            usage("missing arguments (DIR_SOURCES FILE_TARGET)");
+                            usage("update:language: missing arguments (DIR_SOURCES FILE_TARGET)");
                         } else {
                             $builder->updateLanguages($args[1], $args[2]);
                         }
@@ -573,6 +575,22 @@ function main()
                             $models = $options['models'];
                             $builder->createModule($options['templates'], $views, $controllers, $models);
                             $builder->adaptRouting();
+                        }
+                        break;
+                    case 'import:table':
+                        if (count($args) < 2) {
+                            usage("missing IMPORT_FILE");
+                        } else {
+                            $filename = $args[1];
+                            if (! file_exists($filename)){
+                                usage("IMPORT_FILE $filename does not exist");
+                            } else {
+                                $translator = new SimpleTranslatorHelper();
+                                $msg = Export::infoOfImportFile($filename, $translator);
+                                echo $msg;
+                                $msg = Export::importFile($filename, $translator);
+                                echo $msg;
+                            }
                         }
                         break;
                     case 'test:mini':
