@@ -48,12 +48,12 @@ class MediaWikiBase extends LayoutStatus
     function buildNextFieldname(): string
     {
         $rc = null;
-        if ($this->correctFieldnames){
-            if (count($this->fieldnames) == 0){
+        if ($this->correctFieldnames) {
+            if (count($this->fieldnames) == 0) {
                 $rc = 'fld1A1';
             } else {
                 $lastName = $this->fieldnames[count($this->fieldnames) - 1];
-                if (preg_match('/(\d+)$/', $lastName, $matcher)){
+                if (preg_match('/(\d+)$/', $lastName, $matcher)) {
                     $no = intval($matcher[1]);
                     do {
                         $no++;
@@ -64,13 +64,13 @@ class MediaWikiBase extends LayoutStatus
                     do {
                         $no++;
                         $rc = $lastName . strval($no);
-                    } while(in_array($rc, $this->fieldnames));
+                    } while (in_array($rc, $this->fieldnames));
                 }
                 $this->corrections .= " $rc";
             }
             array_push($this->fieldnames, $rc);
         }
-    return $rc;
+        return $rc;
     }
     /**
      * Tests all fieldnames of the page for uniqueness.
@@ -82,27 +82,27 @@ class MediaWikiBase extends LayoutStatus
         $newBody = '';
         $start = 0;
         $lastEnd = 0;
-        while (preg_match('/%field\(\w+/', $body, $matcher, PREG_OFFSET_CAPTURE, $start) > 0){
-                $fieldname = substr($matcher[0][0], 7);
-                $offset = intval($matcher[0][1]) + 7;
-                $start = $offset + strlen($fieldname);
-                if (! in_array($fieldname, $this->fieldnames)){
-                    array_push($this->fieldnames, $fieldname);
+        while (preg_match('/%field\(\w+/', $body, $matcher, PREG_OFFSET_CAPTURE, $start) > 0) {
+            $fieldname = substr($matcher[0][0], 7);
+            $offset = intval($matcher[0][1]) + 7;
+            $start = $offset + strlen($fieldname);
+            if (!in_array($fieldname, $this->fieldnames)) {
+                array_push($this->fieldnames, $fieldname);
+            } else {
+                if ($this->correctFieldnames) {
+                    $newName = $this->buildNextFieldname();
                 } else {
-                    if ($this->correctFieldnames){
-                        $newName = $this->buildNextFieldname();
-                    } else {
-                        // make a warning in front of "%field(..)":
-                        $offset -=7;
-                        // a red exclamation symbol, warning, exclamation
-                        $newName = 'U+x2757;U+x26A0;!!';
-                        $fieldname = '';
-                    }
-                    $newBody .= substr($body, $lastEnd, $offset - $lastEnd) . $newName;
-                    $lastEnd = $offset + strlen($fieldname);
+                    // make a warning in front of "%field(..)":
+                    $offset -= 7;
+                    // a red exclamation symbol, warning, exclamation
+                    $newName = 'U+x2757;U+x26A0;!!';
+                    $fieldname = '';
+                }
+                $newBody .= substr($body, $lastEnd, $offset - $lastEnd) . $newName;
+                $lastEnd = $offset + strlen($fieldname);
             }
         }
-        if ($newBody !== ''){
+        if ($newBody !== '') {
             $body = $newBody . substr($body, $lastEnd);
         }
     }
@@ -166,7 +166,7 @@ class MediaWikiBase extends LayoutStatus
     {
         $this->clozeMode = $clozeMode;
         $this->clozeData = $clozeData;
-        if ($clozeMode === 'preview'){
+        if ($clozeMode === 'preview') {
             $this->fieldnames = [];
             $this->correctFieldnames = true;
         }
@@ -232,7 +232,7 @@ class MediaWikiBase extends LayoutStatus
      */
     function toHtml(string &$wikiText): string
     {
-        if ($this->fieldnames !== null){
+        if ($this->fieldnames !== null) {
             $this->checkFieldnames($wikiText);
         }
         $this->htmlBody = '';
@@ -241,6 +241,9 @@ class MediaWikiBase extends LayoutStatus
             $linePrefix = '';
             if (($lineTrimmed = trim($line)) === '') {
                 $this->writeParagraphEnd();
+            } elseif (str_starts_with($line, '<nl>')) {
+                $this->writeParagraphEnd();
+                $this->htmlBody .= "<p class=\"lkn-empty-line\">&nbsp;</p>\n";
             } elseif ($this->openTable && strncmp($line, '|}', 2) == 0) {
                 $this->stopTable();
             } elseif (strncmp($line, '{|', 2) == 0) {
@@ -278,7 +281,7 @@ class MediaWikiBase extends LayoutStatus
                         $line = '';
                     }
                     if ($line !== '') {
-                        if (strpos('=*#: -|@,', $linePrefix) === false){
+                        if (strpos('=*#: -|@,', $linePrefix) === false) {
                             $linePrefix = "\n";
                         }
                         if ($linePrefix != $this->prefixLastLine) {
@@ -722,7 +725,7 @@ class LayoutStatus
                 $tag = '<th ' . $this->checkAttributes($parts[0]) . '>';
                 $line = $parts[1];
             }
-            $this->htmlBody .= $tag; 
+            $this->htmlBody .= $tag;
             $this->writeText($line);
         }
         $this->prefixLastCol = '!';

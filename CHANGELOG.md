@@ -1,4 +1,8 @@
 # Development phase
+# 0.10.9 MediaWikiBase, laraknife.css
+
+- laraknife.css: new:  .lkn-empty-line
+- MediaWikiBase: new: <nl> (newline)
 
 # 0.10.8 Builder MediaWikiBase Export seeders
 

@@ -19,7 +19,9 @@ table {
 .lkn-empty-line-above {
     margin-top: 1rem;
 }
-
+.lkn-empty-line {
+    font-size: 80%;
+}
 .lkn-wide {
     width: 100%;
 }
