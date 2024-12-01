@@ -350,6 +350,7 @@ class FieldInfo
     public string $name;
     public string $nameCapital;
     public string $baseName;
+    public string $nameShort;
     public string $baseNameCapital;
     // string text reference number
     public string $type;
@@ -365,6 +366,12 @@ class FieldInfo
         $this->refId = null;
         $this->name = $fieldname;
         $this->nameCapital = StringHelper::toCapital($fieldname);
+        $this->nameShort = $this->name;
+        if (strpos($this->nameShort, '_scope') !== false){
+            $this->nameShort = str_replace('_scope', '', $this->name);
+        } elseif (strpos( $this->nameShort, '_id') !== false){
+            $this->nameShort = str_replace('_id', '', $this->name);
+        }
         $endLength = 0;
         if (str_ends_with($fieldname, '_id')) {
             $endLength = 3;
@@ -454,6 +461,7 @@ class FieldInfo
     public function replaceVariables(string $line): string
     {
         $line = str_replace('#field#', $this->name, $line);
+        $line = str_replace('#fieldShort#', $this->nameShort, $line);
         $line = str_replace('#type#', $this->inputType(), $line);
         $line = str_replace('#Field#', $this->nameCapital, $line);
         $line = str_replace('#attribute#', $this->multiline ? 'rows="2" ' : '', $line);

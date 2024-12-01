@@ -28,8 +28,8 @@ class #Module#Controller extends Controller
             if (count($fields) === 0) {
                 $fields = [
 ##CASE(fields)##
-##ON nameLike(user_id)##
-                    '#field' => auth()->id()#comma#
+##ON nameLike(user_id|owner_id)##
+                    '#field#' => auth()->id()#comma#
 ##ON nameLike(.)##
                     '#field#' => ''#comma#
 ##END.CASE##
@@ -108,12 +108,14 @@ class #Module#Controller extends Controller
 SELECT t0.*#Comma#
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-  t#no#.name as #field##comma#
+  t#no#.name as #fieldShort##comma#
 ##END.CASE##
 FROM #table# t0
 ##CASE(fields)##
-##ON nameLike(_(scope|id)$)##
+##ON nameLike(_(scope)$)##
 LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#
+##ON nameLike(_(owner_id|user_id)$)##
+LEFT JOIN users t#no# ON t#no#.id=t0.#field#
 ##END.CASE##
 ";
             $parameters = [];
@@ -154,7 +156,7 @@ LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $fields['#base#'], 'all');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#base#'], __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#base#'], __('all'));
 ##END.CASE##
             $context = new ContextLaraKnife($request, $fields);
             return view('#module#.index', [
@@ -206,7 +208,7 @@ LEFT JOIN sproperties t#no# ON t#no#.id=t0.#field#
 ##ON nameLike(_scope$)##
             $options#Base# = SProperty::optionsByScope('#base#', $#module#->#field#, '');
 ##ON nameLike(_id$)##
-            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $fields['#field#'], __('<Please select>'));
+            $options#Base# = DbHelper::comboboxDataOfTable('#ref.table#', 'name', '#ref.id#', $#module#->#field#', __('<Please select>'));
 ##END.CASE##
             $context = new ContextLaraKnife($request, null, $#module#);
             $rc = view('#module#.show', [

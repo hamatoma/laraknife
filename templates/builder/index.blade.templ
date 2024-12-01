@@ -27,7 +27,7 @@
             <th></th>
 ##CASE(fields)##
 ##ON nameLike(.)##
-            <th sortId="#field#">{{__('#Base#')}}</th>
+            <th sortId="#fieldShort#">{{__('#Base#')}}</th>
 ##END.CASE##
             <th></th>
           </tr>
@@ -38,9 +38,9 @@
             <td><x-laraknife.icons.change-record module="#module#" no="{{ $#module#->id }}" /></td>
 ##CASE(fields)##
 ##ON nameLike(_scope$)##
-              <td> {{ __($#module#->#field#) }}</td>
+              <td> {{ __($#module#->#fieldShort#) }}</td>
 ##ON nameLike(.)##
-              <td>{{$#module#->#field#}}</td>
+              <td>{{$#module#->#fieldShort#}}</td>
 ##END.CASE##
             <td><x-laraknife.icons.delete-record module="#module#" no="{{ $#module#->id }}" /></td>
         </tr>

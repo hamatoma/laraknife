@@ -1,4 +1,24 @@
 # Development phase
+# 0.10.10 Builder, Address, Location
+
+- Builder
+  - new: FieldInfo.nameShort (without '_id' or '_scope')
+  - replaceVariables(): macro '#fieldShort#'
+- new modules Address and Location
+- view/file.index.php: 'filegroup_scope' -> 'filegroup'
+- FileController.index(): 'filegroup_scope' -> 'filegroup'
+- view/note.index.php: 'category_scope' -> 'category', 'notestatus_scope' -> ...
+- NoteController.index(): 'category_scope' -> 'category' ...
+- view/term.index.php: 'visibility_scope' -> 'visibility'
+- TermController.index(): 'visibility_scope' -> 'visibility'
+- TermController.index(): table 'users' for 'owner_id'
+- controller.templ:
+  - function create(): #field -> #field#
+  - function index(): handling of nameLike(_(owner_id|user_id)$)
+  - function index(): DbHelper::comboboxDataOfTable(): '<Please select>' -> 'all' 
+  - function create(): + handling of 'owner_id'
+- index.template: using of '#fieldShort# '
+
 # 0.10.9 MediaWikiBase, laraknife.css
 
 - laraknife.css: new:  .lkn-empty-line

@@ -27,7 +27,7 @@
                         <th sortId="title">{{ __('Title') }}</th>
                         <th sortId="description">{{ __('Description') }}</th>
                         <th sortId="filename">{{ __('Filename') }}</th>
-                        <th sortId="filegroup_scope">{{ __('Filegroup') }}</th>
+                        <th sortId="filegroup">{{ __('Filegroup') }}</th>
                         <th sortId="user">{{ __('Owner') }}</th>
                         <th sortid="size">{{ __('Size (MByte)') }}</th>
                         <th sortid="visibility">{{ __('Visibility') }}</th>
@@ -45,7 +45,7 @@
                             <td>{{ $file->title }}</td>
                             <td>{{ $file->description }}</td>
                             <td> {!! $context->callback('buildAnchor', $file) !!}</td>
-                            <td> {{ __($file->filegroup_scope) }}</td>
+                            <td> {{ __($file->filegroup) }}</td>
                             <td>{{ $file->user }}</td>
                             <td>{{ $file->size }}</td>
                             <td>{{ $file->visibility }}</td>

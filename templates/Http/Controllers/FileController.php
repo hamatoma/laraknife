@@ -134,7 +134,7 @@ class FileController extends Controller
             return redirect('/file-create');
         } else {
             $sql = "
-SELECT t0.*, t1.name as filegroup_scope, t2.name as user, t3.name as visibility 
+SELECT t0.*, t1.name as filegroup, t2.name as user, t3.name as visibility 
 FROM files t0
 LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope
 LEFT JOIN users t2 ON t2.id=t0.user_id

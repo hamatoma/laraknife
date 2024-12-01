@@ -20,8 +20,8 @@
             <th></th>
             <th sortId="title">{{__('Title')}}</th>
             <th sortId="body">{{__('Body')}}</th>
-            <th sortId="category_scope">{{__('Category')}}</th>
-            <th sortId="notestatus_scope">{{__('Status')}}</th>
+            <th sortId="category">{{__('Category')}}</th>
+            <th sortId="notestatus">{{__('Status')}}</th>
             <th sortId="owner_id">{{__('Owner')}}</th>
             <th></th>
           </tr>
@@ -32,9 +32,9 @@
             <td><x-laraknife.icons.change-record module="note" no="{{ $note->id }}" /></td>
               <td>{{$note->title}}</td>
               <td>{{$note->body_short}}</td>
-              <td>{{ __($note->category_scope) }}</td>
-              <td>{{ __($note->notestatus_scope) }}</td>
-              <td>{{$note->owner_id}}</td>
+              <td>{{ __($note->category) }}</td>
+              <td>{{ __($note->notestatus) }}</td>
+              <td>{{$note->owner}}</td>
             <td><x-laraknife.icons.delete-record module="note" no="{{ $note->id }}" /></td>
         </tr>
 @endforeach

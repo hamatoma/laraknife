@@ -98,11 +98,11 @@ class TermController extends Controller
         } else {
             ViewHelper::adaptFieldValues($_POST, ['from' => 'datetime', 'to' => 'datetime']);
             $sql = 'SELECT t0.*,'
-                . 't1.name as visibility_scope, '
+                . 't1.name as visibility, '
                 . 't2.name as owner '
                 . ' FROM terms t0'
                 . ' LEFT JOIN sproperties t1 ON t1.id=t0.visibility_scope'
-                . ' LEFT JOIN sproperties t2 ON t2.id=t0.owner_id'
+                . ' LEFT JOIN users t2 ON t2.id=t0.owner_id'
                 ;
             $parameters = [];
             $fields = $request->all();

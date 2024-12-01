@@ -237,7 +237,7 @@ class NoteController extends Controller
             return redirect('/note-create');
         } else {
             $sql = "
-SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category_scope, t2.name as notestatus_scope, t3.name as owner_id 
+SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category, t2.name as notestatus, t3.name as owner 
 FROM notes t0
 LEFT JOIN sproperties t1 ON t1.id=t0.category_scope
 LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope
@@ -254,8 +254,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                     'owner' => strval(auth()->id()),
                     'title' => '',
                     'body' => '',
-                    '_sortParams' => 'id:asc'
-                        . ';title:desc'
+                    '_sortParams' => 'id:asc;title:desc'
                 ];
             } else {
                 $conditions = [];

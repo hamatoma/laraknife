@@ -21,7 +21,7 @@
             <th sortId="title">{{__('Title')}}</th>
             <th sortId="description">{{__('Description')}}</th>
             <th sortId="owner_id">{{__('Owner')}}</th>
-            <th sortId="visibility_scope">{{__('Visibility')}}</th>
+            <th sortId="visibility">{{__('Visibility')}}</th>
             <th></th>
           </tr>
         </thead>
@@ -34,7 +34,7 @@
               <td>{{$term->title}}</td>
               <td>{{$term->description}}</td>
               <td>{{$term->owner}}</td>
-              <td> {{ __($term->visibility_scope) }}</td>
+              <td> {{ __($term->visibility) }}</td>
             <td><x-laraknife.icons.delete-record module="term" no="{{ $term->id }}" /></td>
         </tr>
 @endforeach
