@@ -8,6 +8,7 @@ function Usage(){
   cat <<EOS
 Usage: laraknife-tool.sh TASK
   Run it from the root directory of the composer package
+Note: <module> is a lowercase module name
 <TASKS>:
   build-links [--force]
     Creates links for unchangable files in laraknife
@@ -29,7 +30,8 @@ Usage: laraknife-tool.sh TASK
   copy-from-laraknife <module>
     Removes the symlinks and copy the files of the given module to the project.
   link-module <module>
-    Include a module from laraknife into the project
+    Include a module from laraknife into the project.
+    Example: link-module address
   setup-nginx TARGET DOMAIN DOCUMENT_ROOT PHP_VERSION
     Creates  a nginx configuration:
     TARGET: local or server
@@ -403,7 +405,7 @@ function LinkModule(){
       node=$(basename $file)
       ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/$node database/migrations/$node
     done
-    ln -sv ../../vendor/hamatoma/laraknife/templates/database/migrations/${Module}Seeder.php database/seeders/${Module}Seeder.php
+    ln -sv ../../vendor/hamatoma/laraknife/templates/database/seeders/${Module}Seeder.php database/seeders/${Module}Seeder.php
   fi
 }
 # ===
@@ -435,7 +437,7 @@ function MoveToLaraknife(){
     if [ -e $fn ]; then
       local node=$(basename $fn)
       mv -v $fn vendor/hamatoma/laraknife/templates/database/seeders
-      ln -sv ../../vendor/hamatoma/laraknife/templates/database/seeders/$node database/seeders/$node
+      ln -sv ../../vendor/hamatoma/laraknife/templates/database/seeders/$node database/seeders/
     fi
   fi
 }

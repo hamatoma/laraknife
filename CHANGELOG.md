@@ -1,4 +1,25 @@
 # Development phase
+
+# 0.10.11 Pages, UserController, laraknife-tool, ContextLaraKnife
+
+- new: wiki-text.blade.php
+- UserController: 
+  - Fix: handling of empty $fields
+  - Fix: getNavigationTabInfo(): wrong index
+  - Fix: rules(): roleId on ! $isCreate
+- PageController
+  - edit(): pagetype_scope changeable
+  - new: editWiki.blade + showwiki.blade
+  - showPretty(): using editwiki.blade for pagetype = 'wiki'
+  - new showStartPage(), showUserPage()
+- laraknife-tool.sh:
+  - Help messages improved
+  - Fix: LinkModule(): wrong symbolic link
+- ContextLaraKnife:
+  - fix: id() -> id
+  - new: readonlyUnlessOwner()
+
+
 # 0.10.10 Builder, Address, Location
 
 - Builder

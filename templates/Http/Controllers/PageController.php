@@ -127,10 +127,10 @@ $sep
      */
     public function edit(Page $page, Request $request)
     {
+        $fields = $request->all();
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/page-index');
         } else {
-            $fields = $request->all();
             if (count($fields) === 0) {
                 $fields = [
                     'title' => $page->title,
@@ -152,7 +152,6 @@ $sep
                 if (strpos($fields['title'], '"') !== false){
                     $fields['title'] = str_replace('"', "\u{201F}", $fields['title']);
                 }
-                $fields['pagetype_scope'] = $page->pagetype_scope;
                 $fields['markup_scope'] = $page->markup_scope;
                 $fields['language_scope'] = $page->language_scope;
             }
@@ -179,6 +178,70 @@ $sep
             }
             $context = new ContextLaraKnife($request, $fields, $page);
             $rc = view('page.edit', [
+                'context' => $context,
+                'optionsPagetype' => $optionsPagetype,
+                'optionsMarkup' => $optionsMarkup,
+                'optionsLanguage' => $optionsLanguage,
+            ]);
+        }
+        return $rc;
+    }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function editWiki(Page $page, Request $request)
+    {
+        if ($request->btnSubmit === 'btnCancel') {
+            $rc = redirect('/page-showpretty/' . $page->id);
+        } else {
+            $fields = $request->all();
+            if (count($fields) <= 3) {
+                $fields = [
+                    'title' => $page->title,
+                    'name' => $page->name,
+                    'columns' => $page->columns,
+                    'contents' => $page->contents,
+                    'info' => $page->info,
+                    'pagetype_scope' => $page->pagetype_scope,
+                    'markup_scope' => $page->markup_scope,
+                    'language_scope' => $page->language_scope,
+                    'order' => $page->order ?? '0',
+                    'audio_id' => $page->audio_id,
+                    'previous_id' => $page->previous_id,
+                    'next_id' => $page->next_id,
+                    'up_id' => $page->up_id,
+                    'message' => ''
+                ];
+            } else {
+                if (strpos($fields['title'], '"') !== false){
+                    $fields['title'] = str_replace('"', "\u{201F}", $fields['title']);
+                }
+                $fields['markup_scope'] = $page->markup_scope;
+                $fields['language_scope'] = $page->language_scope;
+            }
+            $fields['contents'] = MediaWiki::expandStarItems($fields['contents']);
+            if ($request->btnSubmit === 'btnStore') {
+                $this->update($page, $request, $fields);
+            }
+            $optionsPagetype = SProperty::optionsByScope('pagetype', $page->pagetype_scope, '');
+            $optionsMarkup = SProperty::optionsByScope('markup', $page->markup_scope, '');
+            $optionsLanguage = SProperty::optionsByScope('localization', $page->language_scope, '');
+            if ($request->btnSubmit === 'btnPreview') {
+                $wiki = new MediaWiki();
+                //$wiki->setClozeParameters('preview');
+                $wikiText = $fields['contents'];
+                $fields['preview'] = $wiki->toHtml($wikiText);
+                if ($wikiText !== $page->contents){
+                    $page->contents = $wikiText;
+                    $fields['message'] = '+++ ' . __('There are corrections:') . $wiki->corrections;
+                }
+            }
+            if ($page->audio_id != null) {
+                $file = File::find($page->audio_id);
+                $fields['audio'] = $file->filename;
+            }
+            $context = new ContextLaraKnife($request, $fields, $page);
+            $rc = view('page.editwiki', [
                 'context' => $context,
                 'optionsPagetype' => $optionsPagetype,
                 'optionsMarkup' => $optionsMarkup,
@@ -276,11 +339,10 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
             'contents' => 'required',
             'info' => '',
             'order' => 'integer|min:0|max:9999',
-            'columns' => 'integer|min:1|max:4'
+            'pagetype_scope' => $isCreate ? 'required' : ''
         ];
         if ($isCreate) {
             $rc['markup_scope'] = 'required';
-            $rc['pagetype_scope'] = 'required';
             $rc['language_scope'] = 'required';
         }
         return $rc;
@@ -292,6 +354,8 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         Route::get('/page-create', [PageController::class, 'create'])->middleware('auth');
         Route::put('/page-store', [PageController::class, 'store'])->middleware('auth');
         Route::post('/page-edit/{page}', [PageController::class, 'edit'])->middleware('auth');
+        Route::get('/page-editwiki/{page}', [PageController::class, 'editWiki'])->middleware('auth');
+        Route::post('/page-editwiki/{page}', [PageController::class, 'editWiki'])->middleware('auth');
         Route::get('/page-edit/{page}', [PageController::class, 'edit'])->middleware('auth');
         Route::get('/page-show/{page}/delete', [PageController::class, 'show'])->middleware('auth');
         Route::delete('/page-show/{page}/delete', [PageController::class, 'destroy'])->middleware('auth');
@@ -300,6 +364,8 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         Route::get('/page-showmenu/{title}', [PageController::class, 'showMenu'])->middleware('auth');
         Route::get('/page-showhelp/{title}', [PageController::class, 'showHelp'])->middleware('auth');
         Route::get('/page-showbyname/{name}/{pageType}', [PageController::class, 'showByName'])->middleware('auth');
+        Route::get('/page-startpage', [PageController::class, 'showStartPage']);
+        Route::get('/page-userpage', [PageController::class, 'showUserPage'])->middleware('auth');
     }
     /**
      * Display the specified resource.
@@ -324,13 +390,18 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
     public function showPretty(Page $page, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/page-index')->middleware('auth');
+            $rc = redirect(to: '/page-index')->middleware('auth');
         } else {
             $textRaw = $page->contents;
             $view = 'page.show-col1';
             $audio = $page->audio_id == null ? null : File::relativeFileLink($page->audio_id);
             $params = ['audio' => $audio];
             switch ($page->pagetype_scope) {
+                case 1144: /* wiki */
+                    $view = 'page.showwiki';
+                    $params["text"] = $this->asHtml($page);
+                    $params["title"] = $page->title;
+                    break;
                 default:
                     $columns = 1 + substr_count($textRaw, "\n---- %col%");
                     if ($columns <= 1) {
@@ -364,7 +435,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         $page = Page::where(['name' => $name, 'pagetype_scope' => $pageType])->first();
         if ($page == null) {
             $context = new ContextLaraKnife($request, ['text' => "invalid reference: $name $pageType"]);
-            $rc = $rc = view('page.unknown', [
+            $rc = view('page.unknown', [
                 'context' => $context,
             ]);
         } else {
@@ -381,6 +452,24 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
     public function showMenu(string $title, Request $request)
     {
         $rc = $this->showByName($title, 1141, $request);
+        return $rc;
+    }
+
+    public function showStartPage(Request $request)
+    {
+        $rc = $this->showByName('main', 1141, $request);
+        return $rc;
+    }
+
+    public function showUserPage(Request $request)
+    {
+        $name = 'user.' . strval(auth()->id());
+        $page = Page::where(['name' => $name, 'pagetype_scope' => 1141])->first();
+        if ($page == null) {
+            $rc = $this->showByName('main', 1141, $request);
+        } else {
+            $rc = $this->showPretty($page, $request);
+        }
         return $rc;
     }
 

@@ -1,7 +1,7 @@
 @extends('layouts.backend')
 
 @section('content')
-    <form id="page-edit" enctype="multipart/form-data" action="/page-edit/{{ $context->model->id }}" method="POST">
+    <form id="page-ediwiki" enctype="multipart/form-data" action="/page-editwiki/{{ $context->model->id }}" method="POST">
         @csrf
         <x-laraknife.panels.edit title="{{ __('Change of a Page') }}">
             <x-laraknife.forms.combobox position="first" name="pagetype_scope" label="Pagetype" :options="$optionsPagetype" width2="4" />

@@ -109,11 +109,21 @@ class UserController extends Controller
      */
     public function edit(User $user, Request $request)
     {
-        if ($request->btnSubmit === 'btnCancel') {
+        $button = $request->btnSubmit;
+        if ($button === 'btnCancel') {
             $rc = redirect('/user-index');
-        } elseif ($request->btnSubmit === 'btnSetPassword') {
+        } elseif ($button === 'btnSetPassword') {
             $rc = redirect('/user-editpassword/' . strval($user->id));
         } else {
+            $fields = $request->all();
+            if (count($fields) === 0) {
+                $fields = [
+                    'name' => $user->name,
+                    'email' => $user->info,
+                    'localization' => $user->localization,
+                    'role' => $user->role
+                    ];
+            }
             $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
             $localizationOptions = SProperty::optionsByScope('localization', $user->localization, '', 'name', 'shortname');
 
@@ -145,7 +155,10 @@ class UserController extends Controller
     public function editPassword(User $user, Request $request, ?string $redirect = null)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect($redirect ?? '/menuitem-menu_main');
+            if ($redirect == null || ! $user->isAdmin()){
+                $redirect = '/menuitem-menu_main';
+            }
+            $rc = redirect($redirect);
         } else {
             $rc = null;
             $error = null;
@@ -170,7 +183,7 @@ class UserController extends Controller
                 $examples = StringHelper::createPassword() . "<br>\n" . StringHelper::createPassword()
                     . "<br>\n" . StringHelper::createPassword();
                 $context = new ContextLaraKnife($request, null, $user);
-                $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('user-edit', 0, $user->id);
+                $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('user-edit', 1, $user->id);
                 $rc = view('user.changepw', [
                     'context' => $context,
                     'user' => $user,
@@ -379,14 +392,14 @@ class UserController extends Controller
             $rc = [
                 'name' => 'required|unique:users',
                 'email' => 'required|email|unique:users',
-                'role_id' => 'required',
+                'role_id' => $isCreation ? 'required' : '',
                 'localization' => 'required'
             ];
         } else {
             $rc = [
                 'name' => ['required', Rule::unique('users')->ignore($user)],
                 'email' => 'required|unique:users,id,' . strval($user->id),
-                'role_id' => 'required',
+                'role_id' => '',
                 'localization' => 'required'
             ];
         }
@@ -468,9 +481,10 @@ class UserController extends Controller
     public function update(User $user, Request $request)
     {
         $rc = null;
-        if ($request->btnSubmit === 'btnSetPassword') {
+        $button = $request->btnSubmit;
+        if ($button === 'btnSetPassword') {
             $rc = $rc = redirect('/user-editpassword/' . strval($user->id));
-        } elseif ($request->btnSubmit === 'btnStore') {
+        } elseif ($button === 'btnStore') {
             $fields = $request->all();
             $email = strtolower($fields['email']);
             $validator = Validator::make($fields, $this->rules(false, $user));

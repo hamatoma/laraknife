@@ -2,6 +2,7 @@
 namespace App\Helpers;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -87,9 +88,18 @@ class ContextLaraKnife
     public function isAdminOrOwner(int $id = null): bool{
         $rc = $this->isAdmin();
         if (! $rc && $id != null){
-            $rc = $id === auth()->user()->id();
+            $rc = $id === auth()->user()->id;
         }
         return $rc;
+    }
+    public function readonlyUnlessOwner(int $id = null): string{
+        if ($id == null && $this->model instanceof User){
+            $id = $this->model->id;
+        }
+        $isOwner = $this->isAdmin() || ($id != null && $id === auth()->user()->id);
+        $rc = $isOwner ? '' : 'readonly';
+        return $rc;
+
     }
     public function text(string $text): string
     {
