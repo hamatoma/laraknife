@@ -9,7 +9,7 @@
             <x-laraknife.forms.combobox position="last" name="owner_id" label="Owner" :options="$optionsOwner" width2="4" />
             <x-laraknife.forms.string type="datetime-local" position="first" name="term" label="Term"
                 value="{{ $context->valueOf('term') }}" width2="4" />
-            <x-laraknife.forms.string position="last" name="duration" label="Duration"
+            <x-laraknife.forms.string position="last" name="duration" label="Duration (minutes)"
                 value="{{ $context->valueOf('duration') }}" valueTime="{{ $context->valueOf('duration') }}"
                 width2="4" />
             <x-laraknife.forms.string position="alone" name="title" label="Title" value="{{ $context->valueOf('title') }}"

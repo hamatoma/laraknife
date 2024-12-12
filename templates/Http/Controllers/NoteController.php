@@ -251,7 +251,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                     'category' => '1051',
                     'notestatus' => '1011',
                     'visibility' => '1091',
-                    'owner' => strval(auth()->id()),
+                    'owner' => null,
                     'title' => '',
                     'body' => '',
                     '_sortParams' => 'id:asc;title:desc'
@@ -260,11 +260,11 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                 $conditions = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'category_scope', 'category');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'notestatus_scope', 'notestatus');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'visibility_scope', 'visibility');
                 ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'user');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title,body', 'text');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'title');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'body');
+                ViewHelper::addConditionVisible($conditions, $fields['visibility']);
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
@@ -341,6 +341,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
     {
         $rc = [
             'title' => 'required',
+            'body' => '',
             'category_scope' => 'required',
             'notestatus_scope' => 'required',
             'visibility_scope' => 'required',

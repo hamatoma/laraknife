@@ -139,6 +139,43 @@ class ViewHelper
     /**
      * Adds a SQL condition "like a FIELD" for filtering records.
      * @param array $conditions IN/OUT: the new condition is put to that list
+     * @param int||null $visibility the value of the filter field "visibility"
+     * @param string $fieldVisibility the column name specifying the visibility, e.g. "visibility_scope"
+     * @param string $fieldOwner the column name of the field specifying the ownership, e.g. "owner_id"
+     * @param int|null $id  the user id of the owner. If null the current user is taken
+     */
+    public static function addConditionVisible(
+        array &$conditions,
+        ?int $visibility,
+        string $fieldOwner = 'owner_id',
+        ?int $id = null,
+        string $fieldVisibility = 'visibility_scope'
+    ) {
+        $condition = null;
+        if ($visibility == null) {
+            if ($id == null) {
+                $id = auth()->user()->id;
+            }
+            $condition = "($fieldVisibility!=1092 or $fieldOwner=$id)";
+        } else {
+            switch ($visibility) {
+                case 1092 /* private */ :
+                    if ($id == null) {
+                        $id = auth()->user()->id;
+                    }
+                    $condition = "($fieldOwner=$id and $fieldVisibility=1092)";
+                    break;
+
+                default:
+                    $condition = "($fieldVisibility=$visibility)";
+                    break;
+            }
+        }
+        array_push($conditions, $condition);
+    }
+    /**
+     * Adds a SQL condition "like a FIELD" for filtering records.
+     * @param array $conditions IN/OUT: the new condition is put to that list
      * @param array $parameters IN/OUT: the named sql parameters (":value")
      * @param string $column the column name. May be a comma separated list of columns.
      *   In this case each of the columns will be compared and combined with the OR operator
@@ -172,6 +209,15 @@ class ViewHelper
                 array_push($conditions, '(' . implode(" OR ", $conditions2) . ')');
             }
         }
+    }
+    /**
+     * Adds a SQL condition "like a FIELD" for filtering records.
+     * @param array $conditions IN/OUT: the new condition is put to that list
+     * @param string $sqlCondition the condition written as raw sql expression
+     */
+    public static function addConditionRawSql(array &$conditions, string $sql)
+    {
+        array_push($conditions, "($sql)");
     }
     /**
      * Appends a field to a field list if that field is not in the list.

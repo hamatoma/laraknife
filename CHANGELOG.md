@@ -1,5 +1,19 @@
 # Development phase
 
+# 0.10.12 ViewHelper Note Term Export
+
+- ViewHelper: new: addConditionVisible(), addConditionRawSql()
+- Exports: index.blade: removed: column "edit"
+- Note:
+  - edit.blade: layout changed
+  - index.blade: layout changed
+  - NoteController: index(): visibility filter
+  - NoteController: rules(): handling of "body"
+- Term: 
+  - create.blade+edit.blade: label "Duration" changed
+  - TermController: index(): visibility filter
+- Export: ExportSeeder: menu label: "Exports" -> "Imports"
+
 # 0.10.11 Pages, UserController, laraknife-tool, ContextLaraKnife
 
 - new: wiki-text.blade.php

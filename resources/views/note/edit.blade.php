@@ -9,11 +9,11 @@
                     value="{{ $context->valueOf('category_scope') }}" width2="4" />
                 <x-laraknife.forms.combobox position="last" name="notestatus_scope" label="Status" :options="$optionsNotestatus"
                     width2="4" />
-                <x-laraknife.forms.string position="first" name="title" label="Title"
-                    value="{{ $context->valueOf('title') }}" width2="4" />
-                <x-laraknife.forms.combobox position="last" name="visibility_scope" label="Visibility" :options="$optionsVisibility"
+                <x-laraknife.forms.string position="alone" name="title" label="Title"
+                    value="{{ $context->valueOf('title') }}" width2="10" />
+                <x-laraknife.forms.combobox position="first" name="visibility_scope" label="Visibility" :options="$optionsVisibility"
                     width2="4" />
-                <x-laraknife.forms.combobox position="alone" name="group_id" label="Group" :options="$optionsGroup"
+                <x-laraknife.forms.combobox position="last" name="group_id" label="Group" :options="$optionsGroup"
                     width2="4" />
                 <x-laraknife.forms.text position="alone" name="body" label="Body"
                     value="{{ $context->valueOf('body') }}" width2="10" rows="10" />

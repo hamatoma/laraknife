@@ -13,7 +13,6 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th></th>
                             <th>{{ __('Name') }}</th>
                             <th>{{ __('Date') }}</th>
                             <th class="lkn-align-right">{{ __('Size') }}</th>
@@ -23,7 +22,6 @@
                     <tbody>
                         @foreach ($records as $file)
                             <tr>
-                                <td><x-laraknife.icons.change-record module="role" no="{{ 1 }}" /></td>
                                 <td>{!! $context->buildFileLink($file->node, "export") !!}</td>
                                 <td>{{ $file->date->format('Y.m.d H:i') }}</td>
                                 <td class="lkn-align-right">{{ sprintf('%.6f MByte', $file->sizeMByte) }}</td>
