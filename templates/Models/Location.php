@@ -20,6 +20,6 @@ class Location extends Model
         'additional',
         'info',
         'priority',
-        'owner_id'
+        'person_id'
     ];
 }

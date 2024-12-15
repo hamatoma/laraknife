@@ -17,6 +17,11 @@ class Address extends Model
         'info',
         'addresstype_scope',
         'priority',
-        'owner_id'
+        'person_id'
     ];
+    public function byPerson(){
+        $rc = '';
+        $addresses = $this->hasMany(Person::class, 'owner_id');
+        return $addresses;
+    }
 }

@@ -1,4 +1,10 @@
 # Development phase
+# 0.10.13 +Person Location Address OPEN!!!
+
+- new: module Person
+- Address+Location: owner_id -> person_id
+- laraknife-tool.sh: help message
+
 
 # 0.10.12 ViewHelper Note Term Export
 

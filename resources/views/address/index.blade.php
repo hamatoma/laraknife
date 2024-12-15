@@ -6,7 +6,7 @@
     <x-laraknife.panels.index title="{{ __('Addresses') }}">
       <x-laraknife.panels.filter legend="{{ $pagination->legendText() }}">
       <x-laraknife.forms.combobox position="first" name="addresstype" label="Addresstype" :options="$optionsAddresstype" class="lkn-autoupdate" width2="4" />
-      <x-laraknife.forms.combobox position="last" name="owner" label="Owner" :options="$optionsOwner" class="lkn-autoupdate" width2="4" />
+      <x-laraknife.forms.combobox position="last" name="person" label="Person" :options="$optionsPerson" class="lkn-autoupdate" width2="4" />
       <x-laraknife.forms.string position="alone" name="text" label="Text" value="{{ $context->valueOf('text') }}" width2="10" />
       </x-laraknife.panels.filter>
       <x-laraknife.panels.index-button buttonType="new"/>
@@ -16,7 +16,7 @@
             <th></th>
             <th sortId="addresstype">{{__('Addresstype')}}</th>
             <th sortId="name">{{__('Name')}}</th>
-            <th sortId="owner">{{__('Owner')}}</th>
+            <th sortId="person">{{__('Person')}}</th>
             <th>{{__('Info')}}</th>
             <th sortId="priority">{{__('Prio')}}</th>
             <th></th>
@@ -28,7 +28,7 @@
             <td><x-laraknife.icons.change-record module="address" no="{{ $address->id }}" /></td>
               <td> {{ __($address->addresstype) }}</td>
               <td>{{$address->name}}</td>
-              <td>{{$address->owner}}</td>
+              <td>{{$address->person}}</td>
               <td>{{$address->info}}</td>
               <td>{{$address->priority}}</td>
               <td><x-laraknife.icons.delete-record module="address" no="{{ $address->id }}" /></td>

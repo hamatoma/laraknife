@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('additional')->nullable();
             $table->string('info')->nullable();
             $table->integer('priority');
-            $table->foreignId('owner_id')->nullable()->references('id')->on('users');
+            $table->foreignId('person_id')->nullable()->references('id')->on('persons');
         });
     }
 

@@ -4,7 +4,7 @@
     <form id="location-edit" action="/location-update/{{ $context->model->id }}" method="POST">
         @csrf
         <x-laraknife.panels.edit title="{{ __('Change of a Location') }}">
-            <x-laraknife.forms.combobox position="first" name="owner_id" label="Owner" :options="$optionsOwner" width2="4"
+            <x-laraknife.forms.combobox position="first" name="person_id" label="Person" :options="$optionsPerson" width2="4"
                 attribute="readonly" />
             <x-laraknife.forms.string position="last" name="country" label="Country"
                 value="{{ $context->valueOf('country') }}" width2="4" />

@@ -27,7 +27,7 @@ class AddressController extends Controller
             $fields = $request->all();
             if (count($fields) === 0) {
                 $fields = [
-                    'owner_id' => auth()->id(),
+                    'person_id' => auth()->id(),
                     'name' => '',
                     'info' => '',
                     'priority' => '10',
@@ -35,12 +35,12 @@ class AddressController extends Controller
                 ];
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $fields['addresstype_scope'], '-');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, $fields);     
             $rc = view('address.create', [
                 'context' => $context,
                 'optionsAddresstype' => $optionsAddresstype,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 ]);
         }
         return $rc;
@@ -60,16 +60,16 @@ class AddressController extends Controller
                     'info' => $address->info,
                     'addresstype_scope' => $address->addresstype_scope,
                     'priority' => $address->priority,
-                    'owner_id' => $address->owner_id
+                    'person_id' => $address->person_id
                     ];
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $address->addresstype_scope, '');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $address);
             $rc = view('address.edit', [
                 'context' => $context,
                 'optionsAddresstype' => $optionsAddresstype,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 ]);
         }
         return $rc;
@@ -95,38 +95,38 @@ class AddressController extends Controller
             $sql = "
 SELECT t0.*,
   t1.name as addresstype,
-  t2.name as owner
+  t2.nickname as person
 FROM addresses t0
 LEFT JOIN sproperties t1 ON t1.id=t0.addresstype_scope
-LEFT JOIN users t2 ON t2.id=t0.owner_id
+LEFT JOIN persons t2 ON t2.id=t0.person_id
 ";
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
                 'addresstype' => '',
-                'owner' => '',
+                'person' => '',
                 'text' => '',
                 '_sortParams' => 't0.name:asc;priority:desc;id:asc'
                 ];
             } else {
                 $conditions = [];
                 ViewHelper::addConditionComparism($conditions, $parameters, 'addresstype_scope', 'addresstype');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
+                ViewHelper::addConditionComparism($conditions, $parameters, 'person_id', 'person');
+                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info,t2.nickname', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $fields['addresstype'], 'all');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner'], __('all'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person'], __('all'));
             $context = new ContextLaraKnife($request, $fields);
             return view('address.index', [
                 'context' => $context,
                 'records' => $records,
                 'optionsAddresstype' => $optionsAddresstype,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 'pagination' => $pagination
             ]);
         }
@@ -135,13 +135,13 @@ LEFT JOIN users t2 ON t2.id=t0.owner_id
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreate, int $addressType): array
+    private function rules(bool $isCreate, ?int $addressType): array
     {
         $rc = [
             'name' => $addressType == 1321 /* email */ ? 'required|email' : 'required|regex:/^[+]?[0-9 -]+$/',
             'info' => '',
             'addresstype_scope' => $isCreate ? 'required' : '',
-            'owner_id' => $isCreate ? 'required' : '',
+            'person_id' => $isCreate ? 'required' : '',
             'priority' => 'required|integer'
         ];
         return $rc;
@@ -168,13 +168,13 @@ LEFT JOIN users t2 ON t2.id=t0.owner_id
         } else {
             $fields = $request->all();
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $address->addresstype_scope, '');
-            $owner = $address->owner_id;
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $owner, __('<Please select>'));
+            $person = $address->person_id;
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $person, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $address);
             $rc = view('address.show', [
                 'context' => $context,
                 'optionsAddresstype' => $optionsAddresstype,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 'mode' => 'delete'
                 ]);
         }

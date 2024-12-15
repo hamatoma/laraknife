@@ -27,6 +27,7 @@ Note: <module> is a lowercase module name
     Creates a homepage
   move-to-laraknife <module>
     Moves all files of the given module to the laraknife directory.
+    Example: move-to-laraknife page
   copy-from-laraknife <module>
     Removes the symlinks and copy the files of the given module to the project.
   link-module <module>

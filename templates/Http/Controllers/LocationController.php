@@ -27,7 +27,7 @@ class LocationController extends Controller
             $fields = $request->all();
             if (count($fields) === 0) {
                 $fields = [
-                    'owner_id' => auth()->id(),
+                    'person_id' => '',
                     'country' => 'D',
                     'zip' => '',
                     'city' => '',
@@ -37,11 +37,11 @@ class LocationController extends Controller
                     'priority' => 10
                 ];
             }
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, $fields);     
             $rc = view('location.create', [
                 'context' => $context,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 ]);
         }
         return $rc;
@@ -64,14 +64,14 @@ class LocationController extends Controller
                     'additional' => $location->additional,
                     'info' => $location->info,
                     'priority' => $location->priority,
-                    'owner_id' => $location->owner_id
+                    'person_id' => $location->person_id
                     ];
             }
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['person_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $location);
             $rc = view('location.edit', [
                 'context' => $context,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 ]);
         }
         return $rc;
@@ -96,9 +96,9 @@ class LocationController extends Controller
         } else {
             $sql = "
 SELECT t0.*,
-  t1.name as owner
+  t1.nickname as person
 FROM locations t0
-LEFT JOIN users t1 ON t1.id=t0.owner_id
+LEFT JOIN persons t1 ON t1.id=t0.person_id
 ";
             $parameters = [];
             $fields = $request->all();
@@ -108,14 +108,14 @@ LEFT JOIN users t1 ON t1.id=t0.owner_id
                 'zip' => '',
                 'city' => '',
                 'text' => '',
-                '_sortParams' => 'country:desc;zip:desc'
+                '_sortParams' => 'person:desc;country:desc;zip:desc'
                 ];
             } else {
                 $conditions = [];
                 ViewHelper::addConditionPattern($conditions, $parameters, 'country');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'zip');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'city');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'zip,city,street,additional,info', 'text');
+                ViewHelper::addConditionPattern($conditions, $parameters, 'zip,city,street,additional,t0.info,t1.nickname', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
@@ -143,7 +143,7 @@ LEFT JOIN users t1 ON t1.id=t0.owner_id
             'additional' => '',
             'info' => '',
             'priority' => 'required|integer',
-            'owner_id' => $isCreate ? 'required' : ''
+            'person_id' => $isCreate ? 'required' : ''
         ];
         return $rc;
     }
@@ -167,11 +167,11 @@ LEFT JOIN users t1 ON t1.id=t0.owner_id
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/location-index')->middleware('auth');
         } else {
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $location->owner_id, __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $location->person_id, __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $location);
             $rc = view('location.show', [
                 'context' => $context,
-                'optionsOwner' => $optionsOwner,
+                'optionsPerson' => $optionsPerson,
                 'mode' => 'delete'
                 ]);
         }

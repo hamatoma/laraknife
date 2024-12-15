@@ -5,7 +5,7 @@
         @csrf
         @method('PUT')
         <x-laraknife.panels.create title="{{ __('Creation of a Location') }}">
-        <x-laraknife.forms.combobox position="first" name="owner_id" label="Owner" :options="$optionsOwner" width2="4"/>
+        <x-laraknife.forms.combobox position="first" name="person_id" label="Person" :options="$optionsPerson" width2="4"/>
         <x-laraknife.forms.string position="last" name="country" label="Country" value="{{ $context->valueOf('country') }}" width2="4" />
         <x-laraknife.forms.string position="first" name="zip" label="Zip" value="{{ $context->valueOf('zip') }}" width2="4" />
         <x-laraknife.forms.string position="last" name="city" label="City" value="{{ $context->valueOf('city') }}" width2="4" />

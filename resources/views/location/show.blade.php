@@ -10,7 +10,7 @@
             mode="{{ $mode }}">
             <x-laraknife.forms.string position="first" name="country" label="Country" value="{{ $context->valueOf('country') }}"
                 width2="4" attribute="readonly" />
-            <x-laraknife.forms.combobox position="last" name="owner_id" label="Owner" :options="$optionsOwner" width2="4"
+            <x-laraknife.forms.combobox position="last" name="person_id" label="Person" :options="$optionsPerson" width2="4"
                 attribute="readonly" />
             <x-laraknife.forms.string position="first" name="zip" label="Zip" value="{{ $context->valueOf('zip') }}"
                 width2="4" attribute="readonly" />
