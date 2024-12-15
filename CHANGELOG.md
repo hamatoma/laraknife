@@ -1,4 +1,10 @@
 # Development phase
+
+# 0.10.14 help in addressses for a person
+
+- address.blade: a help link
+- ViewHelperLocale.templ: corrections in notes-edit and person-edit
+
 # 0.10.13 +Person Location Address OPEN!!!
 
 - new: module Person

@@ -27,12 +27,20 @@ class ViewHelperLocal
         switch ($name) {
             case 'note-edit':
                 $list = [
-                    "Properties;/note-edit/$referenceId",
+                'Notes;/note-index',
+                "Properties;/note-edit/$referenceId",
                     "Documents;/note-index_documents/$referenceId",
                     "Shift;/note-edit_shift/$referenceId",
                 ];
                 $rc = new NavigationTabs($list, $indexActive);
                 break;
+            case 'person-edit':
+                    $rc = new NavigationTabs([
+                        'Persons;/person-index',
+                        "Properties;/person-edit/$referenceId",
+                        "Address;/person-address/$referenceId"
+                    ], $indexActive);
+                    break;
             case 'user-edit':
                 $rc = new NavigationTabs([
                     "Properties;/user-edit/$referenceId",
