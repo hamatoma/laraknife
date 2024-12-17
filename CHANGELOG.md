@@ -1,5 +1,10 @@
 # Development phase
 
+# 0.10.15 
+
+- PersonController:
+  - index(): Fix: "t0.info" instead of "info"
+  
 # 0.10.14 help in addressses for a person
 
 - address.blade: a help link
