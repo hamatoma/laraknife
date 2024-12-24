@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Change;
+use App\Helpers\Helper;
+use App\Models\Address;
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Address;
-use App\Models\SProperty;
-use App\Helpers\ContextLaraKnife;
-use App\Helpers\ViewHelper;
-use App\Helpers\DbHelper;
-use App\Helpers\Helper;
-use App\Helpers\Pagination;
 
 class AddressController extends Controller
 {
@@ -36,12 +37,12 @@ class AddressController extends Controller
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $fields['addresstype_scope'], '-');
             $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
-            $context = new ContextLaraKnife($request, $fields);     
+            $context = new ContextLaraKnife($request, $fields);
             $rc = view('address.create', [
                 'context' => $context,
                 'optionsAddresstype' => $optionsAddresstype,
                 'optionsPerson' => $optionsPerson,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -61,7 +62,7 @@ class AddressController extends Controller
                     'addresstype_scope' => $address->addresstype_scope,
                     'priority' => $address->priority,
                     'person_id' => $address->person_id
-                    ];
+                ];
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $address->addresstype_scope, '');
             $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
@@ -70,7 +71,7 @@ class AddressController extends Controller
                 'context' => $context,
                 'optionsAddresstype' => $optionsAddresstype,
                 'optionsPerson' => $optionsPerson,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -81,6 +82,7 @@ class AddressController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $address->delete();
+            Change::createFromModel($address, Change::$DELETE, 'Address');
         }
         return redirect('/address-index');
     }
@@ -104,18 +106,17 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
-                'addresstype' => '',
-                'person' => '',
-                'text' => '',
-                '_sortParams' => 't0.name:asc;priority:desc;id:asc'
+                    'addresstype' => '',
+                    'person' => '',
+                    'text' => '',
+                    '_sortParams' => 't0.name:asc;priority:desc;id:asc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'addresstype_scope', 'addresstype');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'person_id', 'person');
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info,t2.nickname', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'addresstype_scope', 'addresstype');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'person_id', 'person');
+            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info,t2.nickname', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -176,7 +177,7 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
                 'optionsAddresstype' => $optionsAddresstype,
                 'optionsPerson' => $optionsPerson,
                 'mode' => 'delete'
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -195,11 +196,12 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-            $validated['info'] = strip_tags($validated['info']);
-                Address::create($validated);
+                $validated['info'] = strip_tags($validated['info']);
+                $address = Address::create($validated);
+                Change::createFromFields($validated, Change::$CREATE, 'Address', $address->id);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/address-index');
         }
         return $rc;
@@ -220,9 +222,10 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $address->update($validated);
+                Change::createFromFields($validated, Change::$UPDATE, 'Address', $address->id);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/address-index');
         }
         return $rc;

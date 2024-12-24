@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Change;
+use App\Helpers\Helper;
+use App\Models\Location;
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Location;
-use App\Models\SProperty;
-use App\Helpers\ContextLaraKnife;
-use App\Helpers\ViewHelper;
-use App\Helpers\DbHelper;
-use App\Helpers\Helper;
-use App\Helpers\Pagination;
 
 class LocationController extends Controller
 {
@@ -67,7 +68,7 @@ class LocationController extends Controller
                     'person_id' => $location->person_id
                     ];
             }
-            $optionsPerson = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['person_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $location);
             $rc = view('location.edit', [
                 'context' => $context,
@@ -83,6 +84,7 @@ class LocationController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $location->delete();
+            Change::createFromModel($location, Change::$DELETE, 'Location');
         }
         return redirect('/location-index');
     }
@@ -191,7 +193,8 @@ LEFT JOIN persons t1 ON t1.id=t0.person_id
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-                Location::create($validated);
+                $location = Location::create($validated);
+                Change::createFromFields($validated, Change::$CREATE, 'Location', $location->id);
             }
         }
         if ($rc == null){
@@ -213,6 +216,7 @@ LEFT JOIN persons t1 ON t1.id=t0.person_id
             } else {
                 $validated = $validator->validated();
                 $location->update($validated);
+                Change::createFromFields($validated, Change::$UPDATE, 'Location', $location->id);
             }
         }
         if ($rc == null){

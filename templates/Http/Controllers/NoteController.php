@@ -7,6 +7,7 @@ use App\Models\Note;
 use App\Models\Page;
 use App\Models\User;
 use App\Models\Group;
+use App\Models\Change;
 use App\Models\Module;
 use App\Helpers\Helper;
 use App\Helpers\DbHelper;
@@ -166,14 +167,14 @@ class NoteController extends Controller
             $fields = $request->all();
             if (count($fields) === 0) {
                 $fields = [
-                'owner_id' => $note->owner_id,
-                'recipients' => '',
+                    'owner_id' => $note->owner_id,
+                    'recipients' => '',
                 ];
             }
             ViewHelper::adaptCheckbox($fields, 'withEmail');
             if ($request->btnSubmit === 'btnShift' && ($owner = $fields['owner_id']) != null) {
                 $note->update(['owner_id' => $fields['owner_id']]);
-                if ($fields['withEmail']){
+                if ($fields['withEmail']) {
                     $this->sendEmail($note->owner_id, $note);
                 }
             } elseif ($request->btnSubmit === 'btnCopy' && ($recipients = $fields['recipients']) != null) {
@@ -189,7 +190,7 @@ class NoteController extends Controller
                                 'notestatus_scope' => $note->notestatus_scope,
                                 'owner_id' => $id
                             ]);
-                            if ($fields['withEmail']){
+                            if ($fields['withEmail']) {
                                 $this->sendEmail($id, $note);
                             }
                         }
@@ -217,6 +218,9 @@ class NoteController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $note->delete();
+            if ($note->visibility_scope != 1092) {
+                Change::createFromModel($note, Change::$DELETE, 'Note');
+            }
         }
         return redirect('/note-index');
     }
@@ -237,7 +241,8 @@ class NoteController extends Controller
             return redirect('/note-create');
         } else {
             $sql = "
-SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category, t2.name as notestatus, t3.name as owner 
+SELECT t0.*, cast(t0.body AS VARCHAR(40)) as body_short, t1.name as category, t2.name as notestatus, 
+  t3.name as owner, (select count(id) from files t5 where t5.reference_id=t0.id) as filecount 
 FROM notes t0
 LEFT JOIN sproperties t1 ON t1.id=t0.category_scope
 LEFT JOIN sproperties t2 ON t2.id=t0.notestatus_scope
@@ -256,17 +261,16 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                     'body' => '',
                     '_sortParams' => 'id:asc;title:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'category_scope', 'category');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'notestatus_scope', 'notestatus');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'user');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'title,body', 'text');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'title');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'body');
-                ViewHelper::addConditionVisible($conditions, $fields['visibility']);
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'category_scope', 'category');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'notestatus_scope', 'notestatus');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'user');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'title,body', 'text');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'title');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'body');
+            ViewHelper::addConditionVisible($conditions, $fields['visibility']);
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -293,7 +297,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
             return redirect("/note-create_document/$note->id");
         } else {
             $sql = "
-SELECT t0.*, t1.name as filegroup_scope, t2.name as user_id 
+SELECT t0.*, t1.name as filegroup, t2.name as user_id 
 FROM files t0
 LEFT JOIN sproperties t1 ON t1.id=t0.filegroup_scope
 LEFT JOIN sproperties t2 ON t2.id=t0.user_id
@@ -303,10 +307,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
-                    'filegroup' => '',
                     'owner' => auth()->id(),
                     'text' => '',
-                    'filegroup_scope' => '1101',
                     '_sortParams' => 'id:desc',
                 ];
             } else {
@@ -318,8 +320,6 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
-            $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup'], 'all');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner']);
             $context = new ContextLaraKnife($request, $fields);
             $fileController = new FileController();
             $context->setCallback('buildAnchor', $fileController, 'buildAnchor');
@@ -373,10 +373,16 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         Route::delete('/note-show_document/{file}/delete', [NoteController::class, 'destroyDocument'])->middleware('auth');
         TaskController::routes();
     }
-    private function sendEmail(int $userId, Note $note){
+    private function sendEmail(int $userId, Note $note)
+    {
         $user = User::find($userId);
-        EmailHelper::sendMail('note.notification', $user->email, ['name' => $user->name, 'title' => $note->title, 'contents' => $note->body, 
-            'from' => auth()->user()->name, 'link' => ViewHelper::buildLink("/note-edit/$note->id")]);
+        EmailHelper::sendMail('note.notification', $user->email, [
+            'name' => $user->name,
+            'title' => $note->title,
+            'contents' => $note->body,
+            'from' => auth()->user()->name,
+            'link' => ViewHelper::buildLink("/note-edit/$note->id")
+        ]);
     }
     /**
      * Display the specified resource.
@@ -437,7 +443,10 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             } else {
                 $validated = $validator->validated();
                 array_push($validated, strip_tags($fields['body'] ?? ''));
-                Note::create($validated);
+                $note = Note::create($validated);
+                if ($note->visibility_scope != 1092) {
+                    Change::createFromFields($validated, Change::$CREATE, 'Note', $note->id);
+                }
             }
         }
         if ($rc == null) {
@@ -487,6 +496,9 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
                 $validated = $validator->validated();
                 $validated['body'] = strip_tags($fields['body']);
                 $note->update($validated);
+                if ($note->visibility_scope != 1092) {
+                    Change::createFromFields($validated, Change::$UPDATE, 'Note', $note->id);
+                }
             }
         }
         if ($rc == null) {

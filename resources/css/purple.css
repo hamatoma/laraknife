@@ -125,6 +125,11 @@ a:active.lkn-overview-cell {
     background-color: orangered;
 }
 
+.lkn-text-info5 {
+    color: white;
+    background-color: green;
+}
+
 .lkn-background-info {
     background-color: #83163F;
 }

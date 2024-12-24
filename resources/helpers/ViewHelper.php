@@ -25,6 +25,7 @@ class ViewHelper
     }
     /**
      * Adds a SQL condition "compared to FIELD" for filtering records.
+     * @deprecated use addConditionComparison() instead
      * @param array $conditions IN/OUT: the new condition is put to that list
      * @param array $parameters IN/OUT: the named sql parameters (":value")
      * @param string $column the column name
@@ -43,6 +44,36 @@ class ViewHelper
         $filterField ??= $column;
         $value = array_key_exists($filterField, $_POST) ? $_POST[$filterField] : '';
         if ($value !== '' && $value !== $ignoreValue) {
+            if (strpos($column, '.') === false) {
+                array_push($conditions, "`$column`=:$filterField");
+            } else {
+                $parts = explode('.', $column);
+                array_push($conditions, "$parts[0].`$parts[1]`=:$filterField");
+            }
+            $parameters[":$filterField"] = $value;
+        }
+    }
+    /**
+     * Adds a SQL condition "compared to FIELD" for filtering records.
+     *
+     * @param array $conditions IN/OUT: the new condition is put to that list
+     * @param array $parameters IN/OUT: the named sql parameters (":value")
+     * @param string $column the column name
+     * @param string $filterField name of the filter field (HTML input field). If null $column is taken
+     * @param string $operator the comparison operator: "=", ">", ">=", "<", "<=", "!="
+     * @param string $ignoreValue if the filter value has that value no condition is created
+     */
+    public static function addConditionComparison(array &$fields,
+        array &$conditions,
+        array &$parameters,
+        string $column,
+        ?string $filterField = null,
+        string $operator = "=",
+        $ignoreValue = '-'
+    ) {
+        $filterField ??= $column;
+        $value = array_key_exists($filterField, $fields) ? $fields[$filterField] : '';
+        if ($value != null && $value !== '' && $value !== $ignoreValue) {
             if (strpos($column, '.') === false) {
                 array_push($conditions, "`$column`=:$filterField");
             } else {

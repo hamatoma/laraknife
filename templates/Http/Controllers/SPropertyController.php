@@ -76,7 +76,7 @@ class SPropertyController extends Controller
                 $fields = ['scope' => '', 'text' => '', '_sortParams' => 'scope:asc;order:asc;name:asc'];
             } else {
                 $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'scope');
+                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'scope');
                 ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }

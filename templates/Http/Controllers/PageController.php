@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\Page;
+use App\Models\Change;
 use App\Models\Module;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
@@ -149,7 +150,7 @@ $sep
                     'message' => ''
                 ];
             } else {
-                if (strpos($fields['title'], '"') !== false){
+                if (strpos($fields['title'], '"') !== false) {
                     $fields['title'] = str_replace('"', "\u{201F}", $fields['title']);
                 }
                 $fields['markup_scope'] = $page->markup_scope;
@@ -167,7 +168,7 @@ $sep
                 //$wiki->setClozeParameters('preview');
                 $wikiText = $fields['contents'];
                 $fields['preview'] = $wiki->toHtml($wikiText);
-                if ($wikiText !== $page->contents){
+                if ($wikiText !== $page->contents) {
                     $page->contents = $wikiText;
                     $fields['message'] = '+++ ' . __('There are corrections:') . $wiki->corrections;
                 }
@@ -213,7 +214,7 @@ $sep
                     'message' => ''
                 ];
             } else {
-                if (strpos($fields['title'], '"') !== false){
+                if (strpos($fields['title'], '"') !== false) {
                     $fields['title'] = str_replace('"', "\u{201F}", $fields['title']);
                 }
                 $fields['markup_scope'] = $page->markup_scope;
@@ -231,7 +232,7 @@ $sep
                 //$wiki->setClozeParameters('preview');
                 $wikiText = $fields['contents'];
                 $fields['preview'] = $wiki->toHtml($wikiText);
-                if ($wikiText !== $page->contents){
+                if ($wikiText !== $page->contents) {
                     $page->contents = $wikiText;
                     $fields['message'] = '+++ ' . __('There are corrections:') . $wiki->corrections;
                 }
@@ -257,7 +258,8 @@ $sep
     {
         if ($request->btnSubmit === 'btnDelete') {
             $page->delete();
-        }
+            Change::createFromModel($page, Change::$DELETE, 'Page');
+         }
         return redirect('/page-index');
     }
     /**
@@ -292,16 +294,15 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
                     'owner' => '',
                     '_sortParams' => 'title:asc;id:asc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'pagetype_scope', 'pagetype');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'markup_scope', 'markup');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'language_scope', 'language');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,title,t0.info', 'title');
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.info,contents', 'contents');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'pagetype_scope', 'pagetype');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'markup_scope', 'markup');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'language_scope', 'language');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
+            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,title,t0.info', 'title');
+            ViewHelper::addConditionPattern($conditions, $parameters, 't0.info,contents', 'contents');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -497,6 +498,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
                 $validated['owner_id'] = $fields['owner_id'];
                 $validated['contents'] = MediaWiki::expandStarItems($validated['contents']);
                 $page = Page::create($validated);
+                Change::createFromFields($validated, Change::$UPDATE, 'Page', $page->id);
                 if ($page != null) {
                     $rc = redirect("/page-edit/$page->id");
                 }
@@ -544,6 +546,10 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
                 $validated['audio_id'] = $fileId;
             }
             $page->update($validated);
+            $current = "<title>: " . $validated['title'] . "\n<name>: " . $validated['name']
+                . "\n<info>: " . $validated['info'] . "\n<contents>: " . $validated['contents'] . "\n";
+            $link = null;
+            Change::createFromFields($validated, Change::$UPDATE, 'Page', $page->id);
         }
     }
 }

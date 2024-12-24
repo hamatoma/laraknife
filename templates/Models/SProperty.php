@@ -29,7 +29,7 @@ class SProperty extends Model
      * @param $scope the scope to search for
      * @param $name the field value (of the column $column) to search for
      * @param $column the column name of the field value to search for
-     * @return NULL|id the primary key
+     * @return null|int the primary key
      */
     public static function byScopeAndName(string $scope, string $name, string $column='name'): ?int
     {
@@ -40,7 +40,7 @@ class SProperty extends Model
     /**
      * Returns the id of a record with scope 'localization' and a given name.
      * @param $localization the name of the record. If null the user's localization is taken
-     * @return NULL|int the id or NULL if not found
+     * @return null|int the id or NULL if not found
      */
     public static function idOfLocalization(?string $localization = null): ?int{
         if ($localization == null){
@@ -71,7 +71,7 @@ class SProperty extends Model
      * @param string $scope defines the database records to use
      * @param string $selected the current field value (defines the selected entry)
      * cted the value which marks the selected entry
-     * @param NULL|string $titleUndefined  if not null the first entry has that title and the value ''
+     * @param null|string $titleUndefined  if not null the first entry has that title and the value ''
      * @param string $titleField the titles are taken from that column
      * @param string $valueField the value are taken from that column
      * @param bool $translate true: the title will be translated

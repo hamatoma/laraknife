@@ -1,5 +1,20 @@
 # Development phase
 
+# 0.10.16 Change Note Term Address Location Builder
+
+- new module Change
+- purple.css: new lkn-text-info5
+- Builder: CaseInfo.__init__(): index checking
+- Builder: main(): file checking
+- ViewHelper: new: addConditionComparison()
+- Note: index.blade: error while sorting
+- Note: index(): new column file count
+- forgotten.blade: hiding buttons "store" and "cancel"
+- replacement addConditionComparism() -> addConditionComparison()
+- Location: edit(): "users" -> "persons"
+- Address: edit.blade: new: "priority"
+- Page, Note, Term, Address, Location: logging of insert, update and delete: Change::createFromFields()
+
 # 0.10.15 
 
 - PersonController:

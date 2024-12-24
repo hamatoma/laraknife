@@ -22,6 +22,7 @@
             <th sortId="category">{{__('Category')}}</th>
             <th sortId="notestatus">{{__('Status')}}</th>
             <th sortId="owner_id">{{__('Owner')}}</th>
+            <th sortId="filecount">{{__('Files')}}</th>
             <th></th>
           </tr>
         </thead>
@@ -34,6 +35,7 @@
               <td>{{ __($note->category) }}</td>
               <td>{{ __($note->notestatus) }}</td>
               <td>{{$note->owner}}</td>
+              <td>{{$note->filecount}}</td>
             <td><x-laraknife.icons.delete-record module="note" no="{{ $note->id }}" /></td>
         </tr>
 @endforeach

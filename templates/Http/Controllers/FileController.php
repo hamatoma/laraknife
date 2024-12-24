@@ -151,14 +151,13 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
                     'filegroup_scope' => '1101',
                     '_sortParams' => 'id:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'filegroup_scope', 'filegroup');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'visibility_scope', 'visibility');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'user_id', 'user');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'filegroup_scope', 'filegroup');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'visibility_scope', 'visibility');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'user_id', 'user');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -264,7 +263,7 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
         if ($file != null) {
             $name = empty($fields['filename']) ? $file->getClientOriginalName() : $fields['filename'];
             $ext = FileHelper::extensionOf($name);
-            if (empty($ext)){
+            if (empty($ext)) {
                 $name .= FileHelper::extensionOf($file->getClientOriginalName());
             }
             $filename = session('userName') . '_' . strval(time()) . '!' . $name;

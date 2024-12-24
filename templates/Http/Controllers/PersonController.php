@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Change;
 use App\Models\Person;
 use App\Helpers\Helper;
 use App\Models\Address;
@@ -33,8 +34,8 @@ class PersonController extends Controller
             $fields = $request->all();
             if ($button === 'btnAdd') {
                 $msg = $this->storeAddresses($person, $fields['address']);
-                if ($msg != null){
-                    
+                if ($msg != null) {
+
                 }
             }
             $fields['list'] = $person->findAddresses();
@@ -74,12 +75,12 @@ class PersonController extends Controller
             }
             $optionsGender = SProperty::optionsByScope('gender', $fields['gender_scope'], '-');
             $optionsPersongroup = SProperty::optionsByScope('persongroup', $fields['persongroup_scope'], '-');
-            $context = new ContextLaraKnife($request, $fields);     
+            $context = new ContextLaraKnife($request, $fields);
             $rc = view('person.create', [
                 'context' => $context,
                 'optionsGender' => $optionsGender,
                 'optionsPersongroup' => $optionsPersongroup,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -102,7 +103,7 @@ class PersonController extends Controller
                     'gender_scope' => $person->gender_scope,
                     'persongroup_scope' => $person->persongroup_scope,
                     'info' => $person->info
-                    ];
+                ];
             }
             $optionsGender = SProperty::optionsByScope('gender', $person->gender_scope, '');
             $optionsPersongroup = SProperty::optionsByScope('persongroup', $person->persongroup_scope, '');
@@ -113,7 +114,7 @@ class PersonController extends Controller
                 'optionsGender' => $optionsGender,
                 'optionsPersongroup' => $optionsPersongroup,
                 'navTabsInfo' => $navigationTabInfo
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -124,6 +125,7 @@ class PersonController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $person->delete();
+            Change::createFromModel($person, Change::$DELETE, 'Person');
         }
         return redirect('/person-index');
     }
@@ -147,18 +149,17 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
-                'gender' => '',
-                'persongroup' => '',
-                'text' => '',
-                '_sortParams' => 'lastname:desc'
+                    'gender' => '',
+                    'persongroup' => '',
+                    'text' => '',
+                    '_sortParams' => 'lastname:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 'gender_scope', 'gender');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'persongroup_scope', 'persongroup');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'firstname,lastname,middlename,titles,nickname,t0.info', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'gender_scope', 'gender');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'persongroup_scope', 'persongroup');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'firstname,lastname,middlename,titles,nickname,t0.info', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -178,7 +179,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreate=false): array
+    private function rules(bool $isCreate = false): array
     {
         $rc = [
             'firstname' => '',
@@ -222,7 +223,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
                 'optionsGender' => $optionsGender,
                 'optionsPersongroup' => $optionsPersongroup,
                 'mode' => 'delete'
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -240,16 +241,18 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-            $validated['info'] = strip_tags($validated['info']);
-                Person::create($validated);
+                $validated['info'] = strip_tags($validated['info']);
+                $person = Person::create($validated);
+                Change::createFromFields($validated, Change::$CREATE, 'Person', $person->id);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect(to: '/person-index');
         }
         return $rc;
     }
-    public function storeAddresses(Person &$person, string $text): ?string{
+    public function storeAddresses(Person &$person, string $text): ?string
+    {
         $rc = null;
         $lines = explode("\n", $text);
         $line1 = $lines[0];
@@ -259,55 +262,66 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
         $priority = 10;
         $matcher = null;
         $addressType = 0;
-        foreach ($lines as &$line){
-            if (preg_match('/prio(rity)?:\s*(\d+)/i', $line, $matcher)){
+        foreach ($lines as &$line) {
+            if (preg_match('/prio(rity)?:\s*(\d+)/i', $line, $matcher)) {
                 $prio = intval($matcher[2]);
             }
         }
-        if (count($parts) > 1){
+        if (count($parts) > 1) {
             array_shift($parts);
             $info = implode("\n", $parts);
         }
-        if (strpos($line1, '@') !== false){
+        if (strpos($line1, '@') !== false) {
             $addressType = 1321;
             $validator = Validator::make(['email' => $address], ['email' => 'email']);
             if ($validator->fails()) {
                 //$rc = back()->withErrors($validator)->withInput();
                 $rc = __('Wrong email address');
-            } 
-        } elseif (preg_match('/^[+]?\d/', $line1)){
-                $addressType = 1322;
-                $validator = Validator::make(['phone' => $address], ['phone' => 'regex:/^[+]?[0-9 -]+$/']);
-                if ($validator->fails()) {
-                    //$rc = back()->withErrors($validator)->withInput();
-                    $rc = __('Wrong phone number. Examples: +49-89-12342432 or 0831-12 34 56');
-                }
+            }
+        } elseif (preg_match('/^[+]?\d/', $line1)) {
+            $addressType = 1322;
+            $validator = Validator::make(['phone' => $address], ['phone' => 'regex:/^[+]?[0-9 -]+$/']);
+            if ($validator->fails()) {
+                //$rc = back()->withErrors($validator)->withInput();
+                $rc = __('Wrong phone number. Examples: +49-89-12342432 or 0831-12 34 56');
+            }
         } else {
             $address = null;
-            if (count($lines) < 2){
+            if (count($lines) < 2) {
                 $rc = 'too few lines';
             } else {
                 $street = $line1;
                 $country = 'D';
                 // ...............12...2.1.3...3.4..4
-                if (!preg_match('/^(([a-zA-Z]+)-)?(\d+) (.*)\s*/', $lines[1], $matcher)){
+                if (!preg_match('/^(([a-zA-Z]+)-)?(\d+) (.*)\s*/', $lines[1], $matcher)) {
                     $rc = 'Wrong format of line 2 (zip city)';
                 } else {
-                    if ($matcher[2] !== ''){
+                    if ($matcher[2] !== '') {
                         $country = $matcher[2];
                     }
                     $zip = $matcher[3];
                     $city = $matcher[4];
-                    $attributes = ['country' => $country, 'zip' => $zip, 'city' => $city, 
-                        'street' => $street, 'info' => strip_tags($info), 
-                        'priority' => $priority, 'person_id' => $person->id];
+                    $attributes = [
+                        'country' => $country,
+                        'zip' => $zip,
+                        'city' => $city,
+                        'street' => $street,
+                        'info' => strip_tags($info),
+                        'priority' => $priority,
+                        'person_id' => $person->id
+                    ];
                     Location::create($attributes);
                 }
             }
         }
-        if ($rc == null && $address != null){
-            $attributes = ['name' => $address, 'addresstype_scope' => $addressType, 'info' => strip_tags($info), 
-            'priority' => $priority, 'person_id' => $person->id];
+        if ($rc == null && $address != null) {
+            $attributes = [
+                'name' => $address,
+                'addresstype_scope' => $addressType,
+                'info' => strip_tags($info),
+                'priority' => $priority,
+                'person_id' => $person->id
+            ];
             Address::create($attributes);
 
         }
@@ -328,9 +342,10 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $person->update($validated);
+                Change::createFromFields($validated, Change::$UPDATE, 'Person', $person->id);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/person-index');
         }
         return $rc;

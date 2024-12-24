@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Term;
+use App\Models\Change;
+use App\Helpers\Helper;
+use App\Helpers\DbHelper;
+use App\Models\SProperty;
+use App\Helpers\Pagination;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
+use App\Helpers\ContextLaraKnife;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Term;
-use App\Models\SProperty;
-use App\Helpers\ContextLaraKnife;
-use App\Helpers\ViewHelper;
-use App\Helpers\DbHelper;
-use App\Helpers\Helper;
-use App\Helpers\Pagination;
 
 class TermController extends Controller
 {
@@ -38,12 +39,12 @@ class TermController extends Controller
             }
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
-            $context = new ContextLaraKnife($request, $fields);     
+            $context = new ContextLaraKnife($request, $fields);
             $rc = view('term.create', [
                 'context' => $context,
                 'optionsVisibility' => $optionsVisibility,
                 'optionsOwner' => $optionsOwner,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -65,7 +66,7 @@ class TermController extends Controller
                     'description' => '',
                     'visibility_scope' => '',
                     'owner_id' => ''
-                    ];
+                ];
             }
             $optionsVisibility = SProperty::optionsByScope('visibility', $term->visibility_scope, '');
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $term->owner_id, __('<Please select>'));
@@ -74,7 +75,7 @@ class TermController extends Controller
                 'context' => $context,
                 'optionsVisibility' => $optionsVisibility,
                 'optionsOwner' => $optionsOwner,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -85,6 +86,9 @@ class TermController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $term->delete();
+            if ($term->visible_scope != 1092) {
+                Change::createFromModel($term, Change::$DELETE, 'Term');
+            }
         }
         return redirect('/term-index');
     }
@@ -103,28 +107,27 @@ class TermController extends Controller
                 . ' FROM terms t0'
                 . ' LEFT JOIN sproperties t1 ON t1.id=t0.visibility_scope'
                 . ' LEFT JOIN users t2 ON t2.id=t0.owner_id'
-                ;
+            ;
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
-                'visibility' => '',
-                'owner' => '',
-                'title' => '',
-                'from' => '',
-                'to' => '',
-                'text' => '',
-                '_sortParams' => 'term:desc;duration:desc;title:desc'
+                    'visibility' => null,
+                    'owner' => null,
+                    'title' => '',
+                    'from' => '',
+                    'to' => '',
+                    'text' => '',
+                    '_sortParams' => 'term:desc;duration:desc;title:desc'
                 ];
-            } else {
-                $conditions = [];
-                //ViewHelper::addConditionComparism($conditions, $parameters, 'visibility_scope', 'visibility');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description', 'text');
-                ViewHelper::addConditionDateTimeRange($conditions, $parameters, 'from', 'to', 'term');
-                ViewHelper::addConditionVisible($conditions, $fields['visibility']);
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            //ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'visibility_scope', 'visibility');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'title,description', 'text');
+            ViewHelper::addConditionDateTimeRange($conditions, $parameters, 'from', 'to', 'term');
+            ViewHelper::addConditionVisible($conditions, $fields['visibility']);
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -144,7 +147,7 @@ class TermController extends Controller
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreate=false): array
+    private function rules(bool $isCreate = false): array
     {
         $rc = [
             'title' => 'required',
@@ -184,7 +187,7 @@ class TermController extends Controller
                 'optionsVisibility' => $optionsVisibility,
                 'optionsOwner' => $optionsOwner,
                 'mode' => 'delete'
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -202,11 +205,14 @@ class TermController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-            $validated['description'] = strip_tags($validated['description']);
-                Term::create($validated);
+                $validated['description'] = strip_tags($validated['description']);
+                $term = Term::create($validated);
+                if ($term->visibility_scope != 1092) {
+                    Change::createFromFields($validated, Change::$CREATE, 'Term', $term->id);
+                }
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/term-index');
         }
         return $rc;
@@ -227,9 +233,12 @@ class TermController extends Controller
                 $validated = $validator->validated();
                 $validated['description'] = strip_tags($validated['description']);
                 $term->update($validated);
+                if ($term->visibility_scope != 1092) {
+                    Change::createFromFields($validated, Change::$UPDATE, 'Term', $term->id);
+                }
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/term-index');
         }
         return $rc;

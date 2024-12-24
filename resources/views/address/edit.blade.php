@@ -8,7 +8,9 @@
                 width2="4" attribute="readonly" />
                 <x-laraknife.forms.combobox position="last" name="person_id" label="Person" :options="$optionsPerson" width2="4"
                     attribute="readonly" />
-            <x-laraknife.forms.string position="alone" name="name" label="Name" value="{{ $context->valueOf('name') }}"
+            <x-laraknife.forms.string position="first" name="name" label="Name" value="{{ $context->valueOf('name') }}"
+                width2="4" />
+            <x-laraknife.forms.string position="last" name="priority" label="Priority" value="{{ $context->valueOf('priority') }}"
                 width2="4" />
             <x-laraknife.forms.text position="alone" name="info" label="Info" value="{{ $context->valueOf('info') }}"
                 width2="10" rows="2" />

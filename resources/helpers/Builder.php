@@ -274,7 +274,10 @@ class CaseInfo
     {
         $this->index = -1;
         $this->fields = $fields;
-        $this->lastField = $fields[count($fields) - 1];
+        $this->lastField = '';
+        if ( ($ix = count($fields) - 1) >= 0){
+            $this->lastField = $fields[$ix];
+        }
         $this->block = [];
         $this->builder = $builder;
     }
@@ -575,9 +578,11 @@ function main()
                     case 'create:module':
                         if (count($args) < 2) {
                             usage("missing FILE_MIGRATION");
+                        } elseif (! file_exists($fnMigration = $args[1])) {
+                            usage("not found: $fnMigration");
                         } else {
                             $builder->setModule($options['module']);
-                            $builder->readDefinition($args[1]);
+                            $builder->readDefinition($fnMigration);
                             $views = $options['views'];
                             $controllers = $options['controllers'];
                             $models = $options['models'];

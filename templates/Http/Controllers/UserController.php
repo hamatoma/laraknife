@@ -259,8 +259,8 @@ class UserController extends Controller
             } else {
                 $conditions = [];
                 $parameters = [];
-                ViewHelper::addConditionComparism($conditions, $parameters, 't0.role_id', 'role');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'role_id');
+                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 't0.role_id', 'role');
+                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'role_id');
                 ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,email', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
