@@ -310,7 +310,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
                         'priority' => $priority,
                         'person_id' => $person->id
                     ];
-                    Location::create($attributes);
+                    $location = Location::create($attributes);
+                    Change::createFromFields($attributes, Change::$CREATE, 'Location', $location->id);
                 }
             }
         }
@@ -322,8 +323,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
                 'priority' => $priority,
                 'person_id' => $person->id
             ];
-            Address::create($attributes);
-
+            $address = Address::create($attributes);
+            Change::createFromFields($attributes, Change::$CREATE, 'Address', $address->id);
         }
         return $rc;
     }

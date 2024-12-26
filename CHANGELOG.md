@@ -1,5 +1,15 @@
 # Development phase
 
+# 0.10.17 StringHelper File Note Person
+
+- StringHelper::textToUrl(): $text may be null
+- Note:
+  - index(): "title" -> "document"
+  - updateDocument(): creation of a Change instance
+- File: creation of a Change instance on updates/inserts
+- Page: fix store(): $UPDATE -> $CREATE
+- Person: storeAddresses(): creation of a Change instance
+
 # 0.10.16 Change Note Term Address Location Builder
 
 - new module Change

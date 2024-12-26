@@ -257,7 +257,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                     'notestatus' => '1011',
                     'visibility' => '1091',
                     'owner' => null,
-                    'title' => '',
+                    'filename' => '',
                     'body' => '',
                     '_sortParams' => 'id:asc;title:desc'
                 ];
@@ -270,6 +270,14 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
             ViewHelper::addConditionPattern($conditions, $parameters, 'title');
             ViewHelper::addConditionPattern($conditions, $parameters, 'body');
             ViewHelper::addConditionVisible($conditions, $fields['visibility']);
+            if ( ($fn = $fields['filename']) != null && $fn !== ''){
+                $fn = '%' . strip_tags($fn) . '%';
+                $fn = str_replace('*', '%', $fn);
+                $fn = str_replace('%%', '%', $fn);
+                ViewHelper::addConditionRawSql($conditions,
+                    "t0.id in (select reference_id from files t5 where t5.reference_id=t0.id and (t5.title like '$fn' or t5.description like '$fn' or t5.filename like '$fn'))",
+                    []);
+            }
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
@@ -518,6 +526,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             } else {
                 $fields2 = $request->only(['title', 'description', 'filegroup_scope']);
                 $file->update($fields2);
+                Change::createFromFields($fields2, Change::$UPDATE, 'File', $file->id);
             }
         }
         if ($rc == null) {

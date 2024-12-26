@@ -498,7 +498,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
                 $validated['owner_id'] = $fields['owner_id'];
                 $validated['contents'] = MediaWiki::expandStarItems($validated['contents']);
                 $page = Page::create($validated);
-                Change::createFromFields($validated, Change::$UPDATE, 'Page', $page->id);
+                Change::createFromFields($validated, Change::$CREATE, 'Page', $page->id);
                 if ($page != null) {
                     $rc = redirect("/page-edit/$page->id");
                 }

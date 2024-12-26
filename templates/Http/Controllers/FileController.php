@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
+use App\Models\Change;
 use App\Models\Module;
 use App\Helpers\Helper;
 use App\Helpers\DbHelper;
@@ -269,7 +270,7 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
             $filename = session('userName') . '_' . strval(time()) . '!' . $name;
             ViewHelper::addFieldIfMissing($fields, 'module_id', null);
             ViewHelper::addFieldIfMissing($fields, 'reference_id', null);
-            $file2 = new File([
+            $attributes = [
                 'title' => $fields['title'],
                 'description' => $fields['description'],
                 'filename' => $filename,
@@ -279,10 +280,12 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
                 'size' => $file->getSize() / 1E6,
                 'module_id' => $fields['module_id'],
                 'reference_id' => $fields['reference_id'],
-            ]);
+            ];
+            $file2 = new File($attributes);
             $filePath = FileHelper::storeFile($request, 'file', $filename);
             $file2->save();
             $id = $file2->id;
+            Change::createFromFields($attributes, Change::$CREATE, 'File', $id);
             $filename2 = strval($id) . '_' . $name;
             FileHelper::renameUploadedFile($filename, $filename2, $file2->created_at);
             $file2->update(['filename' => $filename2]);

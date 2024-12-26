@@ -101,7 +101,7 @@ class FileHelper
     /**
      * Returns a list of FileInfo instances of a given $directory.
      * @param string $directory that directory will be scanned
-     * @param NULL|string $pattern a regular expression for filtering. Only matching files will be returned. Example: "/^.*.txt$"
+     * @param null|string $pattern a regular expression for filtering. Only matching files will be returned. Example: "/^.*.txt$"
      * @return array the list of filtered files from $directory 
      */
     public static function fileInfoList(string $directory, string $pattern = null): array
@@ -145,7 +145,14 @@ class FileHelper
         $relativePath = FileHelper::buildFileStoragePath($date);
         $request->file($fieldname)->storeAs($relativePath, $filename, 'public');
     }
-
+    /**
+     * Stores the uploaded file given in $fieldname in the file storage path using $filename. 
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $fieldname
+     * @param string $filename
+     * @return string the absolute path of the stored file
+     */
     public static function storeFile(Request $request, string $fieldname, string $filename): string
     {
         $relativePath = FileHelper::buildFileStoragePath(null);

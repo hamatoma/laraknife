@@ -132,17 +132,22 @@ class StringHelper
     }
     /**
      * Converts a string into a word usable as part of an URL.
-     * @param string $text the text to convert
-     * @param NULL|int $maxLength the result is never longer than that
+     * @param null|string $text the text to convert
+     * @param null|int $maxLength the result is never longer than that
      * @return string a word usable as part of the string
      */
-    public static function textToUrl(string $text, ?int $maxLength = null): string
+    public static function textToUrl(?string $text, ?int $maxLength = null): string
     {
-        $rc = preg_replace(['/[^\w.+-]+/', '/__+/'], ['_', '_'], $text);
-        if ($maxLength != null && strlen($rc) > $maxLength) {
-            $rc = substr($rc, $maxLength);
+        if ($text == null) {
+            $rc = '';
+        } else {
+            $rc = preg_replace(['/[^\w.+-]+/', '/__+/'], ['_', '_'], $text);
+            if ($maxLength != null && strlen($rc) > $maxLength) {
+                $rc = substr($rc, $maxLength);
+            }
+            $rc = strtolower($rc);
         }
-        return strtolower($rc);
+        return $rc;
     }
     /**
      * Converts the $string into a capital string: the first character will be uppercase.

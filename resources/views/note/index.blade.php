@@ -10,7 +10,7 @@
       <x-laraknife.forms.combobox position="first" name="visibility" label="Visibility" :options="$optionsVisibility" class="lkn-autoupdate" width2="4" />
       <x-laraknife.forms.combobox position="last" name="owner" label="Owner" :options="$optionsUser" class="lkn-autoupdate" width2="4" />
       <x-laraknife.forms.string position="first" name="text" label="Text" value="{{ $context->valueOf('text') }}" width2="4" />
-      <x-laraknife.forms.string position="last" name="title" label="Title" value="{{ $context->valueOf('title') }}" width2="4" />
+      <x-laraknife.forms.string position="last" name="filename" label="Dokument" value="{{ $context->valueOf('filename') }}" width2="4" />
       </x-laraknife.panels.filter>
       <x-laraknife.panels.index-button buttonType="new"/>
       <x-laraknife.panels.sortable-table :context="$context" :pagination="$pagination">
