@@ -236,7 +236,7 @@ class TransactionController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $transaction->delete();
-            Change::createFromModel($transaction, Change::$DELETE, 'transactions');
+            Change::createFromModel($transaction, Change::$DELETE, 'Transaction');
         }
         return redirect('/transaction-index');
     }
@@ -458,7 +458,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['account_id'] = $account->id;
                 $transaction = Transaction::create($validated);
-                Change::createFromFields($validated, Change::$CREATE, 'transactions', $transaction->id);
+                Change::createFromFields($validated, Change::$CREATE, 'Transaction', $transaction->id);
                 $account->update(['amount' => $account->amount + floatval($fields['amount'])]);
                 $rc = redirect("/transaction-edit/$transaction->id");
             }

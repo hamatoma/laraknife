@@ -178,7 +178,7 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $mandator = Mandator::create($validated);
-                Change::createFromFields($validated, Change::$CREATE, 'mandators', $mandator->id);
+                Change::createFromFields($validated, Change::$CREATE, 'Mandator', $mandator->id);
             }
         }
         if ($rc == null) {
@@ -201,7 +201,7 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $mandator->update($validated);
-                Change::createFromFields($validated, Change::$UPDATE, 'mandators', $mandator->id);
+                Change::createFromFields($validated, Change::$UPDATE, 'Mandator', $mandator->id);
             }
         }
         if ($rc == null) {

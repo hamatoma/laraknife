@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.10.19 Account, Mandator, Transaction
+
+- fix wrong module name in Change::createFromModel() and Change::createFromField()
+
 # 0.10.18 docu Account, Mandator, Transaction ChangeSeeder
 
 - new: docu/development.md

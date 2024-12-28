@@ -94,7 +94,7 @@ class AccountController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $account->delete();
-            Change::createFromModel($account, Change::$DELETE, 'accounts');
+            Change::createFromModel($account, Change::$DELETE, 'Account');
         }
         return redirect('/account-index');
     }
@@ -199,7 +199,7 @@ LEFT JOIN mandators t1 ON t1.id=t0.mandator_id
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['mandator_id'] = $mandator->id;
                 $account = Account::create($validated);
-                Change::createFromFields($validated, Change::$CREATE, 'accounts', $account->id);            }
+                Change::createFromFields($validated, Change::$CREATE, 'Account', $account->id);            }
         }
         if ($rc == null) {
             $rc = redirect("/account-index/$mandator->id");
