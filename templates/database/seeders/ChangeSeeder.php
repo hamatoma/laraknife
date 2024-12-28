@@ -15,9 +15,9 @@ class ChangeSeeder extends Seeder
      */
     public function run(): void
     {
-        SProperty::insertIfNotExists(1331, 'changetype', 'insert', 10, 'I');
-        SProperty::insertIfNotExists(1332, 'changetype', 'update', 20, 'U');
-        SProperty::insertIfNotExists(1333, 'changetype', 'delete', 30, 'D');
+        SProperty::insertIfNotExists(1341, 'changetype', 'insert', 10, 'I');
+        SProperty::insertIfNotExists(1342, 'changetype', 'update', 20, 'U');
+        SProperty::insertIfNotExists(1343, 'changetype', 'delete', 30, 'D');
         Menuitem::insertIfNotExists('changes', 'bi bi-clock-history');
         Module::insertIfNotExists('Change');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Change;
 use App\Helpers\Helper;
 use App\Models\Account;
 use App\Models\Mandator;
@@ -93,6 +94,7 @@ class AccountController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $account->delete();
+            Change::createFromModel($account, Change::$DELETE, 'accounts');
         }
         return redirect('/account-index');
     }
@@ -118,13 +120,12 @@ LEFT JOIN mandators t1 ON t1.id=t0.mandator_id
                     'text' => '',
                     '_sortParams' => 'name:asc;id:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'info');
-                ViewHelper::addConditionConstComparison($conditions, $parameters, 'mandator_id', $mandator->id);
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'info');
+            ViewHelper::addConditionConstComparison($conditions, $parameters, 'mandator_id', $mandator->id);
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -197,8 +198,8 @@ LEFT JOIN mandators t1 ON t1.id=t0.mandator_id
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['mandator_id'] = $mandator->id;
-                Account::create($validated);
-            }
+                $account = Account::create($validated);
+                Change::createFromFields($validated, Change::$CREATE, 'accounts', $account->id);            }
         }
         if ($rc == null) {
             $rc = redirect("/account-index/$mandator->id");

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Change;
 use App\Helpers\Helper;
 use App\Models\Mandator;
 use App\Helpers\DbHelper;
@@ -34,11 +35,11 @@ class MandatorController extends Controller
                 ];
             }
             $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
-            $context = new ContextLaraKnife($request, $fields);     
+            $context = new ContextLaraKnife($request, $fields);
             $rc = view('mandator.create', [
                 'context' => $context,
                 'optionsGroup' => $optionsGroup,
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -56,7 +57,7 @@ class MandatorController extends Controller
                     'name' => $mandator->name,
                     'info' => $mandator->info,
                     'group_id' => $mandator->group_id
-                    ];
+                ];
             }
             $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
             $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('mandator-edit', 1, $mandator->id);
@@ -65,7 +66,7 @@ class MandatorController extends Controller
                 'context' => $context,
                 'optionsGroup' => $optionsGroup,
                 'navTabsInfo' => $navigationTabInfo
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -75,7 +76,8 @@ class MandatorController extends Controller
     public function destroy(Mandator $mandator, Request $request)
     {
         if ($request->btnSubmit === 'btnDelete') {
-            $mandator->delete();
+            $mandator = $mandator->delete();
+            Change::createFromModel($mandator, Change::$DELETE, 'notes');
         }
         return redirect('/mandator-index');
     }
@@ -97,15 +99,14 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = [
-                'text' => '',
-                '_sortParams' => 'name:asc;id:asc'
+                    'text' => '',
+                    '_sortParams' => 'name:asc;id:asc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
-                ViewHelper::addConditionFindInList($conditions, $parameters, 't1.members', strval(auth()->user()->id));
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
+            ViewHelper::addConditionFindInList($conditions, $parameters, 't1.members', strval(auth()->user()->id));
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -121,7 +122,7 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
-    private function rules(bool $isCreate=false): array
+    private function rules(bool $isCreate = false): array
     {
         $rc = [
             'name' => 'required',
@@ -150,13 +151,14 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/mandator-index')->middleware('auth');
         } else {
+            $fields = $request->all();
             $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
             $context = new ContextLaraKnife($request, null, $mandator);
             $rc = view('mandator.show', [
                 'context' => $context,
                 'optionsGroup' => $optionsGroup,
                 'mode' => 'delete'
-                ]);
+            ]);
         }
         return $rc;
     }
@@ -174,11 +176,12 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $validated = $validator->validated();
-            $validated['info'] = strip_tags($validated['info']);
-                Mandator::create($validated);
+                $validated['info'] = strip_tags($validated['info']);
+                $mandator = Mandator::create($validated);
+                Change::createFromFields($validated, Change::$CREATE, 'mandators', $mandator->id);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/mandator-index');
         }
         return $rc;
@@ -198,9 +201,10 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);
                 $mandator->update($validated);
+                Change::createFromFields($validated, Change::$UPDATE, 'mandators', $mandator->id);
             }
         }
-        if ($rc == null){
+        if ($rc == null) {
             $rc = redirect('/mandator-index');
         }
         return $rc;

@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Change extends Model
 {
     use HasFactory;
-    public static $CREATE = 1331;
-    public static $UPDATE = 1332;
-    public static $DELETE = 1333;
+    public static $CREATE = 1341;
+    public static $UPDATE = 1342;
+    public static $DELETE = 1343;
     protected $table = 'changes';
     protected $fillable = [
         'changetype_scope',

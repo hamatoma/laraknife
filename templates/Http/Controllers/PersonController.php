@@ -347,7 +347,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
             }
         }
         if ($rc == null) {
-            $rc = redirect('/person-index');
+            $rc = redirect("/person-edit/$person->id");
         }
         return $rc;
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\User;
+use App\Models\Change;
 use App\Models\Module;
 use App\Helpers\Helper;
 use App\Models\Account;
@@ -235,6 +236,7 @@ class TransactionController extends Controller
     {
         if ($request->btnSubmit === 'btnDelete') {
             $transaction->delete();
+            Change::createFromModel($transaction, Change::$DELETE, 'transactions');
         }
         return redirect('/transaction-index');
     }
@@ -269,17 +271,16 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
                     'until' => '',
                     '_sortParams' => 'date:desc;id:asc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionConstComparison($conditions, $parameters, 'account_id', $account->id);
-                ViewHelper::addConditionComparism($conditions, $parameters, 'transactiontype_scope', 'transactiontype');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'transactionstate_scope', 'transactionstate');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'name,info', 'text');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'from', 'date', '>=');
-                ViewHelper::addConditionComparism($conditions, $parameters, 'until', 'date', '<=');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionConstComparison($conditions, $parameters, 'account_id', $account->id);
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'transactiontype_scope', 'transactiontype');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'transactionstate_scope', 'transactionstate');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
+            ViewHelper::addConditionPattern($conditions, $parameters, 'name,info', 'text');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'from', 'date', '>=');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'until', 'date', '<=');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -457,6 +458,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
                 $validated['info'] = strip_tags($validated['info']);
                 $validated['account_id'] = $account->id;
                 $transaction = Transaction::create($validated);
+                Change::createFromFields($validated, Change::$CREATE, 'transactions', $transaction->id);
                 $account->update(['amount' => $account->amount + floatval($fields['amount'])]);
                 $rc = redirect("/transaction-edit/$transaction->id");
             }

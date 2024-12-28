@@ -219,7 +219,7 @@ class NoteController extends Controller
         if ($request->btnSubmit === 'btnDelete') {
             $note->delete();
             if ($note->visibility_scope != 1092) {
-                Change::createFromModel($note, Change::$DELETE, 'Note');
+                Change::createFromModel($note, Change::$DELETE, 'notes');
             }
         }
         return redirect('/note-index');

@@ -1,5 +1,12 @@
 # Development phase
 
+# 0.10.18 docu Account, Mandator, Transaction ChangeSeeder
+
+- new: docu/development.md
+- ChangeSeeder/Change: new values of "changetype" items (conflicts)
+- Account, Mandator, Transaction: logging with Change
+- PersonController::update(): redirect to "edit"
+
 # 0.10.17 StringHelper File Note Person
 
 - StringHelper::textToUrl(): $text may be null
