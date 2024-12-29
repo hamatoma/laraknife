@@ -546,9 +546,6 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
                 $validated['audio_id'] = $fileId;
             }
             $page->update($validated);
-            $current = "<title>: " . $validated['title'] . "\n<name>: " . $validated['name']
-                . "\n<info>: " . $validated['info'] . "\n<contents>: " . $validated['contents'] . "\n";
-            $link = null;
             Change::createFromFields($validated, Change::$UPDATE, 'Page', $page->id);
         }
     }

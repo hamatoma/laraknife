@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.11.1 *create_persons* renamed
+
+- migrations/*create_persons*.php renamed (to change the creation order)
+
 # 0.10.19 Account, Mandator, Transaction
 
 - fix wrong module name in Change::createFromModel() and Change::createFromField()
