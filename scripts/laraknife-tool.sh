@@ -111,8 +111,11 @@ function AdaptModules(){
   else
     sed -i \
       -e "s=view('welcome')=redirect('/menuitem-menu_main')=" \
-      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#N##A#TermController;#N##A#PageController;#N##A#GroupController;#N##A#ExportController;/' \
-      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;#N#Group#C#;#N#Export#C#;/' \
+      -e 's/Route;/Route;#N##A#RoleController;#N##A#UserController;#N##A#SPropertyController;#N##A#ChangeController;#N##A#MenuitemController;#N##A#NoteController;#N##A#FileController;#Controller2#/' \
+      -e 's/#Controller2#/#N##A#TermController;#N##A#PageController;#N##A#GroupController;#N##A#ExportController;#N##A#PersonController;#N##A#LocationController;#N##A#AddressController;#Controller3#/' \
+      -e 's/#Controller3#/#N##A#MandatorController;#N##A#AccountController;#N##A#TransactionController;/' \
+      -e 's/\([}]);\)/\1#N#Role#C#;#N#SProperty#C#;#N#User#C#;#N#Menuitem#C#;#N#Change#C#;#N#Note#C#;#N#File#C#;#N#Term#C#;#N#Page#C#;#N#Group#C#;#N#Export#C#;#N##Model2#/' \
+      -e 's/#Model2#/Person#C#;#N#Location#C#;#N#Address#C#;#N#Mandator#C#;#N#Account#C#;#N#Transaction#C#;/' \
       -e 's/#A#/use App\\Http\\Controllers\\/g' \
       -e 's/#C#/Controller::routes()/g' \
       -e 's=\(Route::get(./home\)=# \1=' \
@@ -134,8 +137,8 @@ function BuildLinks(){
   elif [ ! -d $dirTemplates ]; then
     Usage "wrong current directory: use root directory of the package. [missing $dirTemplates]"
   else
-    # === Modules
-    for module in SProperty Role User Menuitem Module Note File Term Page Group; do
+    # === Modules completely linked
+    for module in SProperty Role User Menuitem Change Module Note File Term Page Group Person Location Address Mandator Account Transaction; do
       test "$option" = "--force" && rm -fv app/Models/$module.php app/Http/Controllers/${module}Controller.php
       if [ $module != User ]; then
         ln -sv ../../$dirTemplates/Models/${module}.php app/Models/
@@ -144,14 +147,18 @@ function BuildLinks(){
         ln -sv ../../../$dirTemplates/Http/Controllers/${module}Controller.php app/Http/Controllers/
       fi
     done
+    # === Modules copied 
     for module in Export Task; do
       local fn=app/Http/Controllers/${module}Controller.php
       if [ ! -f $fn ]; then
+        if  [ "$module" != 'Task' ]; then
+          cp -av ../../$dirTemplates/Models/${module}.php app/Models/
+        fi
         cp -av $dirTemplates/Http/Controllers/${module}Controller.php $fn
       fi
     done
     # === Views
-    for module in laraknife sproperty role user menuitem note file term page group task export; do
+    for module in laraknife change sproperty role user menuitem note file term page group task export person location address mandator account transaction; do
       test "$option" = "--force" && rm -fv resources/views/$module
       ln -sv ../../$dirResources/views/$module/ resources/views/
     done
@@ -355,11 +362,18 @@ function FillDb(){
   php artisan db:seed --class=GroupSeeder
   php artisan db:seed --class=SPropertySeeder
   php artisan db:seed --class=MenuitemSeeder
+  php artisan db:seed --class=ChangeSeeder
   php artisan db:seed --class=FileSeeder
   php artisan db:seed --class=NoteSeeder
   php artisan db:seed --class=TermSeeder
   php artisan db:seed --class=PageSeeder
   php artisan db:seed --class=ExportSeeder
+  php artisan db:seed --class=PersonSeeder
+  php artisan db:seed --class=LocationSeeder
+  php artisan db:seed --class=AddressSeeder
+  php artisan db:seed --class=MandatorSeeder
+  # php artisan db:seed --class=AccountSeeder
+  php artisan db:seed --class=TransactionSeeder
 }
 # ===
 function InitI18N(){

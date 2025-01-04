@@ -17,6 +17,7 @@ class MenuitemSeeder extends Seeder
     {
         Module::insertIfNotExists('Menuitem');
         Menuitem::insertIfNotExists('menuitems', 'bi bi-menu-up', 'Start Menu');
+        Menuitem::insertIfNotExists('startpage', 'bi bi-menu-up', 'Article', '/page-showmenu/main');
         Menuitem::buildMinimalMenu();
     }
 }

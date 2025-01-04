@@ -1,5 +1,16 @@
 # Development phase
 
+# 0.11.2 laraknife-tools.sh controller.templ ExportSeeder
+
+- development.md: link to icons
+- laraknife-tools.sh:
+  - AdaptModules(): added modules: Change Person Address Location Mandator Account Transaction
+  - FillDb(): Seeders from Change Person Address Location Mandator Transaction
+- controller.templ: show(): wrong "'"
+- ExportSeeder: new entry for "import"
+- MenuitemSeeder: new entry for "startpage"
+- PageSeeder: new entry ('pagetype', 'wiki-encrypted')
+
 # 0.11.1 *create_persons* renamed
 
 - migrations/*create_persons*.php renamed (to change the creation order)
