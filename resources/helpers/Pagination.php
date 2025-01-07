@@ -19,7 +19,7 @@ class Pagination
      * Constructor.
      * @param string $sql the sql statement for selecting the record with the table rows
      * @param array $fields the input fields
-     * @param NULL|string $sqlTotalCount a sql statement (or part of that) to get the total
+     * @param null|string $sqlTotalCount a sql statement (or part of that) to get the total
      *  count of the records. If null: that SQL statement is derived from $sql
      *  starting with 'select': the full SQL statement
      *  Otherwise: the table name

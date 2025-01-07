@@ -38,6 +38,12 @@ class ContextLaraKnife
         $this->role = null;
         $this->combobox = null;
     }
+    public function asDateString(string $dbDateTime): string{
+        $parts = explode(' ', $dbDateTime);
+        $partsDate = explode('-', $parts[0]);
+        $rc = "$partsDate[2].$partsDate[1].$partsDate[0]";
+        return $rc;
+    }
     public function asDateTimeString(string $dbDateTime, bool $withSeconds = false): string{
         $parts = explode(' ', $dbDateTime);
         $partsDate = explode('-', $parts[0]);

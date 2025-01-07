@@ -17,7 +17,8 @@ class DbHelper
      * @param array $conditions a list of conditions
      * @return string the $sql with an added where condition
      */
-    public static function addConditions(string $sql, array $conditions): string{
+    public static function addConditions(string $sql, array $conditions): string
+    {
         if (count($conditions) > 0) {
             $condition = count($conditions) == 1 ? $conditions[0] : implode(' AND ', $conditions);
             $sql .= " WHERE $condition";
@@ -50,9 +51,9 @@ class DbHelper
                 if (!empty($order)) {
                     $order .= ',';
                 }
-                if (strpos($first = $parts[0], '`') !== false){
+                if (strpos($first = $parts[0], '`') !== false) {
                     $order .= $first;
-                } elseif (strpos($first, '.') === false){
+                } elseif (strpos($first, '.') === false) {
                     $order .= "`$first`";
                 } else {
                     $parts2 = explode('.', $first);
@@ -63,7 +64,7 @@ class DbHelper
                 }
             }
         }
-        if (! empty($order)){
+        if (!empty($order)) {
             $sql .= " order by $order";
         }
         return $sql;
@@ -75,18 +76,26 @@ class DbHelper
      * @param string $format the format like in sprintf()
      * @return string the sum as string
      */
-    public static function buildSum(array $records, string $column, string $format="%0.2f"): string{
-        $rc = 0;
-        foreach($records as &$record){
-            $rc += $record->$column;
+    public static function buildSum(array $records, string $column, string $format = "%0.2f"): string
+    {
+        $sum = 0;
+        foreach ($records as &$record) {
+            $sum += $record->$column;
         }
-        return sprintf($format, $rc);
+        if ($format !== 'h:m') {
+            $rc = sprintf($format, $sum);
+        } else {
+            $hours = intval($sum / 60);
+            $minutes = $sum % 60;
+            $rc = sprintf('%02d:%02d', $hours, $minutes);
+        }
+        return $rc;
     }
     /**
      * Returns one column from a record given by the primary key.
      * @param mixed $primaryKey specifies the record
      * @param string $column specifies the column
-     * @return NULL|mixed NULL: no record found. Otherwise: the $column of the record
+     * @return null|mixed NULL: no record found. Otherwise: the $column of the record
      */
     public function columnOf($primaryKey, string $column)
     {
@@ -115,21 +124,21 @@ class DbHelper
         int $limit = 100
     ): array {
         $selected ??= '';
-        if ($undefinedText == null || $undefinedText === ''){
+        if ($undefinedText == null || $undefinedText === '') {
             $rc = [];
         } else {
-            if ($undefinedText == 'all'){
+            if ($undefinedText == 'all') {
                 $undefinedText = __('<All>');
-            } elseif ($undefinedText == '-'){
+            } elseif ($undefinedText == '-') {
                 $undefinedText = __('<Please select>');
             }
             $rc = [['text' => $undefinedText, 'value' => '', 'active' => $selected === '']];
         }
         $sql = "SELECT $titleField, $valueField from $table $where";
-        if ($orderBy == null){
+        if ($orderBy == null) {
             $orderBy = $titleField;
         }
-        if ($orderBy !== ''){
+        if ($orderBy !== '') {
             $sql .= ' order by ' . $orderBy;
         }
         $sql .= " limit $limit;";
@@ -145,10 +154,11 @@ class DbHelper
      * @param array $items  the items of the combobox
      * @return string the value of the first "active" item in the list or the value of the first item.
      */
-    public static function findCurrentSelectedInCombobox(array &$items): string{
+    public static function findCurrentSelectedInCombobox(array &$items): string
+    {
         $rc = strval($items[0]['value']);
         foreach ($items as &$item) {
-            if ($item['active']){
+            if ($item['active']) {
                 $rc = strval($item['value']);
                 break;
             }
@@ -161,11 +171,12 @@ class DbHelper
      * @param $ids a list of ids (integer)
      * @return array all entries of $records with the order given by ids
      */
-    public static function resortById(array $records, array $ids): array{
+    public static function resortById(array $records, array $ids): array
+    {
         $rc = [];
-        foreach($ids as &$id){
-            foreach ($records as &$rec){
-                if ($rec->id == $id){
+        foreach ($ids as &$id) {
+            foreach ($records as &$rec) {
+                if ($rec->id == $id) {
                     array_push($rc, $rec);
                     break;
                 }

@@ -75,12 +75,12 @@ class ViewHelper
         $value = array_key_exists($filterField, $fields) ? $fields[$filterField] : '';
         if ($value != null && $value !== '' && $value !== $ignoreValue) {
             if (strpos($column, '.') === false) {
-                array_push($conditions, "`$column`=:$filterField");
+                array_push($conditions, "`$column`=?");
             } else {
                 $parts = explode('.', $column);
-                array_push($conditions, "$parts[0].`$parts[1]`=:$filterField");
+                array_push($conditions, "$parts[0].`$parts[1]`=?");
             }
-            $parameters[":$filterField"] = $value;
+            array_push($parameters, $value);
         }
     }
     /**

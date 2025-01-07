@@ -1,5 +1,13 @@
 # Development phase
 
+# 0.11.3 Hour ViewHelper DateTimeHelper
+
+- new module Hour
+- fix ViewHelper::addConditionComparison(): wrong usage of "parameters"
+- DbHelper::buildSum(): handling of format "h:m" (time)
+- new: DateTimeHelper::timeToMinutes()
+- new: ContextLaraKnife::asDateString()
+
 # 0.11.2 laraknife-tools.sh controller.templ ExportSeeder
 
 - development.md: link to icons

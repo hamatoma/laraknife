@@ -27,7 +27,7 @@ php artisan migrate
 ```
 php artisan make:seeder DeviceSeeder
 ```
-- [[https://icons.getbootstrap.com Icons]]
+- [[https://icons.getbootstrap.com|Icons]]
 ```
 public function run(): void
     {
