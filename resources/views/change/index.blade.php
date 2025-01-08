@@ -29,7 +29,7 @@
 @foreach ($records as $change)
         <tr>
             <td><x-laraknife.icons.change-record module="change" no="{{ $change->id }}" /></td>
-              <td>{{$change->created_at}}</td>
+              <td>{{$context->asDateTimeString($change->created_at)}}</td>
               <td> {{ __($change->changetype) }}</td>
               <td>{{$change->module}}</td>
               <td>{{$change->reference_id}}</td>

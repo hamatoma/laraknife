@@ -16,6 +16,7 @@
         <thead>
           <tr>
             <th></th>
+            <th sortId="dayofweek">{{__('Day')}}</th>
             <th sortId="term">{{__('Term')}}</th>
             <th sortId="duration">{{__('Duration')}}</th>
             <th sortId="title">{{__('Title')}}</th>
@@ -29,6 +30,7 @@
 @foreach ($records as $term)
         <tr>
             <td><x-laraknife.icons.change-record module="term" no="{{ $term->id }}" /></td>
+              <td>{{$context->asDayOfWeek($term->dayofweek)}}</td>
               <td>{{$context->asDateTimeString($term->term)}}</td>
               <td>{{$context->asDuration($term->duration)}}</td>
               <td>{{$term->title}}</td>

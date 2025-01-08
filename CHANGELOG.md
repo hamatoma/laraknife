@@ -1,5 +1,19 @@
 # Development phase
 
+# 0.11.4 ContextLaraKnife Term Change
+
+- ContextLaraKnife:
+  - new: $dayOfWeek
+  - asDateString()+asDateTimeString(): new parameter $positionDayOfWeek
+  - new: asDayOfWeek()
+- Term:
+  - index.blade: format of the date time, new column: "Day"
+  - TermController::index(): default "term": the current date
+  - TermController::index(): limited description length (80) 
+- Change:
+  - index.blade: format of the date time
+
+
 # 0.11.3 Hour ViewHelper DateTimeHelper
 
 - new module Hour

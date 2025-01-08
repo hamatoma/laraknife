@@ -101,9 +101,8 @@ class TermController extends Controller
             return redirect('/term-create');
         } else {
             ViewHelper::adaptFieldValues($_POST, ['from' => 'datetime', 'to' => 'datetime']);
-            $sql = 'SELECT t0.*,'
-                . 't1.name as visibility, '
-                . 't2.name as owner '
+            $sql = 'SELECT t0.*,DAYOFWEEK(t0.term) as dayofweek,CAST(t0.description AS VARCHAR(80)) as description,'
+                . 't1.name as visibility,t2.name as owner '
                 . ' FROM terms t0'
                 . ' LEFT JOIN sproperties t1 ON t1.id=t0.visibility_scope'
                 . ' LEFT JOIN users t2 ON t2.id=t0.owner_id'
@@ -115,10 +114,10 @@ class TermController extends Controller
                     'visibility' => null,
                     'owner' => null,
                     'title' => '',
-                    'from' => '',
+                    'from' => (new \DateTime())->format('Y-m-d'),
                     'to' => '',
                     'text' => '',
-                    '_sortParams' => 'term:desc;duration:desc;title:desc'
+                    '_sortParams' => 'term:desc;title:asc'
                 ];
             }
             $conditions = [];
