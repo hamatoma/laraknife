@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.11.5 Sort order term index
+
+- Sort order term index: now ascending
+
 # 0.11.4 ContextLaraKnife Term Change
 
 - ContextLaraKnife:

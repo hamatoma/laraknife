@@ -117,7 +117,7 @@ class TermController extends Controller
                     'from' => (new \DateTime())->format('Y-m-d'),
                     'to' => '',
                     'text' => '',
-                    '_sortParams' => 'term:desc;title:asc'
+                    '_sortParams' => 'term:asc;title:asc'
                 ];
             }
             $conditions = [];
