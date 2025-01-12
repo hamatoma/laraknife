@@ -100,11 +100,10 @@ class MenuitemController extends Controller
                     '_sortParams' => 'id:asc'
                         . ';name:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionPattern($conditions, $parameters, 'name,label,icon,link', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'name,label,icon,link', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;

@@ -128,8 +128,8 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
                 ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourtype_scope', 'hourtype');
                 ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourstate_scope', 'hourstate');
                 ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionDateTimeRange($conditions, $parameters, 'from', 'until', 'time');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'description', 'text');
+                ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'until', 'time');
+                ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description', 'text');
                 $sql = DbHelper::addConditions($sql, $conditions);
             }
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);

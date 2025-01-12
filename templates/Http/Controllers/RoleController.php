@@ -74,11 +74,10 @@ class RoleController extends Controller
                     'priority' => '',
                     '_sortParams' => 'name:asc;priority:asc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionPattern($conditions, $parameters, 'name', 'name');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'name', 'name');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;

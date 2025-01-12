@@ -266,9 +266,9 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'category_scope', 'category');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'notestatus_scope', 'notestatus');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'user');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'title,body', 'text');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'title');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'body');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title,body', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'body');
             ViewHelper::addConditionVisible($conditions, $fields['visibility']);
             if ( ($fn = $fields['filename']) != null && $fn !== ''){
                 $fn = '%' . strip_tags($fn) . '%';
@@ -319,9 +319,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
                     'text' => '',
                     '_sortParams' => 'id:desc',
                 ];
-            } else {
-                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
             }
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title,description,filename', 'text');
             ViewHelper::addConditionConstComparison($conditions, $parameters, 'module_id', $moduleId);
             ViewHelper::addConditionConstComparison($conditions, $parameters, 'reference_id', $note->id);
             $sql = DbHelper::addConditions($sql, $conditions);

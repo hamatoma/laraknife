@@ -29,7 +29,7 @@ class #Module#Controller extends Controller
                 $fields = [
 ##CASE(fields)##
 ##ON nameLike(user_id|owner_id)##
-                    '#field#' => auth()->id()#comma#
+                    '#field#' => auth()->id(),
 ##ON nameLike(.)##
                     '#field#' => ''#comma#
 ##END.CASE##
@@ -134,21 +134,20 @@ LEFT JOIN users t#no# ON t#no#.id=t0.#field#
                                 . ';#field#:desc'
 ##END.CASE##
                 ];
-            } else {
-                $conditions = [];
-                // Search in multiple columns (field1..field3) with filter field "text":
-                // ViewHelper::addConditionPattern($conditions, $parameters, 'field1,field2,field3', 'text');
+            }
+            $conditions = [];
+            // Search in multiple columns (field1..field3) with filter field "text":
+            // ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'field1,field2,field3', 'text');
 ##CASE(fields)##
 ##ON nameLike(_(scope|id)$)##
-                ViewHelper::addConditionComparism($conditions, $parameters, '#field#', '#base#');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, '#field#', '#base#');
 ##ON typeLike((tring|[tT]ext)$)##
-                ViewHelper::addConditionPattern($conditions, $parameters, '#field#');
-                // ViewHelper::addConditionPattern($conditions, $parameters, 'column1,col2,col3', 'filterfield');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, '#field#');
+            // ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'column1,col2,col3', 'filterfield');
 ##ELSE##
-                ViewHelper::addConditionComparism($conditions, $parameters, '#field#', null, '=');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, '#field#', null, '=');
 ##END.CASE##
-                $sql = DbHelper::addConditions($sql, $conditions);
-            }
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;

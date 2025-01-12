@@ -277,7 +277,7 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'transactiontype_scope', 'transactiontype');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'transactionstate_scope', 'transactionstate');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'name,info', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'name,info', 'text');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'from', 'date', '>=');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'until', 'date', '<=');
             $sql = DbHelper::addConditions($sql, $conditions);
@@ -329,9 +329,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
                     'filegroup_scope' => '1101',
                     '_sortParams' => 'id:desc',
                 ];
-            } else {
-                ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
             }
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title,description,filename', 'text');
             ViewHelper::addConditionConstComparison($conditions, $parameters, 'module_id', $moduleId);
             ViewHelper::addConditionConstComparison($conditions, $parameters, 'reference_id', $transaction->id);
             $sql = DbHelper::addConditions($sql, $conditions);

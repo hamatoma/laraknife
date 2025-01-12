@@ -300,8 +300,8 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'markup_scope', 'markup');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'language_scope', 'language');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
-            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,title,t0.info', 'title');
-            ViewHelper::addConditionPattern($conditions, $parameters, 't0.info,contents', 'contents');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.name,title,t0.info', 'title');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.info,contents', 'contents');
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);

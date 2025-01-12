@@ -1,5 +1,14 @@
 # Development phase
 
+# 0.11.6 
+
+- ViewHelper::addConditionPattern(): new parameter $fields
+- ViewHelper::addConditionDateTimeRange(): new parameter $fields
+- UserController: index(): default value of "role" is empty
+- controller: 
+  - create(): "," instead of "#comma#"
+  - index(): no "else" for count($fields) == 0
+  
 # 0.11.5 Sort order term index
 
 - Sort order term index: now ascending

@@ -157,7 +157,7 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'filegroup_scope', 'filegroup');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'visibility_scope', 'visibility');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'user_id', 'user');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'title,description,filename', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title,description,filename', 'text');
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);

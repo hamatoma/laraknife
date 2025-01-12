@@ -74,12 +74,11 @@ class SPropertyController extends Controller
             $fields = $request->all();
             if (count($fields) == 0) {
                 $fields = ['scope' => '', 'text' => '', '_sortParams' => 'scope:asc;order:asc;name:asc'];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'scope');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'scope,name,shortname,value,info', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'scope');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'scope,name,shortname,value,info', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;

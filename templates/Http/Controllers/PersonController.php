@@ -158,7 +158,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
             $conditions = [];
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'gender_scope', 'gender');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'persongroup_scope', 'persongroup');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'firstname,lastname,middlename,titles,nickname,t0.info', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'firstname,lastname,middlename,titles,nickname,t0.info', 'text');
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);

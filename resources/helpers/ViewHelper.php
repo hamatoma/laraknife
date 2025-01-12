@@ -144,15 +144,15 @@ class ViewHelper
      * @param string $toField the field name of the dattime upper bound.
      * @param string $column the name of the column to compare 
      */
-    public static function addConditionDateTimeRange(array &$conditions, array &$parameters, string $fromField, string $toField, string $column)
+    public static function addConditionDateTimeRange(array &$fields, array &$conditions, array &$parameters, string $fromField, string $toField, string $column)
     {
-        $from = array_key_exists($fromField, $_POST) ? $_POST[$fromField] : '';
-        $to = array_key_exists($toField, $_POST) ? $_POST[$toField] : '';
-        if ($to !== '' && strpos($to, ':') === false) {
+        $from = array_key_exists($fromField, $fields) ? $fields[$fromField] : '';
+        $to = array_key_exists($toField, $fields) ? $fields[$toField] : '';
+        $isValidFrom = $from != null && $from !== '';
+        $isValidTo = $to != null && $to !== '';
+        if ($isValidTo && strpos($to, ':') === false) {
             $to .= ' 23:59:59';
         }
-        $isValidFrom = $from !== '';
-        $isValidTo = $to !== '';
         if ($isValidFrom or $isValidTo) {
             if ($isValidFrom && !$isValidTo) {
                 array_push($conditions, "`$column`>=?");
@@ -212,10 +212,10 @@ class ViewHelper
      *   In this case each of the columns will be compared and combined with the OR operator
      * @param string $filterField name of the filter field (HTML input field). If null $column is taken
      */
-    public static function addConditionPattern(array &$conditions, array &$parameters, string $column, ?string $filterField = null)
+    public static function addConditionPattern(array &$fields, array &$conditions, array &$parameters, string $column, ?string $filterField = null)
     {
         $filterField ??= $column;
-        $value = array_key_exists($filterField, $_POST) ? $_POST[$filterField] : '';
+        $value = array_key_exists($filterField, $fields) ? $fields[$filterField] : '';
         if (!empty($value) && $value !== "*") {
             $value = str_replace('*', '%', $value) . '%';
             $value = str_replace('%%', '%', $value);

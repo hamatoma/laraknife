@@ -115,7 +115,7 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
             $conditions = [];
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'addresstype_scope', 'addresstype');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'person_id', 'person');
-            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info,t2.nickname', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.name,t0.info,t2.nickname', 'text');
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);

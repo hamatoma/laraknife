@@ -112,14 +112,14 @@ LEFT JOIN persons t1 ON t1.id=t0.person_id
                 'text' => '',
                 '_sortParams' => 'person:desc;country:desc;zip:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionPattern($conditions, $parameters, 'country');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'zip');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'city');
-                ViewHelper::addConditionPattern($conditions, $parameters, 'zip,city,street,additional,t0.info,t1.nickname', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'country');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'zip');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'city');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'zip,city,street,additional,t0.info,t1.nickname', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
+
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;

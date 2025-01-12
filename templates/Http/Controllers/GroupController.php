@@ -140,7 +140,7 @@ FROM groups t0
                 ];
             } else {
                 $conditions = [];
-                ViewHelper::addConditionPattern($conditions, $parameters, 'name,info', 'text');
+                ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'name,info', 'text');
                 ViewHelper::addConditionFindInList($conditions, $parameters, 'members', $fields['member']);
                 $sql = DbHelper::addConditions($sql, $conditions);
             }

@@ -67,7 +67,7 @@ LEFT JOIN users t3 ON t3.id=t0.user_id
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'module_id', 'module');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'reference_id', 'reference');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'user_id', 'user');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'description,current', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description,current', 'text');
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);

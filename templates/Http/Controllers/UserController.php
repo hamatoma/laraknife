@@ -255,15 +255,13 @@ class UserController extends Controller
             $parameters = [];
             $fields = $request->all();
             if (count($fields) == 0) {
-                $fields = ['id' => '', 'text' => '', 'role' => '0', '_sortParams' => 'id:asc'];
-            } else {
-                $conditions = [];
-                $parameters = [];
-                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 't0.role_id', 'role');
-                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'role_id');
-                ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,email', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
+                $fields = ['id' => '', 'text' => '', 'role' => '', '_sortParams' => 'id:asc'];
             }
+            $conditions = [];
+            $parameters = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 't0.role_id', 'role');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.name,email', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;

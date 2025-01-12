@@ -123,8 +123,8 @@ class TermController extends Controller
             $conditions = [];
             //ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'visibility_scope', 'visibility');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'title,description', 'text');
-            ViewHelper::addConditionDateTimeRange($conditions, $parameters, 'from', 'to', 'term');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title,description', 'text');
+            ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'to', 'term');
             ViewHelper::addConditionVisible($conditions, $fields['visibility']);
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
