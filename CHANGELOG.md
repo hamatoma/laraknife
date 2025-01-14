@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.11.7 DbHelper, ViewHelper, Hour: +factor
+
+- DbHelper::buildSum(): neuer Parameter $fieldFactor
+- ViewHelper::addConditionPattern(): fix: overwriting $fields
+- Hour: new attribute "factor"
+
 # 0.11.6 
 
 - ViewHelper::addConditionPattern(): new parameter $fields

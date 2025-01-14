@@ -221,10 +221,10 @@ class ViewHelper
             $value = str_replace('%%', '%', $value);
             $value = str_replace('?', '_', $value);
             if ($value !== '%') {
-                $fields = explode(',', $column);
+                $fields2 = explode(',', $column);
                 $conditions2 = [];
                 $no = 0;
-                foreach ($fields as $field) {
+                foreach ($fields2 as $field) {
                     $no++;
                     if (strpos($field, '.') === false) {
                         array_push($conditions2, "`$field` like :$field$no");

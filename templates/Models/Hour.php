@@ -18,6 +18,7 @@ class Hour extends Model
         'hourtype_scope',
         'hourstate_scope',
         'description',
-        'owner_id'
+        'owner_id',
+        'factor',
     ];
 }

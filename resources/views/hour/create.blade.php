@@ -17,7 +17,9 @@
                 value="{{ $context->valueOf('start') }}" width2="4" />
             <x-laraknife.forms.string type="time" position="last" name="end" label="End"
                 value="{{ $context->valueOf('end') }}" width2="4" />
-            <x-laraknife.forms.combobox position="alone" name="owner_id" label="Owner" :options="$optionsOwner" width2="4" />
+            <x-laraknife.forms.string type="number" position="first" name="factor" label="Factor"
+                value="{{ $context->valueOf('factor') }}" width2="4" />
+            <x-laraknife.forms.combobox position="last" name="owner_id" label="Owner" :options="$optionsOwner" width2="4" />
             <x-laraknife.forms.text position="alone" name="description" label="Description"
                 value="{{ $context->valueOf('description') }}" width2="10" rows="2" />
         </x-laraknife.panels.create>

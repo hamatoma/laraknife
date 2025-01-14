@@ -76,11 +76,19 @@ class DbHelper
      * @param string $format the format like in sprintf()
      * @return string the sum as string
      */
-    public static function buildSum(array $records, string $column, string $format = "%0.2f"): string
+    public static function buildSum(array $records, string $column, string $format = "%0.2f", ?string $factorField = null): string
     {
         $sum = 0;
         foreach ($records as &$record) {
-            $sum += $record->$column;
+            if ($factorField == null) {
+                $sum += $record->$column;
+            } else {
+                $factor = $record->$factorField;
+                if ($factor == null || $factor === '' || $factor == 0) {
+                    $factor = 1;
+                }
+                $sum += $record->$column * $factor;
+            }
         }
         if ($format !== 'h:m') {
             $rc = sprintf($format, $sum);

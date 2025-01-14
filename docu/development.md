@@ -41,3 +41,15 @@ public function run(): void
 ```
 php artisan db:seed --class=DeviceSeeder
 ```
+## Modification of a Table
+```
+php artisan make:migration modify_${TABLE}_table
+```
+```
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('factor')->nullable();
+        });
+    }
+```

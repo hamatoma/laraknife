@@ -35,7 +35,8 @@ class HourController extends Controller
                     'duration' => '',
                     'hourtype_scope' => 1351,
                     'hourstate_scope' => 1361,
-                    'description' => ''
+                    'description' => '',
+                    'factor' => 1
                 ];
             }
             $optionsHourtype = SProperty::optionsByScope('hourtype', $fields['hourtype_scope'], '-');
@@ -67,7 +68,8 @@ class HourController extends Controller
                     'hourtype_scope' => $hour->hourtype_scope,
                     'hourstate_scope' => $hour->hourstate_scope,
                     'description' => $hour->description,
-                    'owner_id' => $hour->owner_id
+                    'owner_id' => $hour->owner_id,
+                    'factor' => $hour->factor
                 ];
             }
             $optionsHourtype = SProperty::optionsByScope('hourtype', $hour->hourtype_scope, '');
@@ -135,7 +137,7 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
-            $fields['sum'] = DbHelper::buildSum($records, 'duration', 'h:m');
+            $fields['sum'] = DbHelper::buildSum($records, 'duration', 'h:m', 'factor');
             $optionsHourtype = SProperty::optionsByScope('hourtype', $fields['hourtype'], 'all');
             $optionsHourstate = SProperty::optionsByScope('hourstate', $fields['hourstate'], 'all');
             $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner'], __('all'));
@@ -162,7 +164,8 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             'hourtype_scope' => 'required',
             'hourstate_scope' => 'required',
             'description' => '',
-            'owner_id' => 'required'
+            'owner_id' => 'required',
+            'factor' => 'integer'
         ];
         return $rc;
     }
