@@ -267,8 +267,6 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'notestatus_scope', 'notestatus');
             ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'user');
             ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title,body', 'text');
-            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'title');
-            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'body');
             ViewHelper::addConditionVisible($conditions, $fields['visibility']);
             if ( ($fn = $fields['filename']) != null && $fn !== ''){
                 $fn = '%' . strip_tags($fn) . '%';

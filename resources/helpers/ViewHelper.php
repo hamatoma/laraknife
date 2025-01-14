@@ -227,14 +227,14 @@ class ViewHelper
                 foreach ($fields2 as $field) {
                     $no++;
                     if (strpos($field, '.') === false) {
-                        array_push($conditions2, "`$field` like :$field$no");
-                        $parameters[":$field$no"] = $value;
+                        array_push($conditions2, "`$field` like ?");
+                        array_push($parameters, $value);
                     } else {
                         $names = explode('.', $field);
                         $table = $names[0];
                         $field = $names[1];
-                        array_push($conditions2, "$table.`$field` like :$field$no");
-                        $parameters[":$field$no"] = $value;
+                        array_push($conditions2, "$table.`$field` like ?");
+                        array_push($parameters, $value);
                     }
                 }
                 array_push($conditions, '(' . implode(" OR ", $conditions2) . ')');

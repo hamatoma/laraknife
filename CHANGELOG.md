@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.11.8 ViewHelper NoteController
+
+- ViewHelper::addConditionPattern(): fix: wrong usage of :field instead of "?"
+- NoteController::index(): wrong usage of addConditionPattern() [2 times]
+
+
 # 0.11.7 DbHelper, ViewHelper, Hour: +factor
 
 - DbHelper::buildSum(): neuer Parameter $fieldFactor
