@@ -1,5 +1,12 @@
 # Development phase
 
+# 0.11.9 NoteController PersonContoller
+
+- NoteController: store():  - redirect to /note-edit/$id
+- Person: 
+  - PersonController::store(): redirecto to /person-address/$id
+  - address.blade: added: lastname and firstname (readonly)
+
 # 0.11.8 ViewHelper NoteController
 
 - ViewHelper::addConditionPattern(): fix: wrong usage of :field instead of "?"

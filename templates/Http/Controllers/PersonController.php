@@ -244,6 +244,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
                 $validated['info'] = strip_tags($validated['info']);
                 $person = Person::create($validated);
                 Change::createFromFields($validated, Change::$CREATE, 'Person', $person->id);
+                $rc = redirect(to: "/person-address/$person->id");
             }
         }
         if ($rc == null) {

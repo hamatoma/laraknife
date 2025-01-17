@@ -452,6 +452,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
                 if ($note->visibility_scope != 1092) {
                     Change::createFromFields($validated, Change::$CREATE, 'Note', $note->id);
                 }
+                $rc = redirect("/note-edit/$note->id");
             }
         }
         if ($rc == null) {

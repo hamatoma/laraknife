@@ -5,6 +5,10 @@
         @csrf
         <x-laraknife.panels.standard title="{{ __('Addresses') }}" fieldset="false">
             <x-laraknife.layout.nav-tabs :info="$navTabsInfo" fieldset="true" button1Name="">
+                <x-laraknife.forms.string position="first" name="lastname" label="Lastname"
+                    value="{{ $context->valueOf('lastname') }}" width2="4" attribute="readonly" />
+                <x-laraknife.forms.string position="last" name="firstname" label="Firstname"
+                    value="{{ $context->valueOf('firstname') }}" width2="4"  attribute="readonly"/>
                 <x-laraknife.forms.text position="alone" name="list" label="Current addresses"
                     value="{{ $context->valueOf('list') }}" width2="10" rows="8" attribute="readonly" />
                 <x-laraknife.layout.cell position="first" content="{{ __('') }}" width="2" />
