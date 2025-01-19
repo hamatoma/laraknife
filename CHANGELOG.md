@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.11.10 PersonController
+
+- findAddresses(): handling of empty info
+
 # 0.11.9 NoteController PersonContoller
 
 - NoteController: store():  - redirect to /note-edit/$id

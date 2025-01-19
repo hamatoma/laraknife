@@ -34,7 +34,9 @@ class Person extends Model
         }
         $addresses = DB::table('addresses')->where('person_id', '=', $this->id)->get();
         foreach ($addresses as &$address){
-            $rc .= "$address->name;$address->info;$address->priority\n";
+            $info = $address->info;
+            $info2 = $info !== null && $info !== '' ? " ; $info" : '';
+            $rc .= "$address->name$info2\n";
         }
         return $rc;
     }
