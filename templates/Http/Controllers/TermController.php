@@ -33,8 +33,8 @@ class TermController extends Controller
                     'term' => (new \DateTime())->format('Y-m-d H:00'),
                     'duration' => '0',
                     'description' => '',
-                    'visibility_scope' => '1091',
-                    'owner_id' => auth()->id()
+                    'visibility_scope' => old('visibility_scope', '1091'),
+                    'owner_id' => old('owner_id', auth()->id())
                 ];
             }
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');

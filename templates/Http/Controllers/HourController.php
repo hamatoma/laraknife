@@ -33,8 +33,8 @@ class HourController extends Controller
                     'start' => '',
                     'end' => '',
                     'duration' => '',
-                    'hourtype_scope' => 1351,
-                    'hourstate_scope' => 1361,
+                    'hourtype_scope' => old('hourtype_scope', 1351),
+                    'hourstate_scope' => old('hourstate_scope', 1361),
                     'description' => '',
                     'factor' => 1
                 ];

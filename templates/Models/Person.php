@@ -26,17 +26,19 @@ class Person extends Model
         $rc = '';
         $locations = DB::table('locations')->where('person_id', '=', $this->id)->get();
         foreach ($locations as &$location){
+            $rc .= "<a href=\"/location-edit/$location->id\">";
             if ($location->additional != null && $location->additional !== ''){
                 $rc .= "$location->additional ; ";
             } 
-            $rc .= "$location->street\n";
-            $rc .= "$location->country-$location->zip $location->city\n\n";
+            $rc .= "$location->street<br>\n";
+            $rc .= "$location->country-$location->zip $location->city</a><br><br>\n\n";
         }
         $addresses = DB::table('addresses')->where('person_id', '=', $this->id)->get();
         foreach ($addresses as &$address){
+            $rc .= "<a href=\"/address-edit/$address->id\">";
             $info = $address->info;
             $info2 = $info !== null && $info !== '' ? " ; $info" : '';
-            $rc .= "$address->name$info2\n";
+            $rc .= "$address->name$info2</a><br>\n";
         }
         return $rc;
     }

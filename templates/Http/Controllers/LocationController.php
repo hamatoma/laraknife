@@ -28,7 +28,7 @@ class LocationController extends Controller
             $fields = $request->all();
             if (count($fields) === 0) {
                 $fields = [
-                    'person_id' => '',
+                    'person_id' => old('person_id',''),
                     'country' => 'D',
                     'zip' => '',
                     'city' => '',

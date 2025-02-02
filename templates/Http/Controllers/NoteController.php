@@ -39,10 +39,10 @@ class NoteController extends Controller
                 $fields = [
                     'title' => '',
                     'body' => '',
-                    'category_scope' => '1051',
-                    'notestatus_scope' => '1011',
-                    'visibility_scope' => '1091',
-                    'owner_id' => strval(auth()->id())
+                    'category_scope' => old('category_scope', '1051'),
+                    'notestatus_scope' => old('notestatus_scope', '1011'),
+                    'visibility_scope' => old('visibility_scope', '1091'),
+                    'owner_id' => old('owner_id', strval(auth()->id()))
                 ];
             }
             $optionsCategory = SProperty::optionsByScope('category', $fields['category_scope'], '-');
@@ -71,9 +71,9 @@ class NoteController extends Controller
                     'title' => '',
                     'description' => '',
                     'filename' => '',
-                    'filegroup_scope' => '1101',
-                    'visibility_scope' => '1091',
-                    'owner_id' => auth()->id()
+                    'filegroup_scope' => old('filegroup_scope', '1101'),
+                    'visibility_scope' => old('visibility_scope', '1091'),
+                    'owner_id' => old('owner_id', auth()->id())
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');

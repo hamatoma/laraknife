@@ -38,7 +38,7 @@ class PersonController extends Controller
 
                 }
             }
-            $fields['list'] = $person->findAddresses();
+            $fields['addresslist'] = $person->findAddresses();
             $fields['address'] = '';
             if ($rc == null) {
                 $context = new ContextLaraKnife($request, $fields, $person);
@@ -68,8 +68,8 @@ class PersonController extends Controller
                     'lastname' => '',
                     'nickname' => '',
                     'titles' => '',
-                    'gender_scope' => '',
-                    'persongroup_scope' => '',
+                    'gender_scope' => old('gender_scope'),
+                    'persongroup_scope' => old('persongroup_scope'),
                     'info' => ''
                 ];
             }
@@ -100,13 +100,13 @@ class PersonController extends Controller
                     'lastname' => $person->lastname,
                     'nickname' => $person->nickname,
                     'titles' => $person->titles,
-                    'gender_scope' => $person->gender_scope,
-                    'persongroup_scope' => $person->persongroup_scope,
+                    'gender_scope' => old('gender_scope', $person->gender_scope),
+                    'persongroup_scope' => old('persongroup_scope', $person->persongroup_scope),
                     'info' => $person->info
                 ];
             }
-            $optionsGender = SProperty::optionsByScope('gender', $person->gender_scope, '');
-            $optionsPersongroup = SProperty::optionsByScope('persongroup', $person->persongroup_scope, '');
+            $optionsGender = SProperty::optionsByScope('gender', $fields['gender_scope'], '');
+            $optionsPersongroup = SProperty::optionsByScope('persongroup', $fields['persongroup_scope'], '');
             $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('person-edit', 1, $person->id);
             $context = new ContextLaraKnife($request, null, $person);
             $rc = view('person.edit', [
@@ -238,7 +238,8 @@ LEFT JOIN sproperties t2 ON t2.id=t0.persongroup_scope
             $fields = $request->all();
             $validator = Validator::make($fields, $this->rules(true));
             if ($validator->fails()) {
-                $rc = back()->withErrors($validator)->withInput();
+                //$rc = back()->withErrors($validator)->withInput();
+                $rc = back()->withInput()->withErrors($validator);
             } else {
                 $validated = $validator->validated();
                 $validated['info'] = strip_tags($validated['info']);

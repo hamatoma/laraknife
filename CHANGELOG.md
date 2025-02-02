@@ -1,5 +1,15 @@
 # Development phase
 
+# 0.11.11 Person (Addresses), combobox setting on error
+
+- Person:
+  - "Addresses": const text and links to edit the location/address
+- AccountController, MandatorController: 
+  - fix: $fields for addConditionPattern()
+- AddressController, FileController...
+  - Wrong reset of comboboxes on errors:
+  - create(): fix: $fields = { ... => old(...)...}
+
 # 0.11.10 PersonController
 
 - findAddresses(): handling of empty info

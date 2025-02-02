@@ -46,9 +46,9 @@ class FileController extends Controller
                     'title' => '',
                     'description' => '',
                     'filename' => '',
-                    'filegroup_scope' => '1101',
-                    'visibility_scope' => '1091',
-                    'user_id' => auth()->id()
+                    'filegroup_scope' => old('filegroup_scope', '1101'),
+                    'visibility_scope' => old('visibility_scope', '1091'),
+                    'user_id' => old('user_id', auth()->id())
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');

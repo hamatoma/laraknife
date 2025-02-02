@@ -122,8 +122,8 @@ LEFT JOIN mandators t1 ON t1.id=t0.mandator_id
                 ];
             }
             $conditions = [];
-            ViewHelper::addConditionPattern($conditions, $parameters, 't0.name,t0.info', 'text');
-            ViewHelper::addConditionPattern($conditions, $parameters, 'info');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.name,t0.info', 'text');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'info');
             ViewHelper::addConditionConstComparison($conditions, $parameters, 'mandator_id', $mandator->id);
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);

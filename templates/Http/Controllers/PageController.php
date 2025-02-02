@@ -61,9 +61,9 @@ class PageController extends Controller
                     'name' => '',
                     'contents' => '',
                     'info' => '',
-                    'pagetype_scope' => '',
-                    'markup_scope' => '1122',
-                    'language_scope' => SProperty::idOfLocalization(auth()->user()->localization),
+                    'pagetype_scope' => old('pagetype_scope', ''),
+                    'markup_scope' => old('markup_scope', '1122'),
+                    'language_scope' => old('languare_scope', SProperty::idOfLocalization(auth()->user()->localization)),
                     'order' => '0',
                     'columns' => '1',
                     'audio_id' => '',
@@ -139,14 +139,14 @@ $sep
                     'columns' => $page->columns,
                     'contents' => $page->contents,
                     'info' => $page->info,
-                    'pagetype_scope' => $page->pagetype_scope,
-                    'markup_scope' => $page->markup_scope,
-                    'language_scope' => $page->language_scope,
+                    'pagetype_scope' => old('pagetype_scope', $page->pagetype_scope),
+                    'markup_scope' => old('markup_scope', $page->markup_scope),
+                    'language_scope' => old('language_scope', $page->language_scope),
                     'order' => $page->order ?? '0',
                     'audio_id' => $page->audio_id,
-                    'previous_id' => $page->previous_id,
-                    'next_id' => $page->next_id,
-                    'up_id' => $page->up_id,
+                    'previous_id' => old('previous_id', $page->previous_id),
+                    'next_id' => old('next_id', $page->next_id),
+                    'up_id' => old('up_id', $page->up_id),
                     'message' => ''
                 ];
             } else {
@@ -160,9 +160,9 @@ $sep
             if ($request->btnSubmit === 'btnStore') {
                 $this->update($page, $request, $fields);
             }
-            $optionsPagetype = SProperty::optionsByScope('pagetype', $page->pagetype_scope, '');
-            $optionsMarkup = SProperty::optionsByScope('markup', $page->markup_scope, '');
-            $optionsLanguage = SProperty::optionsByScope('localization', $page->language_scope, '');
+            $optionsPagetype = SProperty::optionsByScope('pagetype', $fields['pagetype_scope'], '');
+            $optionsMarkup = SProperty::optionsByScope('markup', $fields['markup_scope'], '');
+            $optionsLanguage = SProperty::optionsByScope('localization', $fields['language_scope'], '');
             if ($request->btnSubmit === 'btnPreview') {
                 $wiki = new MediaWiki();
                 //$wiki->setClozeParameters('preview');

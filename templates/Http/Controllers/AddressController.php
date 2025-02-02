@@ -32,7 +32,7 @@ class AddressController extends Controller
                     'name' => '',
                     'info' => '',
                     'priority' => '10',
-                    'addresstype_scope' => ''
+                    'addresstype_scope' => old('addresstype_scope', '')
                 ];
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $fields['addresstype_scope'], '-');

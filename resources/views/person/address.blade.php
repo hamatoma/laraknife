@@ -9,8 +9,8 @@
                     value="{{ $context->valueOf('lastname') }}" width2="4" attribute="readonly" />
                 <x-laraknife.forms.string position="last" name="firstname" label="Firstname"
                     value="{{ $context->valueOf('firstname') }}" width2="4"  attribute="readonly"/>
-                <x-laraknife.forms.text position="alone" name="list" label="Current addresses"
-                    value="{{ $context->valueOf('list') }}" width2="10" rows="8" attribute="readonly" />
+                <x-laraknife.forms.const-text position="alone" name="list" label="Current addresses"
+                    text="{!! $context->valueOf('addresslist') !!}" width2="10"/>
                 <x-laraknife.layout.cell position="first" content="{{ __('') }}" width="2" />
                 <x-laraknife.layout.cell content="{!! __('phone or phone;info or email or email;info<br>or street NEWLINE zip city') !!}" width="8" />
                 <x-laraknife.forms.link position="last" reference="/page-showhelp/help_person_address" text="{!! __('Help') !!}" width1="0" width2="2" />
