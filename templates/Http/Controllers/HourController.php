@@ -7,6 +7,7 @@ use App\Helpers\Helper;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
 use App\Helpers\Pagination;
+use App\Helpers\ExportHelperLocal;
 use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
 use App\Helpers\DateTimeHelper;
@@ -36,7 +37,8 @@ class HourController extends Controller
                     'hourtype_scope' => old('hourtype_scope', 1351),
                     'hourstate_scope' => old('hourstate_scope', 1361),
                     'description' => '',
-                    'factor' => 1
+                    'factor' => 1,
+                    'interested' => 0
                 ];
             }
             $optionsHourtype = SProperty::optionsByScope('hourtype', $fields['hourtype_scope'], '-');
@@ -69,8 +71,12 @@ class HourController extends Controller
                     'hourstate_scope' => $hour->hourstate_scope,
                     'description' => $hour->description,
                     'owner_id' => $hour->owner_id,
-                    'factor' => $hour->factor
+                    'factor' => $hour->factor,
+                    'interested' => $hour->interested
                 ];
+            }
+            if ($fields['interested'] == null || $fields['interested'] == '') {
+                $fields['interested'] = 0;
             }
             $optionsHourtype = SProperty::optionsByScope('hourtype', $hour->hourtype_scope, '');
             $optionsHourstate = SProperty::optionsByScope('hourstate', $hour->hourstate_scope, '');
@@ -153,6 +159,75 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
         }
     }
     /**
+     * Display the database records of the resource.
+     */
+    public function multiple(Request $request)
+    {
+        $sql = "
+SELECT t0.*,
+  t1.name as hourtype,
+  t2.name as hourstate,
+  t3.name as owner
+FROM hours t0
+LEFT JOIN sproperties t1 ON t1.id=t0.hourtype_scope
+LEFT JOIN sproperties t2 ON t2.id=t0.hourstate_scope
+LEFT JOIN users t3 ON t3.id=t0.owner_id
+";
+        $parameters = [];
+        $fields = $request->all();
+        if (count($fields) == 0) {
+            $fields = [
+                'hourtype' => '',
+                'hourstate' => 1361,
+                'hourstate2' => null,
+                'owner' => '',
+                'from' => '',
+                'until' => '',
+                'text' => '',
+                '_sortParams' => 'time:desc'
+            ];
+        } else {
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourtype_scope', 'hourtype');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourstate_scope', 'hourstate');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
+            ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'until', 'time');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
+        }
+        $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+        $pagination = new Pagination($sql, $parameters, $fields);
+        $records = $pagination->records;
+        $fields['sum'] = DbHelper::buildSum($records, 'duration', 'h:m', 'factor');
+        $optionsHourtype = SProperty::optionsByScope('hourtype', $fields['hourtype'], 'all');
+        $optionsHourstate = SProperty::optionsByScope('hourstate', $fields['hourstate'], 'all');
+        $optionsHourstate2 = SProperty::optionsByScope('hourstate', $fields['hourstate2'], '-');
+        $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner'], __('all'));
+        $context = new ContextLaraKnife($request, $fields);
+        if ($request->btnSubmit === 'btnSet' && $fields['hourstate2'] != null) {
+            foreach ($records as &$record) {
+                $item = Hour::find($record->id);
+                $item->hourstate_scope = $fields['hourstate2'];
+                $item->save();
+            }
+            $rc = redirect('/hour-multiple');
+        } elseif ($request->btnSubmit === 'btnExport') {
+            $filename = ExportHelperLocal::exportHoursAsCsv($records);
+            $rc = response()->download($filename);
+        } else {
+            $rc = view('hour.multiple', [
+                'context' => $context,
+                'records' => $records,
+                'optionsHourtype' => $optionsHourtype,
+                'optionsHourstate' => $optionsHourstate,
+                'optionsHourstate2' => $optionsHourstate2,
+                'optionsOwner' => $optionsOwner,
+                'pagination' => $pagination
+            ]);
+        }
+        return $rc;
+    }
+    /**
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
@@ -165,7 +240,8 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             'hourstate_scope' => 'required',
             'description' => '',
             'owner_id' => 'required',
-            'factor' => 'integer'
+            'factor' => 'integer',
+            'interested' => ''
         ];
         return $rc;
     }
@@ -173,6 +249,8 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
     {
         Route::get('/hour-index', [HourController::class, 'index'])->middleware('auth');
         Route::post('/hour-index', [HourController::class, 'index'])->middleware('auth');
+        Route::get('/hour-multiple', [HourController::class, 'multiple'])->middleware('auth');
+        Route::post('/hour-multiple', [HourController::class, 'multiple'])->middleware('auth');
         Route::get('/hour-create', [HourController::class, 'create'])->middleware('auth');
         Route::put('/hour-store', [HourController::class, 'store'])->middleware('auth');
         Route::post('/hour-edit/{hour}', [HourController::class, 'edit'])->middleware('auth');
@@ -216,7 +294,7 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             if ($start != null) {
                 $fields['time'] .= ' ' . $fields['start'];
             }
-            if ($start != null && ($end = DateTimeHelper::timeToMinutes($fields['end'])) != null) {    
+            if ($start != null && ($end = DateTimeHelper::timeToMinutes($fields['end'])) != null) {
                 $fields['duration'] = $end - $start;
             }
             $validator = Validator::make($fields, $this->rules(true));
@@ -225,6 +303,9 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             } else {
                 $validated = $validator->validated();
                 $validated['description'] = strip_tags($validated['description']);
+                if ($validated['interested'] == 0) {
+                    $validated['interested'] = null;
+                }
                 Hour::create($validated);
             }
         }
@@ -247,6 +328,9 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             } else {
                 $validated = $validator->validated();
                 $validated['description'] = strip_tags($validated['description']);
+                if ($validated['interested'] == 0) {
+                    $validated['interested'] = null;
+                }
                 $hour->update($validated);
             }
         }

@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.11.12 Hours
+- development.md: modify example
+- Hour: new attribute "interested" 
+- Hour: new page "multiple"
+- HourController: new multiple(), handling of "interested"
+
 # 0.11.11 Person (Addresses), combobox setting on error
 
 - Person:

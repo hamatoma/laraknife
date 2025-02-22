@@ -20,5 +20,6 @@ class Hour extends Model
         'description',
         'owner_id',
         'factor',
+        'interested',
     ];
 }

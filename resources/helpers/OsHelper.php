@@ -18,7 +18,7 @@ class OsHelper
     }
     /**
      * Join two parts of a full filename independent of the platform.
-     * @param string|NULL $directory if NULL it is ignored otherwise: the first part of the result
+     * @param string|null $directory if null it is ignored otherwise: the first part of the result
      * @param string $file the second part of the result
      * @return string the combination of $directory and $file
      */
@@ -37,9 +37,9 @@ class OsHelper
     }
 /**
      * Join many parts of a full filename independent of the platform.
-     * @param string|NULL $directory if NULL it is ignored otherwise: the first part of the result
+     * @param string|null $directory if null it is ignored otherwise: the first part of the result
      * @param array $node a list of parts of the result
-     * @return string|NULL an optional additional part
+     * @return string|null an optional additional part
      * @return string the combinations of the $nodes and $file
      */
     public static function joinPaths(array $nodes, ?string $file = null): string

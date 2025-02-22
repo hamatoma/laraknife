@@ -20,6 +20,7 @@
             <th sortId="time">{{__('Time')}}</th>
             <th sortId="duration" class="lkn-align-right">{{__('Duration')}}</th>
             <th sortId="factor" class="lkn-align-right">{{__('Factor')}}</th>
+            <th sortId="interested" class="lkn-align-right">{{__('Interested')}}</th>
             <th sortId="hourtype">{{__('Hourtype')}}</th>
             <th sortId="hourstate">{{__('Hourstate')}}</th>
             <th sortId="description">{{__('Description')}}</th>
@@ -34,6 +35,7 @@
               <td>{{$context->asDateString($hour->time)}}</td>
               <td class="lkn-align-right">{{$context->asDuration($hour->duration)}}</td>
               <td class="lkn-align-right">{{$hour->factor}}</td>
+              <td class="lkn-align-right">{{$hour->interested}}</td>
               <td> {{ __($hour->hourtype) }}</td>
               <td> {{ __($hour->hourstate) }}</td>
               <td>{{$hour->description}}</td>

@@ -15,6 +15,13 @@ Schema::create('devices', function (Blueprint $table) {
             $table->foreignId('owner_id')->nullable()->references('id')->on('users');
         });
 ```
+## Modify Example
+```
+       Schema::table('hours', function (Blueprint $table) {
+            $table->integer('factor')->nullable();
+        });
+```
+
 ## Creation of Source Code
 ```
 php artisan migrate
