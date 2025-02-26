@@ -1,5 +1,10 @@
 # Development phase
 
+# 0.11.14 HourController
+- HourController:
+  - index() + multiple(): removing "else" from (count($fields) == 0)
+- DateTimeHelper:
+  - new: dBDateTimeToDateTime() and dateTimeToString()
 
 # 0.11.13 Hours
 - new *_modify_hours_interested.php

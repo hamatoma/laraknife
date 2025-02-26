@@ -131,15 +131,14 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
                     'text' => '',
                     '_sortParams' => 'time:desc'
                 ];
-            } else {
-                $conditions = [];
-                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourtype_scope', 'hourtype');
-                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourstate_scope', 'hourstate');
-                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
-                ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'until', 'time');
-                ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description', 'text');
-                $sql = DbHelper::addConditions($sql, $conditions);
             }
+            $conditions = [];
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourtype_scope', 'hourtype');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourstate_scope', 'hourstate');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
+            ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'until', 'time');
+            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description', 'text');
+            $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
@@ -184,17 +183,16 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
                 'from' => '',
                 'until' => '',
                 'text' => '',
-                '_sortParams' => 'time:desc'
+                '_sortParams' => 'time:desc,t0.id:desc'
             ];
-        } else {
-            $conditions = [];
-            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourtype_scope', 'hourtype');
-            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourstate_scope', 'hourstate');
-            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
-            ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'until', 'time');
-            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description', 'text');
-            $sql = DbHelper::addConditions($sql, $conditions);
         }
+        $conditions = [];
+        ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourtype_scope', 'hourtype');
+        ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'hourstate_scope', 'hourstate');
+        ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'owner_id', 'owner');
+        ViewHelper::addConditionDateTimeRange($fields, $conditions, $parameters, 'from', 'until', 'time');
+        ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'description', 'text');
+        $sql = DbHelper::addConditions($sql, $conditions);
         $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
         $pagination = new Pagination($sql, $parameters, $fields);
         $records = $pagination->records;

@@ -4,6 +4,35 @@ namespace App\Helpers;
 class DateTimeHelper
 {
     /**
+     * Converts a date string in the format YYYY-MM-DD to a DateTime object.
+     * @param string|null $dbDateTime
+     * @return bool|\DateTime|null
+     */
+    public static function dBDateTimeToDateTime(?string $dbDateTime): ?\DateTime
+    {
+        $rc = null;
+        if ($dbDateTime != null) {
+            $rc = \DateTime::createFromFormat('Y-m-d H:i:s', $dbDateTime);
+        }
+        return $rc;
+    }
+    /**
+     * Converts a DateTime object to a string.
+     * @param mixed $dateTime the DateTime object to convert
+     * @param bool $withTime if TRUE the time is included in the string (default: TRUE)
+     * @param bool $withSeconds if TRUE the seconds are included in the time (default: FALSE)
+     * @return string|null
+     */
+    public static function dateTimeToString(?\DateTime $dateTime, bool $withTime = true, bool $withSeconds = False): ?string
+    {
+        $rc = null;
+        if ($dateTime != null) {
+            $format = $withTime ? ($withSeconds ? 'Y-m-d H:i:s' : 'Y-m-d H:i') : 'd.m.Y';
+            $rc = $dateTime->format($format);
+        }
+        return $rc;
+    }
+    /**
      * Returns the first day of the given year.
      * @param null|int $year the year to respect. If NULL the current year is taken
      * @return \DateTime the first day of the year
