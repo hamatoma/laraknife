@@ -29,4 +29,16 @@ class Page extends Model
         'next_id',
         'owner_id'
     ];
+    public static function byId(int $id): ?Page{
+        $page = Page::find($id);
+        return $page;
+    }
+    public static function byNameAndType(string $name, int $pageType): mixed{
+        $page = Page::where([['name', '=', $name], ['pagetype_scope', '=', $pageType]])->first();
+        return $page;
+    }
+    public static function byTitle(string $title): mixed{
+        $page = Page::where('title', '=', $title)->first();
+        return $page;
+    }
 }

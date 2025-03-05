@@ -80,7 +80,7 @@ class File extends Model
     /**
      * Returns the filename with the relative path (from document root) of a file.
      * @param int $fileId the primary key
-     * @return NULL|string the filename
+     * @return null|string the filename
      */
     public static function relativeFileLink(int $fileId): ?string
     {

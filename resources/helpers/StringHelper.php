@@ -141,7 +141,8 @@ class StringHelper
         if ($text == null) {
             $rc = '';
         } else {
-            $rc = preg_replace(['/[^\w.+-]+/', '/__+/'], ['_', '_'], $text);
+            $rc = str_replace(['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß' ], ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss'], $text);
+            $rc = preg_replace(['/[^\w.+-]+/', '/__+/'], ['_', '_'], $rc);
             if ($maxLength != null && strlen($rc) > $maxLength) {
                 $rc = substr($rc, $maxLength);
             }

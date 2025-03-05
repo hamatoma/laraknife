@@ -103,9 +103,9 @@ class ViewHelper
         }
         if ($value === null) {
             if ($operator === '=') {
-                array_push($conditions, "$column IS NULL");
+                array_push($conditions, "$column IS null");
             } else {
-                array_push($conditions, "$column IS NOT NULL");
+                array_push($conditions, "$column IS NOT null");
             }
         } else {
             $condition = gettype($value) === 'string' ? "$column$operator'$value'" : "$column$operator$value";
@@ -290,9 +290,9 @@ class ViewHelper
      * Builds the HTML text of the entries ("options") of a combobox ("selection").
      * 
      * @param array $texts the list with then texts of the entries
-     * @param NULL|array $value null: $texts is used. Otherwise the list with the values of the entries
+     * @param null|array $value null: $texts is used. Otherwise the list with the values of the entries
      * @param string $selected '' or the value of the selected entry (from the request)
-     * @param NULL|string $textUndefined null: no additional entry.
+     * @param null|string $textUndefined null: no additional entry.
      *   Otherwise: an entry is added as first entry with that text and the value ''
      * @return array a list of combobox entries, e.g. [['text' => 'x', 'value' => 'y', 'active' => false], ...]
      */
@@ -366,7 +366,7 @@ class ViewHelper
      * Extracts the number of a numbered button.
      * @param array $fields the form fields
      * @param string $name the name of the numbered button
-     * @return int|NULL NULL: no button found. Otherwise: the number of the button
+     * @return int|null null: no button found. Otherwise: the number of the button
      */
     public static function numberOfButton(array $fields, string $name): ?int
     {

@@ -1,5 +1,20 @@
 # Development phase
 
+# 0.11.15 MediaWikiBase StringHelper Page PageController
+- MediaWikiBase:
+  - writeInternalLink(): new syntax: [[page:xxx|title]] and [[page title|linktext]] 
+  - wirteInternalLink(): $text may be null
+  - writeText(): pattern of [[link]]: link text is optional
+- StringHelper:
+  - textToUrl(): replacement of 'ä' to 'ae' ...
+- Page:
+  - new: byId(), byNameAndType(),byTitle() 
+  - create.blade: "columns" removed
+- PageController:
+  - create(): automatic creation: there may be a field "title2"
+  - new: linkOfPageCreation()
+  - routes(): recognition of /page-showbyid/{page}
+
 # 0.11.14 HourController
 - HourController:
   - index() + multiple(): removing "else" from (count($fields) == 0)

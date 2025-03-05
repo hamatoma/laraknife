@@ -55,7 +55,8 @@ class PageController extends Controller
             $rc = redirect('/page-index');
         } else {
             $fields = $request->all();
-            if (count($fields) === 0) {
+            if (count($fields) < 5) {
+                $oldFields = $fields;
                 $fields = [
                     'title' => '',
                     'name' => '',
@@ -68,6 +69,11 @@ class PageController extends Controller
                     'columns' => '1',
                     'audio_id' => '',
                 ];
+                if (array_key_exists('title2', $oldFields)){
+                    $fields['title'] = urldecode($oldFields['title2']);
+                    $fields['pagetype_scope'] = '1144';
+                    $fields['name'] = StringHelper::textToUrl($fields['title']);
+                }
             }
             $optionsPagetype = SProperty::optionsByScope('pagetype', $fields['pagetype_scope'], '-');
             $optionsMarkup = SProperty::optionsByScope('markup', $fields['markup_scope'], '-');
@@ -329,6 +335,17 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         return $rc;
     }
     /**
+     * Returns a link to the page creation with a given title.
+     * @param string $title the title of the page to be created.
+     * @return string e.g. '/page-create?title2=HelpMe'
+     */
+    public static function linkOfPageCreation(string $title){
+        $title2 = urlencode($title);
+        $rc = "/page-create?title2=$title2";
+        return $rc;
+    }
+
+    /**
      * Returns the validation rules.
      * @return array<string, string> The validation rules.
      */
@@ -360,6 +377,8 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         Route::get('/page-edit/{page}', [PageController::class, 'edit'])->middleware('auth');
         Route::get('/page-show/{page}/delete', [PageController::class, 'show'])->middleware('auth');
         Route::delete('/page-show/{page}/delete', [PageController::class, 'destroy'])->middleware('auth');
+        Route::get('/page-showbyid/{page}', [PageController::class, 'showPretty'])->middleware('auth');
+        Route::post('/page-showbyid/{page}', [PageController::class, 'showPretty'])->middleware('auth');
         Route::get('/page-showpretty/{page}', [PageController::class, 'showPretty'])->middleware('auth');
         Route::post('/page-showpretty/{page}', [PageController::class, 'showPretty'])->middleware('auth');
         Route::get('/page-showmenu/{title}', [PageController::class, 'showMenu'])->middleware('auth');
@@ -433,7 +452,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
     }
     public function showByName(string $name, int $pageType, Request $request)
     {
-        $page = Page::where(['name' => $name, 'pagetype_scope' => $pageType])->first();
+        $page = Page::byNameAndType($name, $pageType);
         if ($page == null) {
             $context = new ContextLaraKnife($request, ['text' => "invalid reference: $name $pageType"]);
             $rc = view('page.unknown', [
@@ -465,7 +484,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
     public function showUserPage(Request $request)
     {
         $name = 'user.' . strval(auth()->id());
-        $page = Page::where(['name' => $name, 'pagetype_scope' => 1141])->first();
+        $page = Page::byNameAndType($name, 1141);
         if ($page == null) {
             $rc = $this->showByName('main', 1141, $request);
         } else {
