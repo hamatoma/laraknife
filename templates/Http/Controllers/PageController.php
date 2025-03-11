@@ -69,7 +69,7 @@ class PageController extends Controller
                     'columns' => '1',
                     'audio_id' => '',
                 ];
-                if (array_key_exists('title2', $oldFields)){
+                if (array_key_exists('title2', $oldFields)) {
                     $fields['title'] = urldecode($oldFields['title2']);
                     $fields['pagetype_scope'] = '1144';
                     $fields['name'] = StringHelper::textToUrl($fields['title']);
@@ -265,7 +265,7 @@ $sep
         if ($request->btnSubmit === 'btnDelete') {
             $page->delete();
             Change::createFromModel($page, Change::$DELETE, 'Page');
-         }
+        }
         return redirect('/page-index');
     }
     /**
@@ -339,7 +339,8 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
      * @param string $title the title of the page to be created.
      * @return string e.g. '/page-create?title2=HelpMe'
      */
-    public static function linkOfPageCreation(string $title){
+    public static function linkOfPageCreation(string $title)
+    {
         $title2 = urlencode($title);
         $rc = "/page-create?title2=$title2";
         return $rc;
@@ -384,8 +385,11 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         Route::get('/page-showmenu/{title}', [PageController::class, 'showMenu'])->middleware('auth');
         Route::get('/page-showhelp/{title}', [PageController::class, 'showHelp'])->middleware('auth');
         Route::get('/page-showbyname/{name}/{pageType}', [PageController::class, 'showByName'])->middleware('auth');
-        Route::get('/page-startpage', [PageController::class, 'showStartPage']);
+        Route::get('/page-startpage', [PageController::class, 'showStartMenu']);
+        Route::get('/page-startpublic', [PageController::class, 'showPublicMenu']);
         Route::get('/page-userpage', [PageController::class, 'showUserPage'])->middleware('auth');
+        Route::get('/page-showpublic/{page}', [PageController::class, 'showPretty']);
+        Route::post('/page-showpublic/{page}', [PageController::class, 'showPretty']);
     }
     /**
      * Display the specified resource.
@@ -418,11 +422,19 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
             $params = ['audio' => $audio];
             switch ($page->pagetype_scope) {
                 case 1144: /* wiki */
+                case 1145: /* wiki-encrypted */
+                case 1146: /* wiki-public */
                     $view = 'page.showwiki';
                     $params["text"] = $this->asHtml($page);
                     $params["title"] = $page->title;
                     break;
-                default:
+                case 1143: /* info */
+                case 1147: /* info-public */
+                    $view = 'page.showcol1';
+                    $params["text"] = $this->asHtml($page);
+                    $params["title"] = $page->title;
+                    break;
+               default:
                     $columns = 1 + substr_count($textRaw, "\n---- %col%");
                     if ($columns <= 1) {
                         $params["text1"] = $this->asHtml($page);
@@ -475,9 +487,14 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         return $rc;
     }
 
-    public function showStartPage(Request $request)
+    public function showStartMenu(Request $request)
     {
         $rc = $this->showByName('main', 1141, $request);
+        return $rc;
+    }
+    public function showPublicMenu(Request $request)
+    {
+        $rc = $this->showByName('public', 1141, $request);
         return $rc;
     }
 

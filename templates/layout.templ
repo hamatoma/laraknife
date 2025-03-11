@@ -25,16 +25,20 @@
             <div id="navbarTop" class="collapse navbar-collapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/page-showmenu/main">Start</a>
+                        @auth
+                        <a class="nav-link" href="/page-startpage">Start</a>
+                        @else
+                        <a class="nav-link" href="/page-startpublic">Start</a>
+                        @endauth
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="/menuitem-menu_main">Verwaltung</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="/public/doc/Impressum.pdf" target="_blank">{{ __('Imprint') }}</a>
+                        <a class="nav-link" href="/page-showbyname/imprint/1141">{{ __('Imprint') }}</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="/public/doc/Datenschutz.pdf" target="_blank">{{ __('Privacy') }}</a>
+                        <a class="nav-link" href="/page-showbyname/privacy/1141">{{ __('Privacy') }}</a>
                     </li>
                 </ul>
                 <ul id="lkn-navbar-right" class="navbar-nav mr-auto lkn-logout">

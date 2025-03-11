@@ -122,7 +122,7 @@ class UserController extends Controller
                     'email' => $user->info,
                     'localization' => $user->localization,
                     'role' => $user->role
-                    ];
+                ];
             }
             $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $user->role_id, '');
             $localizationOptions = SProperty::optionsByScope('localization', $user->localization, '', 'name', 'shortname');
@@ -155,7 +155,7 @@ class UserController extends Controller
     public function editPassword(User $user, Request $request, ?string $redirect = null)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            if ($redirect == null || ! $user->isAdmin()){
+            if ($redirect == null || !$user->isAdmin()) {
                 $redirect = '/menuitem-menu_main';
             }
             $rc = redirect($redirect);
@@ -251,28 +251,33 @@ class UserController extends Controller
         if ($request->btnSubmit === 'btnNew') {
             $rc = redirect('/user-create');
         } else {
-            $sql = 'SELECT t0.*, t1.name as role FROM users t0 LEFT JOIN roles t1 on t0.role_id=t1.id ';
-            $parameters = [];
-            $fields = $request->all();
-            if (count($fields) == 0) {
-                $fields = ['id' => '', 'text' => '', 'role' => '', '_sortParams' => 'id:asc'];
+            $user = Auth::user();
+            if ($user == null || !$user->isAdmin()) {
+                $rc = redirect('/menuitem-menu_main');
+            } else {
+                $sql = 'SELECT t0.*, t1.name as role FROM users t0 LEFT JOIN roles t1 on t0.role_id=t1.id ';
+                $parameters = [];
+                $fields = $request->all();
+                if (count($fields) == 0) {
+                    $fields = ['id' => '', 'text' => '', 'role' => '', '_sortParams' => 'id:asc'];
+                }
+                $conditions = [];
+                $parameters = [];
+                ViewHelper::addConditionComparison($fields, $conditions, $parameters, 't0.role_id', 'role');
+                ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.name,email', 'text');
+                $sql = DbHelper::addConditions($sql, $conditions);
+                $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
+                $pagination = new Pagination($sql, $parameters, $fields);
+                $records = $pagination->records;
+                $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role']);
+                $context = new ContextLaraKnife($request, $fields);
+                $rc = view('user.index', [
+                    'context' => $context,
+                    'records' => $records,
+                    'pagination' => $pagination,
+                    'roleOptions' => $options
+                ]);
             }
-            $conditions = [];
-            $parameters = [];
-            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 't0.role_id', 'role');
-            ViewHelper::addConditionPattern($fields, $conditions, $parameters, 't0.name,email', 'text');
-            $sql = DbHelper::addConditions($sql, $conditions);
-            $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
-            $pagination = new Pagination($sql, $parameters, $fields);
-            $records = $pagination->records;
-            $options = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role']);
-            $context = new ContextLaraKnife($request, $fields);
-            $rc = view('user.index', [
-                'context' => $context,
-                'records' => $records,
-                'pagination' => $pagination,
-                'roleOptions' => $options
-            ]);
         }
         return $rc;
     }
@@ -463,7 +468,7 @@ class UserController extends Controller
                 if ($fields['localization'] !== App::getLocale()) {
                     App::setLocale($fields['localization']);
                 }
-                $validated['password'] = strval(rand()) . strval(time()) .  strval(rand());
+                $validated['password'] = strval(rand()) . strval(time()) . strval(rand());
                 $user = User::create($validated);
                 $rc = redirect("/user-editpassword/$user->id");
             }

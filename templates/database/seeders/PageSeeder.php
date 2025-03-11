@@ -28,6 +28,8 @@ class PageSeeder extends Seeder
         SProperty::insertIfNotExists(1143, 'pagetype', 'info', 30, 'I');
         SProperty::insertIfNotExists(1144, 'pagetype', 'wiki', 40, 'W');
         SProperty::insertIfNotExists(1145, 'pagetype', 'wiki-encrypted', 50, 'WE');
+        SProperty::insertIfNotExists(1146, 'pagetype', 'wiki-public', 60, 'WP');
+        SProperty::insertIfNotExists(1147, 'pagetype', 'info-public', 70, 'IP');
 
         DB::table('pages')->insert([
             'title' => 'Startmenu',

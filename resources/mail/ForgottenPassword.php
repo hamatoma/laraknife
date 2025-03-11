@@ -13,6 +13,7 @@ class ForgottenPassword extends Mailable
 {
     use Queueable, SerializesModels;
     private string $link;
+    private array $snippets;
     /**
      * Create a new message instance.
      */

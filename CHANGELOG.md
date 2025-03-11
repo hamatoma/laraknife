@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.11.16 UserController ForgottenPassword PageSeeder layout
+- ForgottenPassword: missing ForgottenPassword->snippets
+- layout.templ: public menu if not @auth
+- PageSeeder: +wiki-public +info-public
+- UserController: index(): redirect if not isAdmin()
+
 # 0.11.15 MediaWikiBase StringHelper Page PageController
 - MediaWikiBase:
   - writeInternalLink(): new syntax: [[page:xxx|title]] and [[page title|linktext]] 
