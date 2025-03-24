@@ -31,9 +31,11 @@
                         <a class="nav-link" href="/page-startpublic">Start</a>
                         @endauth
                     </li>
+                    @auth
                     <li class="nav-item active">
                         <a class="nav-link" href="/menuitem-menu_main">Verwaltung</a>
                     </li>
+                    @endauth
                     <li>
                         <a class="nav-link" href="/page-showbyname/imprint/1141">{{ __('Imprint') }}</a>
                     </li>
@@ -46,10 +48,14 @@
                     <li class="nav-item border rounded-3">
                         <a class="nav-link" href="/user-edit-current">{{ session('userName') }}</a>
                     </li>
-                    @endauth
                     <li class="nav-item border rounded-3">
                         <a class="nav-link" href="/user-logout">{{ __('Logout')  }}</a>
                     </li>
+                    @else
+                    <li class="nav-item border rounded-3">
+                        <a class="nav-link" href="/user-login">{{ __('Login')  }}</a>
+                    </li>
+                    @endauth
                 </ul>
            </div>                
         </nav>

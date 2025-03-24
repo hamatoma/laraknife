@@ -1,5 +1,16 @@
 # Development phase
 
+# 0.11.17 PageController laraknife-tool.sh layout.templ
+- new: file_into_file.py and User.insert.txt
+- laraknife-tool.sh:
+  - AdaptModules(): usage of file_into_file.py
+- PageController:
+  - showPretty() renamed to showById()
+  - showById() works in auth and guest mode
+- layout.templ
+  - non auth(): no "administration" menu item, "login" button field
+
+
 # 0.11.16 UserController ForgottenPassword PageSeeder layout
 - ForgottenPassword: missing ForgottenPassword->snippets
 - layout.templ: public menu if not @auth
@@ -9,7 +20,7 @@
 # 0.11.15 MediaWikiBase StringHelper Page PageController
 - MediaWikiBase:
   - writeInternalLink(): new syntax: [[page:xxx|title]] and [[page title|linktext]] 
-  - wirteInternalLink(): $text may be null
+  - writeInternalLink(): $text may be null
   - writeText(): pattern of [[link]]: link text is optional
 - StringHelper:
   - textToUrl(): replacement of 'ä' to 'ae' ...

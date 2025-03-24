@@ -1,0 +1,45 @@
+    /**
+     * Returns the role of the user.
+     * 
+     * @return Role the role of the user
+     */
+    protected function findRole()
+    {
+        if ($this->role == null){
+            $this->role = Role::find($this->role_id);
+        }
+        return $this->role;
+    }
+    /**
+     * Tests whether the user has a role with a priority less than or equal to the given priority.  The lower the priority, the more powerful the role.
+     * @param int $priority the priority to test against
+     * @return bool True if the user has a role with a priority less than or equal to the given priority, False otherwise
+     */
+    public function hasRole(int $priority): bool
+    {
+        $role = $this->findRole();
+        $rc = $this->role->priority <= $priority;
+        return $rc;
+    }
+    /**
+     * Tests whether the user is an admin.
+
+     * @return bool True if the user is an admin, False otherwise
+     */
+    public function isAdmin(): bool
+    {
+        $this->findRole();
+        $rc = $this->role->priority <= 19;
+        return $rc;
+    }
+    /**
+     * Tests whether the user is a guest (not logged in).
+
+     * @return bool True if the user is a guest
+     */
+    public static function isGuest(): bool
+    {
+        $rc = ! Auth::check();
+        return $rc;
+    }
+

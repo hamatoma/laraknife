@@ -38,7 +38,7 @@ class MediaWikiBase extends LayoutStatus
      *            the title of the article
      * @param string $text
      *            the text of the article. Used if creation is needed
-     * @return string the reference, e.g. "articleview?id=5"
+     * @return string the reference, e.g. "/page-showbyid/123"
      */
     function buildInternalLink(string $title, string $text = null): string
     {
@@ -414,7 +414,7 @@ class MediaWikiBase extends LayoutStatus
                 if ($text == null) {
                     $text = $page->title;
                 }
-                $link = "/page-showbyid?id=$page->id";
+                $link = "/page-showbyid/$page->id";
             }
         } else {
             if ($text == null) {

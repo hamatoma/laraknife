@@ -92,6 +92,7 @@ function ReplaceLinkDir(){
 # ===
 function AdaptModules(){
   local fn=app/Models/User.php
+  local fnReplacement=vendor/hamatoma/laraknife/templates/replacements/User.insert.txt
   found=$(grep role_id $fn)
   echo "== AdaptModules"
   if [ -n "$found" ]; then
@@ -100,8 +101,10 @@ function AdaptModules(){
     sed -i -e "s/\(fillable = .\)/\1#N#        'role_id',/" \
       -e "s/.password' =>.*//" \
       -e "s/\(hidden = .\)/\1#N#        'autologin',#N#        'endautologin',/" \
+      -e "s/^}/#INSERT_POINT#\n}/" \
       -e 's/#N#/\n/g' \
       $fn
+      larascript/file_in_file.py --marker="#INSERT_POINT#" $fn $fnReplacement
   fi
   grep -A5 fillable $fn
   fn=routes/web.php
@@ -121,7 +124,7 @@ function AdaptModules(){
       -e 's=\(Route::get(./home\)=# \1=' \
       -e 's/#N#/\n/g' \
       $fn
-    echo "= routes adapted:"
+    echo "= routes adapted"
   fi
   grep -A3 RoleController::routes $fn
 }

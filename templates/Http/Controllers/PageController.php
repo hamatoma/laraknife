@@ -6,6 +6,7 @@ use App\Models\File;
 use App\Models\Page;
 use App\Models\Change;
 use App\Models\Module;
+use App\Models\User;
 use App\Helpers\DbHelper;
 use App\Models\SProperty;
 use App\Helpers\MediaWiki;
@@ -199,7 +200,7 @@ $sep
     public function editWiki(Page $page, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
-            $rc = redirect('/page-showpretty/' . $page->id);
+            $rc = redirect('/page-showById/' . $page->id);
         } else {
             $fields = $request->all();
             if (count($fields) <= 3) {
@@ -378,18 +379,18 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         Route::get('/page-edit/{page}', [PageController::class, 'edit'])->middleware('auth');
         Route::get('/page-show/{page}/delete', [PageController::class, 'show'])->middleware('auth');
         Route::delete('/page-show/{page}/delete', [PageController::class, 'destroy'])->middleware('auth');
-        Route::get('/page-showbyid/{page}', [PageController::class, 'showPretty'])->middleware('auth');
-        Route::post('/page-showbyid/{page}', [PageController::class, 'showPretty'])->middleware('auth');
-        Route::get('/page-showpretty/{page}', [PageController::class, 'showPretty'])->middleware('auth');
-        Route::post('/page-showpretty/{page}', [PageController::class, 'showPretty'])->middleware('auth');
-        Route::get('/page-showmenu/{title}', [PageController::class, 'showMenu'])->middleware('auth');
-        Route::get('/page-showhelp/{title}', [PageController::class, 'showHelp'])->middleware('auth');
-        Route::get('/page-showbyname/{name}/{pageType}', [PageController::class, 'showByName'])->middleware('auth');
+        Route::get('/page-userpage', [PageController::class, 'showUserPage'])->middleware('auth');
+        Route::get('/page-showbyid/{page}', [PageController::class, 'showById']);
+        Route::post('/page-showbyid/{page}', [PageController::class, 'showById']);
+        Route::get('/page-showpretty/{page}', [PageController::class, 'showById']);
+        Route::post('/page-showpretty/{page}', [PageController::class, 'showById']);
+        Route::get('/page-showmenu/{title}', [PageController::class, 'showMenu']);
+        Route::get('/page-showhelp/{title}', [PageController::class, 'showHelp']);
+        Route::get('/page-showbyname/{name}/{pageType}', [PageController::class, 'showByName']);
         Route::get('/page-startpage', [PageController::class, 'showStartMenu']);
         Route::get('/page-startpublic', [PageController::class, 'showPublicMenu']);
-        Route::get('/page-userpage', [PageController::class, 'showUserPage'])->middleware('auth');
-        Route::get('/page-showpublic/{page}', [PageController::class, 'showPretty']);
-        Route::post('/page-showpublic/{page}', [PageController::class, 'showPretty']);
+        Route::get('/page-showpublic/{page}', [PageController::class, 'showById']);
+        Route::post('/page-showpublic/{page}', [PageController::class, 'showById']);
     }
     /**
      * Display the specified resource.
@@ -411,54 +412,65 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         }
         return $rc;
     }
-    public function showPretty(Page $page, Request $request)
+    public function showById(Page $page, Request $request)
     {
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect(to: '/page-index')->middleware('auth');
         } else {
+            $rc = null;
             $textRaw = $page->contents;
             $view = 'page.show-col1';
             $audio = $page->audio_id == null ? null : File::relativeFileLink($page->audio_id);
             $params = ['audio' => $audio];
-            switch ($page->pagetype_scope) {
-                case 1144: /* wiki */
-                case 1145: /* wiki-encrypted */
-                case 1146: /* wiki-public */
-                    $view = 'page.showwiki';
-                    $params["text"] = $this->asHtml($page);
-                    $params["title"] = $page->title;
-                    break;
-                case 1143: /* info */
-                case 1147: /* info-public */
-                    $view = 'page.showcol1';
-                    $params["text"] = $this->asHtml($page);
-                    $params["title"] = $page->title;
-                    break;
-               default:
-                    $columns = 1 + substr_count($textRaw, "\n---- %col%");
-                    if ($columns <= 1) {
-                        $params["text1"] = $this->asHtml($page);
-                    } else {
-                        $wiki = new MediaWiki();
-                        $parts = explode("\n---- %col%", $textRaw, 4);
-                        for ($no = 1; $no <= $columns; $no++) {
-                            $params["text$no"] = $wiki->toHtml($parts[$no - 1]);
+            if (
+                ($page->pagetype_scope != 1146 /* wiki-public */
+                    && $page->pagetype_scope != 1147 /* info-public */
+                    && ($page->pagetype_scope != 1141 /* menu */ || $page->name !== 'public')
+                )
+                && User::isGuest()
+            ) {
+                $rc = redirect('/user-login');
+            } else {
+                switch ($page->pagetype_scope) {
+                    case 1144: /* wiki */
+                    case 1145: /* wiki-encrypted */
+                    case 1146: /* wiki-public */
+                        $view = 'page.showwiki';
+                        $params["text"] = $this->asHtml($page);
+                        $params["title"] = $page->title;
+                        break;
+                    case 1143: /* info */
+                    case 1147: /* info-public */
+                        $view = 'page.showcol1';
+                        $params["text"] = $this->asHtml($page);
+                        $params["title"] = $page->title;
+                        break;
+                    default:
+                        $columns = 1 + substr_count($textRaw, "\n---- %col%");
+                        if ($columns <= 1) {
+                            $params["text1"] = $this->asHtml($page);
+                        } else {
+                            $wiki = new MediaWiki();
+                            $parts = explode("\n---- %col%", $textRaw, 4);
+                            for ($no = 1; $no <= $columns; $no++) {
+                                $params["text$no"] = $wiki->toHtml($parts[$no - 1]);
+                            }
+                            $view = "page.show-col$columns";
                         }
-                        $view = "page.show-col$columns";
-                    }
-                    break;
+                        break;
+                }
+                if ($page->previous_id != null) {
+                    $params['prev'] = "/page-showById/$page->previous_id";
+                }
+                if ($page->next_id != null) {
+                    $params['next'] = "/page-showById/$page->next_id";
+                }
+                if ($page->up_id != null) {
+                    $params['up'] = "/page-showById/$page->up_id";
+                }
+                $context = new ContextLaraKnife($request, $params, $page);
+                $rc = view($view, ['context' => $context]);
             }
-            if ($page->previous_id != null) {
-                $params['prev'] = "/page-showpretty/$page->previous_id";
-            }
-            if ($page->next_id != null) {
-                $params['next'] = "/page-showpretty/$page->next_id";
-            }
-            if ($page->up_id != null) {
-                $params['up'] = "/page-showpretty/$page->up_id";
-            }
-            $context = new ContextLaraKnife($request, $params, $page);
-            $rc = view($view, ['context' => $context]);
         }
         return $rc;
     }
@@ -471,7 +483,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
                 'context' => $context,
             ]);
         } else {
-            $rc = $this->showPretty($page, $request);
+            $rc = $this->showById($page, $request);
         }
         return $rc;
     }
@@ -505,7 +517,7 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         if ($page == null) {
             $rc = $this->showByName('main', 1141, $request);
         } else {
-            $rc = $this->showPretty($page, $request);
+            $rc = $this->showById($page, $request);
         }
         return $rc;
     }
