@@ -1,5 +1,8 @@
 # Development phase
 
+# 0.11.18
+- MediaWikiBase: writeInternalLink(): null check
+
 # 0.11.17 PageController laraknife-tool.sh layout.templ
 - new: file_into_file.py and User.insert.txt
 - laraknife-tool.sh:

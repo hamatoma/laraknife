@@ -402,7 +402,7 @@ class MediaWikiBase extends LayoutStatus
         } elseif (strpos($link, '/') === false) {
             $title = $this->encodeWikiName($link);
             $page = Page::byTitle($link);
-            if ($text == null) {
+            if ($text == null && $page != null) {
                 $text = $page->title;
             }
             if ($page == null) {
