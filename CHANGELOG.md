@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.11.19 FileHelper
+- FileHelper:
+  - new: baseDirectory() documentRoot()
+
 # 0.11.18
 - MediaWikiBase: writeInternalLink(): null check
 

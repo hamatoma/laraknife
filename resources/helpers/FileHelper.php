@@ -5,6 +5,23 @@ use Illuminate\Http\Request;
 
 class FileHelper
 {
+    static public $documentRoot = null;
+    static public $baseDirectory = null;
+    /**
+     * Returns the directory where the application is installed.
+     * @return string the directory, e.g. '/srv/www/piman'
+     */
+    static public function baseDirectory(): string
+    {
+        if (FileHelper::$baseDirectory == null) {
+            FileHelper::$baseDirectory = str_replace(
+                '/public',
+                '',
+                FileHelper::$documentRoot ?? $_SERVER['DOCUMENT_ROOT']
+            );
+        }
+        return FileHelper::$baseDirectory;
+    }
     /**
      * Builds a filename as two instances: an URL and a real filename.
      * 
@@ -17,7 +34,7 @@ class FileHelper
     public static function buildExportName(string $name, string $extension, bool $unique = true): string
     {
         $user = auth()->user()->name;
-        $rc = $_SERVER['DOCUMENT_ROOT'] . "/export/$user.$name";
+        $rc = FileHelper::documentRoot() . "/export/$user.$name";
         if ($unique) {
             $rc .= '_' . strval(time() % 86400);
         }
@@ -63,6 +80,17 @@ class FileHelper
             $text
         );
         return $rc;
+    }
+    /**
+     * Returns the document root of the web server.
+     * @return string the document root, e.g. '/srv/www/piman/public'
+     */
+    static public function documentRoot(): string
+    {
+        if (FileHelper::$documentRoot == null) {
+            FileHelper::$documentRoot = $_SERVER['DOCUMENT_ROOT'];
+        }
+        return FileHelper::$documentRoot;
     }
     public static function encodeUrl(string $text): string
     {
