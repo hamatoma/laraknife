@@ -48,7 +48,7 @@ class NoteController extends Controller
             $optionsCategory = SProperty::optionsByScope('category', $fields['category_scope'], '-');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $fields['notestatus_scope'], '-');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('note.create', [
                 'context' => $context,
@@ -78,7 +78,7 @@ class NoteController extends Controller
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('note.create_document', [
                 'context' => $context,
@@ -114,7 +114,7 @@ class NoteController extends Controller
             $optionsCategory = SProperty::optionsByScope('category', $note->category_scope, '');
             $optionsNotestatus = SProperty::optionsByScope('notestatus', $note->notestatus_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, '-');
             $optionsGroup = Group::combobox($note->group_id, __('<no group>'));
             $context = new ContextLaraKnife($request, null, $note);
             $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 1, $note->id, $note->options, $note->reference_id);
@@ -148,7 +148,7 @@ class NoteController extends Controller
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
             $context = new ContextLaraKnife($request, null, $file);
             $rc = view('note.edit_document', [
                 'context' => $context,
@@ -197,8 +197,8 @@ class NoteController extends Controller
                     }
                 }
             }
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, __('<Please select>'));
-            $optionsRecipients = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['recipients'], __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $note->owner_id, '-');
+            $optionsRecipients = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['recipients'], '-');
             $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('note-edit', 3, $note->id, $note->options, $note->reference_id);
             $context = new ContextLaraKnife($request, null, $note);
             $rc = view('note.edit_shift', [
@@ -420,7 +420,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         } else {
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
             $context = new ContextLaraKnife($request, null, $file);
             $rc = view('note.show_document', [
                 'context' => $context,

@@ -91,7 +91,7 @@ class UserController extends Controller
                     'localization' => 'de_DE'
                 ];
             }
-            $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], __('<Please select>'));
+            $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role_id'], '-');
             $localizationOptions = SProperty::optionsByScope('localization', $fields['localization'], '', 'name', 'shortname');
 
             $context = new ContextLaraKnife($request, $fields);

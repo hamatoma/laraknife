@@ -47,7 +47,7 @@ class TransactionController extends Controller
             }
             $optionsTransactiontype = SProperty::optionsByScope('transactiontype', $fields['transactiontype_scope'], '-');
             $optionsTransactionstate = SProperty::optionsByScope('transactionstate', $fields['transactionstate_scope'], '-');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $fields['account_id'] = $account->id;
             $fields['account'] = $account->name;
             $fields['mandator'] = Mandator::find($account->mandator_id)->name;
@@ -81,7 +81,7 @@ class TransactionController extends Controller
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $id = $transaction->account_id;
             $account = Account::find($id);
             $fields['account_id'] = $account->id;
@@ -171,7 +171,7 @@ class TransactionController extends Controller
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
             $id = $transaction->account_id;
             $account = Account::find($id);
             $fields['account_id'] = $account->id;
@@ -211,7 +211,7 @@ class TransactionController extends Controller
                     $this->sendEmail($transaction->owner_id, $transaction);
                 }
             }
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $transaction->owner_id, __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $transaction->owner_id, '-');
             $account = Account::find($accountId = $transaction->account_id);
             $fields['account_id'] = $account->id;
             $fields['account'] = $account->name;
@@ -287,7 +287,7 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
             $fields['sum'] = DbHelper::buildSum($records, 'amount');
             $optionsTransactiontype = SProperty::optionsByScope('transactiontype', $fields['transactiontype'], 'all');
             $optionsTransactionstate = SProperty::optionsByScope('transactionstate', $fields['transactionstate'], 'all');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner'], __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner'], '-');
             $fields['account_id'] = $account->id;
             $mandator = Mandator::find($account->mandator_id);
             $fields['mandator'] = $mandator->name;
@@ -408,9 +408,9 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             $fields = $request->all();
             $optionsTransactiontype = SProperty::optionsByScope('transactiontype', $transaction->transactiontype_scope, '');
             $optionsTransactionstate = SProperty::optionsByScope('transactionstate', $transaction->transactionstate_scope, '');
-            $optionsAccount = DbHelper::comboboxDataOfTable('accounts', 'name', 'id', $fields['account_id'], __('<Please select>'));
-            $optionsTwin = DbHelper::comboboxDataOfTable('transactions', 'name', 'id', $fields['twin_id'], __('<Please select>'));
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsAccount = DbHelper::comboboxDataOfTable('accounts', 'name', 'id', $fields['account_id'], '-');
+            $optionsTwin = DbHelper::comboboxDataOfTable('transactions', 'name', 'id', $fields['twin_id'], '-');
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $context = new ContextLaraKnife($request, null, $transaction);
             $rc = view('transaction.show', [
                 'context' => $context,

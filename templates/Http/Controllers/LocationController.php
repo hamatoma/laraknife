@@ -38,7 +38,7 @@ class LocationController extends Controller
                     'priority' => 10
                 ];
             }
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], '-');
             $context = new ContextLaraKnife($request, $fields);     
             $rc = view('location.create', [
                 'context' => $context,
@@ -68,7 +68,7 @@ class LocationController extends Controller
                     'person_id' => $location->person_id
                     ];
             }
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], '-');
             $context = new ContextLaraKnife($request, null, $location);
             $rc = view('location.edit', [
                 'context' => $context,
@@ -169,7 +169,7 @@ LEFT JOIN persons t1 ON t1.id=t0.person_id
         if ($request->btnSubmit === 'btnCancel') {
             $rc = redirect('/location-index')->middleware('auth');
         } else {
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $location->person_id, __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $location->person_id, '-');
             $context = new ContextLaraKnife($request, null, $location);
             $rc = view('location.show', [
                 'context' => $context,

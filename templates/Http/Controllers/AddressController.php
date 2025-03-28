@@ -36,7 +36,7 @@ class AddressController extends Controller
                 ];
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $fields['addresstype_scope'], '-');
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('address.create', [
                 'context' => $context,
@@ -65,7 +65,7 @@ class AddressController extends Controller
                 ];
             }
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $address->addresstype_scope, '');
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person_id'], '-');
             $context = new ContextLaraKnife($request, null, $address);
             $rc = view('address.edit', [
                 'context' => $context,
@@ -121,7 +121,7 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $fields['addresstype'], 'all');
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person'], __('all'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $fields['person'], 'all');
             $context = new ContextLaraKnife($request, $fields);
             return view('address.index', [
                 'context' => $context,
@@ -170,7 +170,7 @@ LEFT JOIN persons t2 ON t2.id=t0.person_id
             $fields = $request->all();
             $optionsAddresstype = SProperty::optionsByScope('addresstype', $address->addresstype_scope, '');
             $person = $address->person_id;
-            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $person, __('<Please select>'));
+            $optionsPerson = DbHelper::comboboxDataOfTable('persons', 'nickname', 'id', $person,'-');
             $context = new ContextLaraKnife($request, null, $address);
             $rc = view('address.show', [
                 'context' => $context,

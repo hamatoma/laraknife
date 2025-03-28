@@ -73,8 +73,8 @@ LEFT JOIN users t3 ON t3.id=t0.user_id
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $optionsChangetype = SProperty::optionsByScope('changetype', $fields['changetype'], 'all');
-            $optionsModule = DbHelper::comboboxDataOfTable('modules', 'name', 'id', $fields['module'], __('all'));
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user'], __('all'));
+            $optionsModule = DbHelper::comboboxDataOfTable('modules', 'name', 'id', $fields['module'], 'all');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user'], 'all');
             $context = new ContextLaraKnife($request, $fields);
             return view('change.index', [
                 'context' => $context,
@@ -134,8 +134,8 @@ LEFT JOIN users t3 ON t3.id=t0.user_id
             $rc = redirect('/change-index');
         } else {
             $optionsChangetype = SProperty::optionsByScope('changetype', $change->changetype_scope, '');
-            $optionsModule = DbHelper::comboboxDataOfTable('modules', 'name', 'id', $change->module_id, __('<Please select>'));
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $change->user_id, __('<Please select>'));
+            $optionsModule = DbHelper::comboboxDataOfTable('modules', 'name', 'id', $change->module_id, '-');
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $change->user_id, '-');
             $context = new ContextLaraKnife($request, null, $change);
             $rc = view('change.show', [
                 'context' => $context,

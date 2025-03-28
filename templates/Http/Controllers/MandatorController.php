@@ -34,7 +34,7 @@ class MandatorController extends Controller
                     'group_id' => ''
                 ];
             }
-            $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
+            $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('mandator.create', [
                 'context' => $context,
@@ -59,7 +59,7 @@ class MandatorController extends Controller
                     'group_id' => $mandator->group_id
                 ];
             }
-            $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
+            $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], '-');
             $navigationTabInfo = ViewHelperLocal::getNavigationTabInfo('mandator-edit', 1, $mandator->id);
             $context = new ContextLaraKnife($request, null, $mandator);
             $rc = view('mandator.edit', [
@@ -152,7 +152,7 @@ LEFT JOIN groups t1 ON t1.id=t0.group_id
             $rc = redirect('/mandator-index')->middleware('auth');
         } else {
             $fields = $request->all();
-            $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], __('<Please select>'));
+            $optionsGroup = DbHelper::comboboxDataOfTable('groups', 'name', 'id', $fields['group_id'], '-');
             $context = new ContextLaraKnife($request, null, $mandator);
             $rc = view('mandator.show', [
                 'context' => $context,

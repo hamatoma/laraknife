@@ -38,7 +38,7 @@ class TermController extends Controller
                 ];
             }
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('term.create', [
                 'context' => $context,
@@ -69,7 +69,7 @@ class TermController extends Controller
                 ];
             }
             $optionsVisibility = SProperty::optionsByScope('visibility', $term->visibility_scope, '');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $term->owner_id, __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $term->owner_id, '-');
             $context = new ContextLaraKnife($request, null, $term);
             $rc = view('term.edit', [
                 'context' => $context,
@@ -179,7 +179,7 @@ class TermController extends Controller
             $rc = redirect('/term-index')->middleware('auth');
         } else {
             $optionsVisibility = SProperty::optionsByScope('visibility', $term->visibility_scope, '');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $term->owner_id, __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $term->owner_id, '-');
             $context = new ContextLaraKnife($request, null, $term);
             $rc = view('term.show', [
                 'context' => $context,

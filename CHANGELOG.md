@@ -1,5 +1,12 @@
 # Development phase
 
+# 0.11.20 ContextLaraKnife
+- ContextLaraKnife: +urlStorage()
+- controller.templ: "<Please select>" replaced in DbHelper::comboboxDataOfTable()
+- most controllers: 
+  - "<Please select>" replaced in DbHelper::comboboxDataOfTable()
+  - "__('all')" replaced in DbHelper::comboboxDataOfTable()
+
 # 0.11.19 FileHelper
 - FileHelper:
   - new: baseDirectory() documentRoot()

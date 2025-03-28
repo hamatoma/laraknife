@@ -43,7 +43,7 @@ class HourController extends Controller
             }
             $optionsHourtype = SProperty::optionsByScope('hourtype', $fields['hourtype_scope'], '-');
             $optionsHourstate = SProperty::optionsByScope('hourstate', $fields['hourstate_scope'], '-');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['owner_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('hour.create', [
                 'context' => $context,
@@ -267,7 +267,7 @@ LEFT JOIN users t3 ON t3.id=t0.owner_id
         } else {
             $optionsHourtype = SProperty::optionsByScope('hourtype', $hour->hourtype_scope, '');
             $optionsHourstate = SProperty::optionsByScope('hourstate', $hour->hourstate_scope, '');
-            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $hour->owner_id, __('<Please select>'));
+            $optionsOwner = DbHelper::comboboxDataOfTable('users', 'name', 'id', $hour->owner_id, '-');
             $context = new ContextLaraKnife($request, null, $hour);
             $rc = view('hour.show', [
                 'context' => $context,

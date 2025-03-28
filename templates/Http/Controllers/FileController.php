@@ -53,7 +53,7 @@ class FileController extends Controller
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $fields['filegroup_scope'], '-');
             $optionsVisibility = SProperty::optionsByScope('visibility', $fields['visibility_scope'], '-');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['user_id'], '-');
             $context = new ContextLaraKnife($request, $fields);
             $rc = view('file.create', [
                 'context' => $context,
@@ -83,7 +83,7 @@ class FileController extends Controller
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
             $context = new ContextLaraKnife($request, null, $file);
             $rc = view('file.edit', [
                 'context' => $context,
@@ -222,7 +222,7 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
             $rc = redirect('/file-index');
         } else {
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
-            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, __('<Please select>'));
+            $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
             $context = new ContextLaraKnife($request, null, $file);
             $rc = view('file.show', [
                 'context' => $context,

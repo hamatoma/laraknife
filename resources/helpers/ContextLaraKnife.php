@@ -203,4 +203,9 @@ class ContextLaraKnife
     {
         $this->snippets[$key] = $value;
     }
+    public function urlStorage(): string
+    {
+        $rc = '/upload';
+        return $rc;
+    }
 }

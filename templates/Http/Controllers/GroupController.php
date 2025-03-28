@@ -76,7 +76,7 @@ class GroupController extends Controller
             }
             if ($rc == null){
                 $context = new ContextLaraKnife($request, $fields, $group);
-                 $optionsMember = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['member'], __('<Please select>'));
+                 $optionsMember = DbHelper::comboboxDataOfTable('users', 'name', 'id', $fields['member'], '-');
                 
                 $rc = view('group.edit', [
                     'context' => $context,
