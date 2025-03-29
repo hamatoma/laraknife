@@ -147,6 +147,14 @@ class FileHelper
         }
         return $rc;
     }
+    public static function pathUpload(?string $relativePath = null): string
+    {
+        $rc = storage_path() . '/app/public';
+        if ($relativePath !== null) {
+            $rc .= "/$relativePath";
+        }
+        return $rc;
+    }
     /**
      * Renames the uploaded file.
      * That is needed because the filename contains the primary key. This is known after storing the record.
@@ -202,6 +210,11 @@ class FileHelper
         if (empty($rc)) {
             $rc = '_';
         }
+        return $rc;
+    }
+    public static function urlUpload(?string $relativePath = null): string
+    {
+        $rc = $relativePath === null ? '/upload' : "/upload/$relativePath"; 
         return $rc;
     }
 }

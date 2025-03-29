@@ -1,5 +1,9 @@
 # Development phase
 
+# 0.11.21 ContextLaraKnife FileHelper
+- ContextLaraKnife: new: pathUpload() urlUpload()
+- FileHelper: new pathUpload() urlUpload()
+
 # 0.11.20 ContextLaraKnife
 - ContextLaraKnife: +urlStorage()
 - controller.templ: "<Please select>" replaced in DbHelper::comboboxDataOfTable()

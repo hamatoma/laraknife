@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Helpers\FileHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -124,23 +125,24 @@ class ContextLaraKnife
     {
         return $this->combobox;
     }
-    protected function findRole()
+    protected function findRole(): ?Role
     {
         if ($this->role == null) {
             $user = Auth::user();
             $this->role = Role::find($user->role_id);
         }
+        return $this->role;
     }
     public function hasRole(int $priority): bool
     {
-        $this->findRole();
-        $rc = $this->role->priority <= $priority;
+        $role = $this->findRole();
+        $rc = $role->priority <= $priority;
         return $rc;
     }
     public function isAdmin(): bool
     {
-        $this->findRole();
-        $rc = $this->role->priority <= 19;
+        $role = $this->findRole();
+        $rc = $role->priority <= 19;
         return $rc;
     }
     public function isAdminOrOwner(int $id = null): bool
@@ -149,6 +151,11 @@ class ContextLaraKnife
         if (!$rc && $id != null) {
             $rc = $id === auth()->user()->id;
         }
+        return $rc;
+    }
+    public function pathUpload(?string $relativePath = null): string
+    {
+        $rc = FileHelper::pathUpload($relativePath);
         return $rc;
     }
     public function readonlyUnlessOwner(int $id = null): string
@@ -203,9 +210,9 @@ class ContextLaraKnife
     {
         $this->snippets[$key] = $value;
     }
-    public function urlStorage(): string
+    public function urlUpload(?string $relativePath = null): string
     {
-        $rc = '/upload';
+        $rc = FileHelper::urlUpload($relativePath);
         return $rc;
     }
 }
