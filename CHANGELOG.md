@@ -1,5 +1,8 @@
 # Development phase
 
+# 0.11.22 link.blade
+- link.blade: no <a> construct on empty references
+
 # 0.11.21 ContextLaraKnife FileHelper
 - ContextLaraKnife: new: pathUpload() urlUpload()
 - FileHelper: new pathUpload() urlUpload()
