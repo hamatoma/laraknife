@@ -1,5 +1,8 @@
 # Development phase
 
+# 0.11.23 forgotten-answer.blade
+- forgotten-answer.blade: Syntax error
+
 # 0.11.22 link.blade
 - link.blade: no <a> construct on empty references
 
