@@ -208,8 +208,11 @@ class UserController extends Controller
                 $rc = back()->withErrors($validator)->withInput();
             } else {
                 $email = $fields['email'];
-                if (($link = $this->buildForgottenLink($email)) != null) {
-                    EmailHelper::sendMail('user.forgotten', $email, ['link' => $link]);
+                $user = User::where('email', $email);
+                if ($user != null && $user->count() > 0) {
+                    if (($link = $this->buildForgottenLink($email)) != null) {
+                        EmailHelper::sendMail('user.forgotten', $email, ['link' => $link]);
+                    }
                 }
                 $message = __('Email has been sent if the email address is known.');
             }

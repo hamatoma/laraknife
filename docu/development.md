@@ -44,7 +44,7 @@ public function run(): void
         Module::insertIfNotExists('Article');
     }
 ```
-
+- Aktivieren:
 ```
 php artisan db:seed --class=DeviceSeeder
 ```

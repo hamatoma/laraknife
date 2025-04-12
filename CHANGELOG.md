@@ -1,5 +1,16 @@
 # Development phase
 
+# 0.11.24 Title of note documents is optional
+
+- if not title is given the filename is taken in a modified kind
+- NoteController:
+  - storeDocument(): if title is empty it will be constructed from the filename
+  - updateDocument(): if title is empty it will be constructed from the filename
+- create_document: title moved behind filename
+- development.md: improvement
+- UserController: forgotten(): email is only sent if email exists in table users
+- File: new: filenameToText()
+
 # 0.11.23 forgotten-answer.blade
 - forgotten-answer.blade: Syntax error
 

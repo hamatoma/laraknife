@@ -468,6 +468,11 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            if ($fields['title'] == null){
+                $file = $request->file('file');
+                $name = empty($fields['filename']) ? $file->getClientOriginalName() : $fields['filename'];
+                $fields['title'] = File::filenameToText($name);
+            }
             $validator = Validator::make($fields, ['title' => 'required', 'filegroup_scope' => 'required', 'visibility_scope' => 'required']);
             if ($validator->fails()) {
                 $errors = $validator->errors();
@@ -508,7 +513,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             }
         }
         if ($rc == null) {
-            $rc = redirect('/note-index');
+            $rc = redirect(to: "/note-update/$note->id");
         }
         return $rc;
     }
@@ -517,12 +522,20 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            if ($fields['title'] == null || $fields['title'] === '') {
+                $name = $file->filename;
+                if ( ($ix = strpos($name, '_')) !== false) {
+                    $name = substr($name, $ix + 1);
+                }
+                $fields['title'] = File::filenameToText($name);
+            }
             $fields['description'] = strip_tags($fields['description']);
             $validator = Validator::make($fields, ['title' => 'required']);
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();
             } else {
-                $fields2 = $request->only(['title', 'description', 'filegroup_scope']);
+                $fields2 = ['title' => $fields['title'], 'description' => $fields['description'], 
+                    'filegroup_scope' => $fields['filegroup_scope'], 'visibility_scope' => $fields['visibility_scope']];
                 $file->update($fields2);
                 Change::createFromFields($fields2, Change::$UPDATE, 'File', $file->id);
             }

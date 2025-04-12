@@ -26,6 +26,17 @@ class File extends Model
         'reference_id'
     ];
     /**
+     * Converts a filename to a text string, e.g. a title.
+     * @param string $filename the filename to convert
+     * @return array|string|null the converted string. Example: "my_best_collection.pdf" -> "my best collection"
+     */
+    public static function filenameToText(string $filename): string
+    {
+        $filename = preg_replace('/\.[^.]+$/', '', $filename);
+        $rc = preg_replace('/[^a-zA-Z0-9]+/', ' ', $filename);
+        return $rc;
+    }
+    /**
      * Stores a record into the table files and return the id.
      * @param Request $request
      * @param string $title
