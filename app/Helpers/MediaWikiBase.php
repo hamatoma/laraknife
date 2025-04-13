@@ -366,8 +366,9 @@ class MediaWikiBase extends LayoutStatus
     function writeInternalLink(string $link, ?string $text)
     {
         $html = null;
-        if (str_starts_with($link, 'upload') && preg_match('/[.](jpe?g|png|gif|svg])$/i', $link)) {
+        if (preg_match('&^(upload|file):?/&', $link) && preg_match('/[.](jpe?g|png|gif|svg])$/i', $link)) {
             $link = preg_replace('&[\\/]\.\.[\/]&', '', $link);
+            $link = 'upload' . preg_replace('%^[^/]+%', '', $link);
             if ($text == null) {
                 $text = basename($link);
             } else {

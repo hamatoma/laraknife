@@ -149,7 +149,8 @@ class NoteController extends Controller
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
             $optionsVisibility = SProperty::optionsByScope('visibility', $file->visibility_scope, '');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
-            $context = new ContextLaraKnife($request, null, $file);
+            $fields['fullname'] = FileHelper::buildFileStoragePath($file->created_at) . "/$file->filename";
+            $context = new ContextLaraKnife($request, $fields, $file);
             $rc = view('note.edit_document', [
                 'context' => $context,
                 'optionsFilegroup' => $optionsFilegroup,
@@ -273,8 +274,7 @@ LEFT JOIN sproperties t4 ON t4.id=t0.visibility_scope
                 $fn = str_replace('*', '%', $fn);
                 $fn = str_replace('%%', '%', $fn);
                 ViewHelper::addConditionRawSql($conditions,
-                    "t0.id in (select reference_id from files t5 where t5.reference_id=t0.id and (t5.title like '$fn' or t5.description like '$fn' or t5.filename like '$fn'))",
-                    []);
+                    "t0.id in (select reference_id from files t5 where t5.reference_id=t0.id and (t5.title like '$fn' or t5.description like '$fn' or t5.filename like '$fn'))");
             }
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);

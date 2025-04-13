@@ -77,14 +77,15 @@ class FileController extends Controller
                 $fields = [
                     'title' => '',
                     'description' => '',
-                    'filename' => '',
+                    'fullname' => '',
                     'filegroup_scope' => '',
                     'user_id' => ''
                 ];
             }
             $optionsFilegroup = SProperty::optionsByScope('filegroup', $file->filegroup_scope, '');
             $optionsUser = DbHelper::comboboxDataOfTable('users', 'name', 'id', $file->user_id, '-');
-            $context = new ContextLaraKnife($request, null, $file);
+            $fields['fullname'] = FileHelper::buildFileStoragePath($file->created_at) . "/$file->filename";
+            $context = new ContextLaraKnife($request, $fields, $file);
             $rc = view('file.edit', [
                 'context' => $context,
                 'optionsFilegroup' => $optionsFilegroup,
@@ -242,7 +243,12 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
-            $validator = Validator::make($fields, $this->rules(true));
+            if ($fields['title'] == null){
+                $file = $request->file('file');
+                $name = empty($fields['filename']) ? $file->getClientOriginalName() : $fields['filename'];
+                $fields['title'] = File::filenameToText($name);
+            }
+             $validator = Validator::make($fields, $this->rules(true));
             if ($validator->fails()) {
                 $errors = $validator->errors();
                 $rc = back()->withErrors($validator)->withInput();
@@ -301,12 +307,20 @@ LEFT JOIN sproperties t3 ON t3.id=t0.visibility_scope
         $rc = null;
         if ($request->btnSubmit === 'btnStore') {
             $fields = $request->all();
+            if ($fields['title'] == null || $fields['title'] === '') {
+                $name = $file->filename;
+                if ( ($ix = strpos($name, '_')) !== false) {
+                    $name = substr($name, $ix + 1);
+                }
+                $fields['title'] = File::filenameToText($name);
+            }
             $fields['description'] = strip_tags($fields['description']);
             $validator = Validator::make($fields, $this->rules(false));
             if ($validator->fails()) {
                 $rc = back()->withErrors($validator)->withInput();
             } else {
-                $fields2 = $request->only(['title', 'description', 'filegroup_scope']);
+                $fields2 = ['title' => $fields['title'], 'description' => $fields['description'], 
+                'filegroup_scope' => $fields['filegroup_scope']];
                 $file->update($fields2);
             }
         }

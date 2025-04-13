@@ -1,5 +1,14 @@
 # Development phase
 
+# 0.11.25 MediaWikiBase File Note
+
+- MediaWikiBase: 
+  - prefix of internal link may be "upload:" or "file:"
+- File + Note:
+  - edit: the relative path of the file will be shown too
+- File:
+  - if title is empty the title will be built from filename
+
 # 0.11.24 Title of note documents is optional
 
 - if not title is given the filename is taken in a modified kind
