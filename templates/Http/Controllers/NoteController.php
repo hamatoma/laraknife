@@ -513,7 +513,7 @@ LEFT JOIN sproperties t2 ON t2.id=t0.user_id
             }
         }
         if ($rc == null) {
-            $rc = redirect(to: "/note-update/$note->id");
+            $rc = redirect(to: "/note-index");
         }
         return $rc;
     }

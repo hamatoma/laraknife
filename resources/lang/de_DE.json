@@ -231,6 +231,7 @@
   "standard": "Standard",
   "Start Menu": "Startmenü",
   "Status": "Status",
+  "Steps": "Einzelschritte",
   "Store": "Speichern",
   "Store Menu": "Menü speichern",
   "Street": "Straße",
@@ -268,7 +269,10 @@
   "Wed": "Mi",
   "Wiki": "Wiki",
   "wiki": "Wiki",
+  "Wfcategory": "Workflowkategorie",
   "work": "Arbeit",
+  "Workflow": "Workflow",
+  "Workflowmodels": "Workflowvorlagen",
   "Zip": "Postleitzahl",
   "ZZZ-last": ""
 }

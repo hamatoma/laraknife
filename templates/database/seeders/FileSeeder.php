@@ -17,7 +17,7 @@ class FileSeeder extends Seeder
     public function run(): void
     {
         Menuitem::insertIfNotExists('files', 'bi bi-file-pdf');
-        Module::insertIfNotExists('Files');
+        Module::insertIfNotExists('File');
 
         SProperty::insertIfNotExists(1101, 'filegroup', 'public', '10', 'PUB');
         SProperty::insertIfNotExists(1102, 'filegroup', 'private', '20', 'PRIV');

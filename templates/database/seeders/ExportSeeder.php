@@ -17,6 +17,6 @@ class ExportSeeder extends Seeder
     public function run(): void
     {
         Menuitem::insertIfNotExists('imports', 'bi bi-file-earmark-arrow-down', 'Import', '/export-index');
-        Module::insertIfNotExists('Exports');
+        Module::insertIfNotExists('Export');
     }
 }
