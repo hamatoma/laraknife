@@ -1,5 +1,11 @@
 # Development phase
 
+# 0.11.26 title-or-id.blade, ContextLaraKnife
+
+- new: title-or-id.blade.php: a field showing a title and that can be filled with an primary key
+- new: ContextLaraKnife::placeholderOf()
+
+
 # 0.11.25 MediaWikiBase File Note
 
 - MediaWikiBase: 

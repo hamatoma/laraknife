@@ -158,6 +158,10 @@ class ContextLaraKnife
         $rc = FileHelper::pathUpload($relativePath);
         return $rc;
     }
+    public function placeholderOf(?string $type): string{
+        $rc = str_replace('#', __($type), __('Insert the id (primary key) of #'));
+        return $rc;
+    }
     public function readonlyUnlessOwner(int $id = null): string
     {
         if ($id == null && $this->model instanceof User) {
