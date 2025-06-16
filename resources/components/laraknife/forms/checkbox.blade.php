@@ -17,10 +17,6 @@
     <input type="checkbox" id="fld_{{$name}}" name="{{ $name }}" value="1"{{ $value === '1' ? ' checked' : ''}} {{$attribute}}>
     <x-laraknife.forms.field-error name="{{$name}}" />
 </div>
-@if ($width2 > 1)
-<div class="col-md-{{ $width2 - 1 }}">&nbsp;
-</div>
-@endif
 @endif
 @if($position === 'alone' || $position === 'last')
 </div>

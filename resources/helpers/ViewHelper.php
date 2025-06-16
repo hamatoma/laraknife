@@ -1,6 +1,8 @@
 <?php
 namespace App\Helpers;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Helpers for views
  * 
@@ -261,6 +263,11 @@ class ViewHelper
         if (!array_key_exists($name, $fields)) {
             $fields[$name] = $value;
         }
+    }
+    public static function addTitleOrId(array &$fields, string $nameField, ?int $id, Model $model, string $columnTitle = 'title'): void
+    {
+        $value = $id == null || $id <= 0 ? '' : $model->find($id)->first()->$columnTitle;
+        $field[$nameField] = $value;
     }
     /**
      * Converts a text of a given $type into HTML.

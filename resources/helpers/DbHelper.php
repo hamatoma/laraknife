@@ -139,6 +139,8 @@ class DbHelper
                 $undefinedText = __('<All>');
             } elseif ($undefinedText == '-') {
                 $undefinedText = __('<Please select>');
+            } elseif ($undefinedText == '--') {
+                $undefinedText = __('<None>');
             }
             $rc = [['text' => $undefinedText, 'value' => '', 'active' => $selected === '']];
         }

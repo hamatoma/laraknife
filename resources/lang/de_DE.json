@@ -1,5 +1,6 @@
 {
   "<All>": "<Alle>",
+  "<None>": "<Keiner>",
   "&lt;All&gt;": "&lt;Alle&gt;",
   "<no group>": "<keine Gruppe>",
   "<Please select>": "<Bitte wählen>",
@@ -10,6 +11,8 @@
   "Action": "Aktion",
   "action|actions": "Aktion|Aktionen",
   "active": "aktiv",
+  "Active at once": "Sofort aktiv",
+  "Active after": "Aktiv nach",
   "Add": "Hinzufügen",
   "Address": "Adresse",
   "Addresses": "TNr+Email",
@@ -73,6 +76,7 @@
   "Creation of a Task": "Erstellen einer Aufgabe",
   "Creation of a Transaction": "Erstellen einer Transaktion",
   "Creation of an User": "Erstellen eines Benutzers",
+  "Creation of a Wfstepmodel": "Erstellen eines Einzelschritts",
   "Current": "Aktuell",
   "current": "aktuell",
   "Current addresses": "Aktuelle Adressen",
