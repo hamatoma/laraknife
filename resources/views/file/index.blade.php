@@ -24,6 +24,7 @@
                 <thead>
                     <tr>
                         <th></th>
+                        <th sortId="id">{{ __('Id') }}</th>
                         <th sortId="title">{{ __('Title') }}</th>
                         <th sortId="description">{{ __('Description') }}</th>
                         <th sortId="filename">{{ __('Filename') }}</th>
@@ -42,6 +43,7 @@
                                 <x-laraknife.icons.exchange-record module="file" method="exchange"
                                     no="{{ $file->id }}" />
                             </td>
+                            <td>{{ $file->id }}</td>
                             <td>{{ $file->title }}</td>
                             <td>{{ $file->description }}</td>
                             <td> {!! $context->callback('buildAnchor', $file) !!}</td>

@@ -1,6 +1,7 @@
 <?php
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -264,10 +265,17 @@ class ViewHelper
             $fields[$name] = $value;
         }
     }
-    public static function addTitleOrId(array &$fields, string $nameField, ?int $id, Model $model, string $columnTitle = 'title'): void
+    public static function addTitleOrId(array &$fields, string $nameField, ?int $id, string $tableReference, string $columnTitle = 'title'): void
     {
-        $value = $id == null || $id <= 0 ? '' : $model->find($id)->first()->$columnTitle;
-        $field[$nameField] = $value;
+        $value = '';
+        if ($id != null){
+            $records = DB::select("SELECT $columnTitle FROM $tableReference WHERE id=?", [$id]);
+            if (count($records) == 1){
+                $record0 = $records[0];
+                $value = $record0->$columnTitle;
+            }
+        } 
+        $fields[$nameField] = $value;
     }
     /**
      * Converts a text of a given $type into HTML.
@@ -366,6 +374,23 @@ class ViewHelper
                     default:
                         break;
                 }
+            }
+        }
+    }
+    /**
+     * 
+     * @param string $value the value of the field containing title or id
+     * @param array $fields the fields that will used for update of the model
+     * @param string $columnReference the name of the column that references the other table
+     * @param string $tableReference name of the table that is referenced by the titleOrId field
+     * @param string $columnTitle the name of the column containing the title of $tableReference
+     * @return void
+     */
+    public static function changeTitleOrId(string $value, array &$fields, string $columnReference, string $tableReference, string $columnTitle = 'title'){
+        if (ctype_digit($value)){
+            $records = DB::select("select $columnTitle from $tableReference where id=?", [$value]);
+            if (count($records) == 1){
+                $fields[$columnReference] = $value;
             }
         }
     }

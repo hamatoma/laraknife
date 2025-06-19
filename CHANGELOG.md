@@ -1,5 +1,12 @@
 # Development phase
 
+# V0.11.28 ViewHelper file/index.blade
+
+- ViewHelper:
+  - corrections in addFieldIfMissing()
+  - new: changeTitleOrId()
+- file/index.blade: additional column "id"
+
 # 0.11.27 checkbox DbHelper ViewHelper
 
 - checkbox.blade.php: wrong spaces
