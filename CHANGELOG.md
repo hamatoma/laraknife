@@ -1,5 +1,10 @@
 # Development phase
 
+# V0.11.29 ViewHelper file/index.blade
+
+- ViewHelper:
+  - corrections in changeTitleOrId()
+  
 # V0.11.28 ViewHelper file/index.blade
 
 - ViewHelper:

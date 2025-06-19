@@ -386,7 +386,8 @@ class ViewHelper
      * @param string $columnTitle the name of the column containing the title of $tableReference
      * @return void
      */
-    public static function changeTitleOrId(string $value, array &$fields, string $columnReference, string $tableReference, string $columnTitle = 'title'){
+    public static function changeTitleOrId(?string $value, array &$fields, string $columnReference, string $tableReference, string $columnTitle = 'title'){
+        $value = $value ?? '';
         if (ctype_digit($value)){
             $records = DB::select("select $columnTitle from $tableReference where id=?", [$value]);
             if (count($records) == 1){
