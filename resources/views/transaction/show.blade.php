@@ -15,8 +15,8 @@
             <x-laraknife.forms.combobox position="alone" name="owner_id" label="Owner" :options="$optionsOwner" width2="4" attribute="readonly"/>
             <x-laraknife.forms.text position="alone" name="info" label="Info" value="{{ $context->valueOf('info') }}" width2="4" attribute="readonly" rows="2" />
             <x-laraknife.forms.string position="alone" name="name" label="Name" value="{{ $context->valueOf('name') }}" width2="4" attribute="readonly" />
-            <x-laraknife.string position="alone" name="amount" label="Amount" value="{{ $context->valueOf('amount') }}" width2="4" attribute="readonly" />
-            <x-laraknife.string type="date" position="alone" name="date" label="Date" value="{{ $context->valueOf('date') }}" width2="4" attribute="readonly" />
+            <x-laraknife.forms.string position="alone" name="amount" label="Amount" value="{{ $context->valueOf('amount') }}" width2="4" attribute="readonly" />
+            <x-laraknife.forms.string type="date" position="alone" name="date" label="Date" value="{{ $context->valueOf('date') }}" width2="4" attribute="readonly" />
         </x-laraknife.panels.show>
     </form>
 @endsection

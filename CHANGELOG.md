@@ -1,5 +1,9 @@
 # Development phase
 
+# V0.11.30 show.blade in transaction
+
+- show.blade in transaction: wrong x-laraknife.string => x-laraknife.forms.string
+
 # V0.11.29 ViewHelper file/index.blade
 
 - ViewHelper:
