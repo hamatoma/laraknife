@@ -1,8 +1,10 @@
-# Create a module
+# Create / modify a module
 
 ```
 TABLE=devices
 php artisan make:migration create_${TABLE}_table
+# or
+php artisan make:migration modify_${TABLE}_table
 ```
 ## Example
 ```

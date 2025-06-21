@@ -1,5 +1,9 @@
 # Development phase
 
+# V0.11.32 Docu
+
+- modify a table
+
 # V0.11.31 UserController, File
 
 - UserController: date changed from y-m-d to Y-m-d
