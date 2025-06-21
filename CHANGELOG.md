@@ -1,5 +1,10 @@
 # Development phase
 
+# V0.11.31 UserController, File
+
+- UserController: date changed from y-m-d to Y-m-d
+- File: new: fileData()
+
 # V0.11.30 show.blade in transaction
 
 - show.blade in transaction: wrong x-laraknife.string => x-laraknife.forms.string

@@ -26,6 +26,27 @@ class File extends Model
         'reference_id'
     ];
     /**
+     * Returns an array with title, link and pretty filename.
+     * 
+     * Example:
+     * title: "Cat"
+     * link: '/upload/2025/06/4_cat.jpg']
+     * pretty filename: 'cat.jpg', 
+     * @param int $fileId
+     * @return array<mixed|string>|null null: not found. Otherwise: [<title>, <link>, <filename>]. Example: 
+     */
+    public static function fileData(int $fileId, bool $withPrettyFilename=false): ?array
+    {
+        $rc = null;
+        if (($file = File::find($fileId)) != null) {
+            $rc = [$file->title, FileHelper::buildFileLink($file->filename, $file->created_at)];
+            if ($withPrettyFilename){
+                array_push($rc, substr($file->filename, strpos($file->filename, '_') + 1));
+            }
+        }
+        return $rc;
+    }
+    /**
      * Converts a filename to a text string, e.g. a title.
      * @param string $filename the filename to convert
      * @return array|string|null the converted string. Example: "my_best_collection.pdf" -> "my best collection"

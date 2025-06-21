@@ -44,7 +44,7 @@ class UserController extends Controller
                     $role = Role::find($user->role_id);
                     $request->session()->regenerate();
                     session(['role' => $role->priority, 'userName' => $user->name]);
-                    $date = (new \DateTime())->format('y-m-d H:i');
+                    $date = (new \DateTime())->format('Y-m-d H:i');
                     DB::update(
                         "UPDATE users SET remember_token=NULL, updated_at='$date' WHERE id=?",
                         [$user->id]
@@ -65,7 +65,7 @@ class UserController extends Controller
         if (($user = User::where('email', $email)->first()) != null) {
             $hash = Hash::make($email . strval(time()) . strval(rand(0, 0x7fffffff)));
             $user->update(['remember_token' => $hash]);
-            $date = (new \DateTime())->format('y-m-d H:i');
+            $date = (new \DateTime())->format('Y-m-d H:i');
             DB::update(
                 "UPDATE users SET remember_token=?, updated_at='$date' WHERE id=?",
                 [$hash, $user->id]
