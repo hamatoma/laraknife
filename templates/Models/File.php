@@ -35,10 +35,10 @@ class File extends Model
      * @param int $fileId
      * @return array<mixed|string>|null null: not found. Otherwise: [<title>, <link>, <filename>]. Example: 
      */
-    public static function fileData(int $fileId, bool $withPrettyFilename=false): ?array
+    public static function fileData(?int $fileId, bool $withPrettyFilename=false): ?array
     {
         $rc = null;
-        if (($file = File::find($fileId)) != null) {
+        if ($fileId != null && ($file = File::find($fileId)) != null) {
             $rc = [$file->title, FileHelper::buildFileLink($file->filename, $file->created_at)];
             if ($withPrettyFilename){
                 array_push($rc, substr($file->filename, strpos($file->filename, '_') + 1));

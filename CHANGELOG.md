@@ -1,5 +1,9 @@
 # Development phase
 
+# V0.11.33 File
+
+- File::fileData(): $fileId may be null
+
 # V0.11.32 Docu
 
 - modify a table
