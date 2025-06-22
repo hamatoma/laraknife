@@ -1,5 +1,9 @@
 # Development phase
 
+# V0.11.34 panels/edit.blade
+
+- panels/edit.blade: additional parameter "with_storage"
+
 # V0.11.33 File
 
 - File::fileData(): $fileId may be null
