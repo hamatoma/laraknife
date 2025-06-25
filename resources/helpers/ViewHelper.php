@@ -393,6 +393,8 @@ class ViewHelper
             if (count($records) == 1){
                 $fields[$columnReference] = $value;
             }
+        } elseif ($value === ''){
+            $fields[$columnReference] = null;
         }
     }
     /**
