@@ -1,5 +1,9 @@
 # Development phase
 
+# V0.11.35 ViewHelper
+
+- ViewHelper::selectByCombobox(): handling of "back" button
+
 # V0.11.34 panels/edit.blade
 
 - panels/edit.blade: additional parameter "with_storage"

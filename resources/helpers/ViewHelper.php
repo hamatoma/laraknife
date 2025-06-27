@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 /**
  * Helpers for views
@@ -66,7 +67,8 @@ class ViewHelper
      * @param string $operator the comparison operator: "=", ">", ">=", "<", "<=", "!="
      * @param string $ignoreValue if the filter value has that value no condition is created
      */
-    public static function addConditionComparison(array &$fields,
+    public static function addConditionComparison(
+        array &$fields,
         array &$conditions,
         array &$parameters,
         string $column,
@@ -268,13 +270,13 @@ class ViewHelper
     public static function addTitleOrId(array &$fields, string $nameField, ?int $id, string $tableReference, string $columnTitle = 'title'): void
     {
         $value = '';
-        if ($id != null){
+        if ($id != null) {
             $records = DB::select("SELECT $columnTitle FROM $tableReference WHERE id=?", [$id]);
-            if (count($records) == 1){
+            if (count($records) == 1) {
                 $record0 = $records[0];
                 $value = $record0->$columnTitle;
             }
-        } 
+        }
         $fields[$nameField] = $value;
     }
     /**
@@ -386,14 +388,15 @@ class ViewHelper
      * @param string $columnTitle the name of the column containing the title of $tableReference
      * @return void
      */
-    public static function changeTitleOrId(?string $value, array &$fields, string $columnReference, string $tableReference, string $columnTitle = 'title'){
+    public static function changeTitleOrId(?string $value, array &$fields, string $columnReference, string $tableReference, string $columnTitle = 'title')
+    {
         $value = $value ?? '';
-        if (ctype_digit($value)){
+        if (ctype_digit($value)) {
             $records = DB::select("select $columnTitle from $tableReference where id=?", [$value]);
-            if (count($records) == 1){
+            if (count($records) == 1) {
                 $fields[$columnReference] = $value;
             }
-        } elseif ($value === ''){
+        } elseif ($value === '') {
             $fields[$columnReference] = null;
         }
     }
@@ -412,6 +415,96 @@ class ViewHelper
             if (str_starts_with($value, $name)) {
                 $rc = intval(substr($value, strlen($name) + 1));
             }
+        }
+        return $rc;
+    }
+    /**
+     * Runs a dialog for selecting a path node by node with a combobox.
+     * 
+     * @param string $sqlPath the SQL statement to query the paths
+     * @param string $sqlTitle the SQL statement to query the title
+     * @param string $viewName the view name of the blade file
+     * @param string $urlRedirectOnFound the prefix of the url if the full path is reached
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public static function selectByCombobox(
+        string $sqlPath,
+        string $sqlTitle,
+        string $viewName,
+        string $urlRedirectOnFound,
+        Request $request
+    ) {
+        $rc = null;
+        $fields = $request->all();
+        if (count($fields) === 0) {
+            $fields = [
+                'path' => '/',
+                'choice' => '',
+            ];
+        }
+        $button = $request->btnSubmit;
+        $path = $fields['path'] = $fields['path'] ?? '/';
+        if ($button === 'btnBack') {
+            if ($path !== '/' && ($ix = strrpos($path, '/', -2)) !== false) {
+                $fields['path'] = substr($path, 0, $ix + 1);
+            }
+        } elseif ($button === 'btnNext') {
+            if ($fields['choice'] !== '') {
+                $value = $fields['choice'];
+                $path = $fields['path'] ?? '/';
+                $fields['path'] = "$path$value/";
+            }
+        }
+        $path = $fields['path'];
+        $path2 = substr($path, 0, strlen($path) - 1);
+        $depth = substr_count($path, '/');
+
+        // /Piepmatz/Laden/Post
+        // /Verein/Mitgliederverwaltung/Post
+        $texts = [];
+        $foundId = null;
+        $isTitle = false;
+        // $records = $process = Process::where('path', 'like', "$path2%")->get();
+        $records = DB::select(
+            $sqlPath,
+            ["$path2%"]
+        );
+        $choice = $fields['choice'] ?? '';
+        foreach ($records as $info) {
+            $parts = explode('/', $info->path);
+            if (count($parts) > $depth) {
+                $item = $parts[$depth];
+            } else {
+                $item = $info->title;
+                if ($choice === $item) {
+                    $foundId = $info->id;
+                    break;
+                }
+            }
+            if (!in_array($item, $texts)) {
+                array_push($texts, $item);
+            }
+        }
+        if (count($texts) == 0 && $choice !== '') {
+            $records = DB::select(
+                $sqlTitle,
+                [$choice]
+            );
+            if (count($records) > 0) {
+                $foundId = $records[0]->id;
+            }
+        }
+        if ($foundId != null) {
+            $rc = redirect("$urlRedirectOnFound/$foundId");
+        }
+        if ($rc == NULL) {
+            $optionsChoice = ViewHelper::buildEntriesOfCombobox($texts, null, $fields['choice']);
+            $context = new ContextLaraKnife($request, $fields);
+            $rc = view($viewName, [
+                'context' => $context,
+                'optionsChoice' => $optionsChoice
+            ]);
         }
         return $rc;
     }
