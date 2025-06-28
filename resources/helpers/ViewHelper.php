@@ -500,6 +500,7 @@ class ViewHelper
         }
         if ($rc == NULL) {
             $optionsChoice = ViewHelper::buildEntriesOfCombobox($texts, null, $fields['choice']);
+            $optionsChoice[0]['active'] = true;
             $context = new ContextLaraKnife($request, $fields);
             $rc = view($viewName, [
                 'context' => $context,

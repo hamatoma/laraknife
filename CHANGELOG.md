@@ -1,5 +1,10 @@
 # Development phase
 
+# V0.11.36 radiogroup ViewHelper
+
+- new: radiogroup.blade
+- ViewHelper::selectByCombobox(): the first entry of the radiogroup is selected automatically
+
 # V0.11.35 ViewHelper
 
 - ViewHelper::selectByCombobox(): handling of "back" button
