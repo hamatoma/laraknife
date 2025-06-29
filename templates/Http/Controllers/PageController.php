@@ -389,6 +389,8 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         Route::get('/page-showbyname/{name}/{pageType}', [PageController::class, 'showByName']);
         Route::get('/page-startpage', [PageController::class, 'showStartMenu']);
         Route::get('/page-startpublic', [PageController::class, 'showPublicMenu']);
+        Route::get('/page-presentation', [PageController::class, 'showPresentation']);
+        Route::get('/page-presentationpublic', [PageController::class, 'showPresentationPublic']);
         Route::get('/page-showpublic/{page}', [PageController::class, 'showById']);
         Route::post('/page-showpublic/{page}', [PageController::class, 'showById']);
     }
@@ -499,6 +501,16 @@ LEFT JOIN users t4 ON t4.id=t0.owner_id
         return $rc;
     }
 
+    public function showPresentation(Request $request)
+    {
+        $rc = $this->showByName('presentation', 1141, $request);
+        return $rc;
+    }
+    public function showPresentationPublic(Request $request)
+    {
+        $rc = $this->showByName('presentationpublic', 1141, $request);
+        return $rc;
+    }
     public function showStartMenu(Request $request)
     {
         $rc = $this->showByName('main', 1141, $request);
