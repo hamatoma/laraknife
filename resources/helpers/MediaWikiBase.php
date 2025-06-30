@@ -1,6 +1,7 @@
 <?php
 namespace App\Helpers;
 
+use App\Models\File;
 use App\Models\Page;
 use App\Http\Controllers\PageController;
 
@@ -366,7 +367,15 @@ class MediaWikiBase extends LayoutStatus
     function writeInternalLink(string $link, ?string $text)
     {
         $html = null;
-        if (preg_match('&^(upload|file):?/&', $link) && preg_match('/[.](jpe?g|png|gif|svg])$/i', $link)) {
+        $matcher = null;
+        if (preg_match('&^file:(\d+)_(.*)[.](jpe?g|png|gif|svg])$&', $link, $matcher)){
+            $id = intval($matcher[1]);
+            $text = $matcher[2];
+            if ( ($link = File::relativeFileLink($id)) == null){
+                $link = '#';
+            }
+            $html = "<img src=\"$link\" alt=\"$text\" class=\"intern-media\" />";
+        } elseif (preg_match('&^(upload):?/&', $link) && preg_match('/[.](jpe?g|png|gif|svg])$/i', $link)) {
             $link = preg_replace('&[\\/]\.\.[\/]&', '', $link);
             $link = 'upload' . preg_replace('%^[^/]+%', '', $link);
             if ($text == null) {
