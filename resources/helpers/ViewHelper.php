@@ -311,12 +311,13 @@ class ViewHelper
      * @param string $selected '' or the value of the selected entry (from the request)
      * @param null|string $textUndefined null: no additional entry.
      *   Otherwise: an entry is added as first entry with that text and the value ''
+     * @param bool $translate 
      * @return array a list of combobox entries, e.g. [['text' => 'x', 'value' => 'y', 'active' => false], ...]
      */
     public static function buildEntriesOfCombobox(
         array $texts,
         ?array $values,
-        string $selected = '',
+        ?string $selected = '',
         ?string $textUndefined = null,
         bool $translate = false
     ): array {
@@ -332,7 +333,7 @@ class ViewHelper
                 if ($translate) {
                     $textUndefined = __($textUndefined);
                 }
-                $rc = [['text' => $textUndefined, 'value' => '', 'active' => $selected === '']];
+                $rc = [['text' => $textUndefined, 'value' => '', 'active' => $selected == null || $selected === '']];
             }
             for ($ix = 0; $ix < count($texts); $ix++) {
                 $text = $texts[$ix];

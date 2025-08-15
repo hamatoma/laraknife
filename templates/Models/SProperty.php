@@ -67,7 +67,7 @@ class SProperty extends Model
      }
   
     /**
-     * Builds the HTML selection options as string from all entries by a given scope.
+     * Builds the data for building a combobox of all entries by a given scope.
      * @param string $scope defines the database records to use
      * @param string $selected the current field value (defines the selected entry)
      * cted the value which marks the selected entry
@@ -75,7 +75,9 @@ class SProperty extends Model
      * @param string $titleField the titles are taken from that column
      * @param string $valueField the value are taken from that column
      * @param bool $translate true: the title will be translated
-     * @return string the HTML text of the options
+     * @param null|array $excludedIds a list of entries not included in the result
+     * @param bool $useName if true the name is the value
+     * @return array a list of combobox entries, e.g. [['text' => 'x', 'value' => 'y', 'active' => false], ...]
      */
     public static function optionsByScope(string $scope, ?string $selected, 
         ?string $titleUndefined = null, string $titleField = 'name', 

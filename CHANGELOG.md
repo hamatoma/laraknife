@@ -1,5 +1,17 @@
 # Development phase
 
+# V0.11.37 MediaWikiBase, ViewHelper, MenuItem
+
+- MediaWikiBase: 
+  - writeText(): text of the link in "[<link> <text>]" may be empty
+- ViewHelper:
+  - buildEntriesOfCombobox(): $selected may be NULL
+- MenuItem/index.blade.php: new field section
+- MenuItem/order.blade.php: new field section
+- MenuitemSeeder: + SProperty menusection
+- MenuitemController: + section
+
+
 # V0.11.36 radiogroup ViewHelper
 
 - new: radiogroup.blade

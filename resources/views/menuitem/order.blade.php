@@ -7,8 +7,10 @@
             <div class="lkn-form-table">
                 <input type="hidden" name="selectedMenuItems" value="{{ $context->valueOf('selectedMenuItems') }}">
                 <input type="hidden" name="lastRole" value="{{ $context->valueOf('lastRole') }}">
-                <x-laraknife.forms.combobox position="alone" name="role" label="Role" :options="$roleOptions"
-                    class="lkn-autoupdate" width2="10" />
+                <x-laraknife.forms.combobox position="first" name="role" label="Role" :options="$roleOptions"
+                    class="lkn-autoupdate" width2="4" />
+                <x-laraknife.forms.combobox position="last" name="section" label="Section" :options="$optionsSection"
+                    class="lkn-autoupdate" width2="4" />
                 <x-laraknife.layout.row-empty />
                 <table class="table table-responsive">
                     <thead>

@@ -97,20 +97,23 @@ class MenuitemController extends Controller
             if (count($fields) == 0) {
                 $fields = [
                     'text' => '',
-                    '_sortParams' => 'id:asc'
-                        . ';name:desc'
+                    'section' => 'main',
+                    '_sortParams' => 'id:desc'
                 ];
             }
             $conditions = [];
             ViewHelper::addConditionPattern($fields, $conditions, $parameters, 'name,label,icon,link', 'text');
+            ViewHelper::addConditionComparison($fields, $conditions, $parameters, 'section');
             $sql = DbHelper::addConditions($sql, $conditions);
             $sql = DbHelper::addOrderBy($sql, $fields['_sortParams']);
             $pagination = new Pagination($sql, $parameters, $fields);
             $records = $pagination->records;
             $context = new ContextLaraKnife($request, $fields);
+            $optionsSection = SProperty::optionsByScope('menusection', $fields['section'], 'all', 'name', 'name');
             return view('menuitem.index', [
                 'context' => $context,
                 'records' => $records,
+                'optionsSection' => $optionsSection,
                 'pagination' => $pagination
             ]);
         }
@@ -148,18 +151,20 @@ class MenuitemController extends Controller
     public function order(Request $request)
     {
         $rc = null;
-        if ($request->btnSubmit === 'btnCancel') {
+        $button = $request->btnSubmit;
+        if ($button === 'btnCancel') {
             $rc = redirect('/menuitem-index');
         } else {
             $fields = $request->all();
             if (count($fields) == 0) {
-                $fields = ['role' => '', 'position' => '1', 'selectedMenuItems' => '', 'lastRole' => ''];
+                $fields = ['role' => '', 'position' => '1', 'selectedMenuItems' => '', 'lastRole' => '', 'section' => 'main'];
             }
             if ($fields['role'] != $fields['lastRole']) {
                 $fields['selectedMenuItems'] = '';
             }
             $ids = empty($fields['selectedMenuItems']) ? [] : explode(',', $fields['selectedMenuItems']);
-            if ($request->btnSubmit === 'btnStore') {
+            $noSql = true;
+            if ($button === 'btnStore') {
                 $role = $fields['role'];
                 DB::delete("DELETE FROM menuitems_roles where role_id=$role");
                 for ($ix = 0; $ix < count($ids); $ix++) {
@@ -191,35 +196,42 @@ class MenuitemController extends Controller
                     array_splice($ids, $ix, 1);
                     array_splice($ids, $ix + 1, 0, $no2);
                 }
+            } else {
+                $noSql = false;
             }
+            $fields['selectedMenuItems'] = implode(',', $ids);
             if ($rc == null) {
-                $fields['selectedMenuItems'] = implode(',', $ids);
-
                 $roleOptions = DbHelper::comboboxDataOfTable('roles', 'name', 'id', $fields['role'], '');
                 $role = intval(DbHelper::findCurrentSelectedInCombobox($roleOptions));
-                if (empty($fields['selectedMenuItems'])) {
-                    $records = DB::select("SELECT DISTINCT t0.id AS role FROM menuitems t0 
-                LEFT JOIN menuitems_roles t1 on t1.menuitem_id=t0.id
-                LEFT JOIN roles t2 on t2.id=t1.role_id
-                WHERE t1.role_id=$role ORDER BY t1.`order`");
+                if (! $noSql && (empty($fields['selectedMenuItems']) || $button === 'btnInternal')) {
+                    $sql = "SELECT DISTINCT t0.id AS member, t0.section 
+                        FROM menuitems t0 
+                        LEFT JOIN menuitems_roles t1 on t1.menuitem_id=t0.id
+                        LEFT JOIN roles t2 on t2.id=t1.role_id
+                        WHERE t1.role_id=$role AND t0.section=? ORDER BY t1.`order`";
+                    $records = DB::select($sql, [$fields['section']]);
                     $ids2 = [];
                     foreach ($records as &$rec) {
-                        array_push($ids2, $rec->role);
+                        array_push($ids2, $rec->member);
                     }
                     $fields['selectedMenuItems'] = implode(',', $ids2);
                 }
                 $ids3 = $fields['selectedMenuItems'];
                 $records = empty($ids3) ? [] : DB::select("SELECT * FROM menuitems WHERE id in ($ids3)");
                 $records = DbHelper::resortById($records, explode(',', $ids3));
-                $where = empty($ids3) ? '' : " WHERE id NOT IN ($ids3)";
-                $records2 = DB::select("SELECT * FROM menuitems$where");
+                $where = empty($ids3) ? '' : " AND id NOT IN ($ids3)";
+                $sql = "SELECT * FROM menuitems WHERE section=?$where";
+                $records2 = DB::select($sql, [$fields['section']]);
                 $fields['lastRole'] = $role;
                 $context = new ContextLaraKnife($request, $fields);
+                $optionsSection = SProperty::optionsByScope('menusection', $fields['section'], '', 'name', 'name');
+
                 $rc = view('menuitem.order', [
                     'context' => $context,
                     'records' => $records,
                     'records2' => $records2,
                     'roleOptions' => $roleOptions,
+                    'optionsSection' => $optionsSection,
                 ]);
             }
         }

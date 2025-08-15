@@ -472,7 +472,13 @@ class MediaWikiBase extends LayoutStatus
             }
             $count = count($match);
             if ($count > 3 && $match[3] !== '') {
-                $this->writeExternLink($match[3], substr($match[5], 1));
+                if (count($match) == 5){
+                    // http:/upload/2025/08/8_any_thing.pdf
+                   $text = substr(basename($match[3]), 2); 
+                } else {
+                    $text = substr($match[5], 1);
+                }
+                $this->writeExternLink($match[3], $text);
             } elseif ($count >= 7 && $match[6] !== '') {
                 $text = $count >= 8 ? substr($match[7], 1) : null;
                 $this->writeInternalLink($match[6], $text);
